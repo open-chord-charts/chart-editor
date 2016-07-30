@@ -3,7 +3,7 @@ module Components.ChartCard exposing (Model, Msg, update, view)
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import List.Split
-import ChartTypes exposing (Chart, Part(..), Bar(..), Chord(..), Quality(..), PartName)
+import ChartTypes exposing (Chart, ChartKey(..), Part(..), Bar(..), Chord(..), Quality(..), PartName)
 
 
 -- TYPES
@@ -67,7 +67,8 @@ update msg model =
 view : Model -> Html Msg
 view { title, key, parts } =
     article [ style [ ( "width", "400px" ) ] ]
-        [ h1 [] [ text <| title ++ " (" ++ toString key ++ ")" ]
+        [ h1 []
+            [ text <| title ++ " (" ++ renderChartKey key ++ ")" ]
         , table
             [ style [ ( "border-collapse", "collapse" ) ] ]
             [ tbody [] <|
@@ -102,6 +103,11 @@ viewBar bar =
 
 
 -- RENDER
+
+
+renderChartKey : ChartKey -> String
+renderChartKey (ChartKey key) =
+    toString key
 
 
 renderBar : Bar -> String
