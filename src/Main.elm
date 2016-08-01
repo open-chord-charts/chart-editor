@@ -1,15 +1,13 @@
 module Main exposing (main)
 
-import Html exposing (..)
-import Components.ChartCard as ChartCard
-import Music.Transposition exposing (transposeChart)
-import Music.Types exposing (ChartKey(..), ChromaticNote(..))
-import Samples
+import Html.App
+import Components.ChartDemoPage
 
 
-main : Html msg
+main : Program Never
 main =
-    div []
-        [ ChartCard.view Samples.allOfMe
-        , ChartCard.view <| transposeChart (ChartKey F) Samples.allOfMe
-        ]
+    Html.App.beginnerProgram
+        { model = Components.ChartDemoPage.model
+        , view = Components.ChartDemoPage.view
+        , update = Components.ChartDemoPage.update
+        }
