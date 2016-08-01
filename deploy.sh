@@ -6,4 +6,4 @@ cd dist
 git init
 git add .
 git commit -m "Deploy to Github Pages"
-git push git@github.com:openchordcharts/chart-editor.git master:gh-pages
+git push --force git@github.com:openchordcharts/chart-editor.git master:gh-pages
