@@ -1,6 +1,6 @@
 module Samples exposing (allOfMe)
 
-import ChartTypes exposing (..)
+import Music.Types exposing (..)
 
 
 allOfMe : Chart

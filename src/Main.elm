@@ -2,7 +2,8 @@ module Main exposing (main)
 
 import Html exposing (..)
 import Components.ChartCard as ChartCard
-import ChartTypes exposing (transposeChart, ChartKey(..), ChromaticNote(..))
+import Music.Transposition exposing (transposeChart)
+import Music.Types exposing (ChartKey(..), ChromaticNote(..))
 import Samples
 
 

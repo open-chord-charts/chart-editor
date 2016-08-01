@@ -3,7 +3,7 @@ module Components.ChartCard exposing (Model, view)
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import List.Split
-import ChartTypes exposing (Chart, ChartKey(..), Part(..), Bar(..), Chord(..), Quality(..), PartName)
+import Music.Types exposing (Chart, ChartKey(..), Part(..), Bar(..), Chord(..), Quality(..), PartName)
 
 
 -- TYPES
