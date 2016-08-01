@@ -62,12 +62,11 @@ view { title, key, parts } =
 
 viewRow : Row -> Html msg
 viewRow (Row name bars) =
-    tr []
-        (td
+    tr [] <|
+        td
             [ style [ ( "width", "1em" ) ] ]
             [ text <| Maybe.withDefault "" name ]
             :: List.map viewBar bars
-        )
 
 
 viewBar : Bar -> Html msg
