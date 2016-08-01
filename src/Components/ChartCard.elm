@@ -1,4 +1,4 @@
-module Components.ChartCard exposing (Model, Msg, update, view)
+module Components.ChartCard exposing (Model, view)
 
 import Html exposing (..)
 import Html.Attributes exposing (style)
@@ -46,49 +46,31 @@ type alias Model =
 
 
 
--- UPDATE
-
-
-type Msg
-    = NoOp
-
-
-update : Msg -> Model -> Model
-update msg model =
-    case msg of
-        NoOp ->
-            model
-
-
-
 -- VIEW
 
 
-view : Model -> Html Msg
+view : Model -> Html msg
 view { title, key, parts } =
     article [ style [ ( "width", "400px" ) ] ]
         [ h1 []
             [ text <| title ++ " (" ++ renderChartKey key ++ ")" ]
         , table
             [ style [ ( "border-collapse", "collapse" ) ] ]
-            [ tbody [] <|
-                (parts |> List.concatMap toRows |> List.map viewRow)
-            ]
+            [ tbody [] (parts |> List.concatMap toRows |> List.map viewRow) ]
         ]
 
 
-viewRow : Row -> Html Msg
+viewRow : Row -> Html msg
 viewRow (Row name bars) =
     tr []
-        ([ td
+        (td
             [ style [ ( "width", "1em" ) ] ]
             [ text <| Maybe.withDefault "" name ]
-         ]
-            ++ List.map viewBar bars
+            :: List.map viewBar bars
         )
 
 
-viewBar : Bar -> Html Msg
+viewBar : Bar -> Html msg
 viewBar bar =
     td
         [ style

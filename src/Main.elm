@@ -1,26 +1,14 @@
 module Main exposing (main)
 
 import Html exposing (..)
-
-
--- import Html.App as App
-
 import Components.ChartCard as ChartCard
+import ChartTypes exposing (transposeChart, ChartKey(..), ChromaticNote(..))
 import Samples
 
 
-main : Html ChartCard.Msg
+main : Html msg
 main =
     div []
         [ ChartCard.view Samples.allOfMe
+        , ChartCard.view <| transposeChart (ChartKey F) Samples.allOfMe
         ]
-
-
-
--- main : Program Never
--- main =
---     App.beginnerProgram
---         { model = Samples.allOfMe
---         , view = view
---         , update = ChartCard.update
---         }
