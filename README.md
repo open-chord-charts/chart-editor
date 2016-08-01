@@ -1,4 +1,4 @@
-# OpenChordCharts viewer/editor
+# OpenChordCharts chart viewer/editor
 
 Chart viewer and editor (written in Elm)
 

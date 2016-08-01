@@ -1,7 +1,8 @@
 #!/bin/bash
 
 rm -rf dist
-elm-make src/Main.elm --warn --output=dist/index.html
+elm-make src/Main.elm --warn --output=dist/main.js
+cp index.gh-pages.html dist/index.html
 cd dist
 git init
 git add .
