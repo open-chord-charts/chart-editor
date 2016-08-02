@@ -5,8 +5,8 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Components.ChartCard as ChartCard
-import Music.Transposition exposing (transposeChart)
-import Music.Types exposing (Chart, ChartKey(..), ChromaticNote(..))
+import Music.Chart as Chart exposing (Chart, Key(..))
+import Music.Note as Note exposing (Note)
 import Samples
 
 
@@ -15,14 +15,14 @@ import Samples
 
 type alias Model =
     { chart : Chart
-    , transposedChartKey : ChartKey
+    , transposedKey : Key
     }
 
 
 model : Model
 model =
     { chart = Samples.allOfMe
-    , transposedChartKey = ChartKey F
+    , transposedKey = Key Note.noteF
     }
 
 
@@ -31,7 +31,7 @@ model =
 
 
 type Msg
-    = ChangeTransposedChartKey ChartKey
+    = ChangeTransposedKey Key
 
 
 
@@ -41,8 +41,8 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        ChangeTransposedChartKey chartKey ->
-            { model | transposedChartKey = chartKey }
+        ChangeTransposedKey key ->
+            { model | transposedKey = key }
 
 
 
@@ -54,27 +54,31 @@ view model =
     div []
         [ ChartCard.view model.chart
         , hr [] []
-        , ChartCard.view <| transposeChart model.transposedChartKey model.chart
+        , ChartCard.view <| Chart.transpose model.transposedKey model.chart
         , label []
             [ text "Chart key: "
             , select
-                [ on "change" <| Json.map ChangeTransposedChartKey <| targetValue `Json.andThen` chartKeyDecoder
+                [ on "change" <|
+                    Json.map ChangeTransposedKey <|
+                        targetValue
+                            `Json.andThen` noteDecoder
+                            `Json.andThen` \note -> Json.succeed <| Key note
                 , style [ ( "margin-top", "1em" ) ]
                 ]
               <|
-                List.map viewSelectChartKeyOption [ Ab, A, Bb, B, C, Db, D, Eb, E, F, Gb, G ]
+                List.map viewSelectKeyOption Note.notes
             ]
         ]
 
 
-viewSelectChartKeyOption : ChromaticNote -> Html Msg
-viewSelectChartKeyOption note =
+viewSelectKeyOption : Note -> Html Msg
+viewSelectKeyOption note =
     let
         noteStr =
-            toString note
+            Note.toString note
     in
         option
-            [ selected <| (ChartKey note) == model.transposedChartKey
+            [ selected <| (Key note) == model.transposedKey
             , value noteStr
             ]
             [ text noteStr ]
@@ -84,54 +88,11 @@ viewSelectChartKeyOption note =
 -- DECODER
 
 
-chartKeyDecoder : String -> Json.Decoder ChartKey
-chartKeyDecoder val =
-    case chromaticNoteFromString val of
+noteDecoder : String -> Json.Decoder Note
+noteDecoder val =
+    case Note.fromString val of
         Just note ->
-            Json.succeed <| ChartKey note
+            Json.succeed note
 
         Nothing ->
-            Json.fail <| "Invalid ChartKey: " ++ val
-
-
-chromaticNoteFromString : String -> Maybe ChromaticNote
-chromaticNoteFromString string =
-    case string of
-        "Ab" ->
-            Just Ab
-
-        "A" ->
-            Just A
-
-        "Bb" ->
-            Just Bb
-
-        "B" ->
-            Just B
-
-        "C" ->
-            Just C
-
-        "Db" ->
-            Just Db
-
-        "D" ->
-            Just D
-
-        "Eb" ->
-            Just Eb
-
-        "E" ->
-            Just E
-
-        "F" ->
-            Just F
-
-        "Gb" ->
-            Just Gb
-
-        "G" ->
-            Just G
-
-        _ ->
-            Nothing
+            Json.fail <| "Value is not of type Note: " ++ val

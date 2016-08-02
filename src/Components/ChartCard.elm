@@ -3,7 +3,9 @@ module Components.ChartCard exposing (Model, view)
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import List.Split
-import Music.Types exposing (Chart, ChartKey(..), Part(..), Bar(..), Chord(..), Quality(..), PartName)
+import Music.Chart exposing (..)
+import Music.Chord as Chord exposing (..)
+import Music.Note as Note
 
 
 -- TYPES
@@ -53,7 +55,7 @@ view : Model -> Html msg
 view { title, key, parts } =
     article [ style [ ( "width", "400px" ) ] ]
         [ h1 []
-            [ text <| title ++ " (" ++ renderChartKey key ++ ")" ]
+            [ text <| title ++ " (" ++ renderKey key ++ ")" ]
         , table
             [ style [ ( "border-collapse", "collapse" ) ] ]
             [ tbody [] (parts |> List.concatMap toRows |> List.map viewRow) ]
@@ -86,31 +88,16 @@ viewBar bar =
 -- RENDER
 
 
-renderChartKey : ChartKey -> String
-renderChartKey (ChartKey key) =
-    toString key
-
-
 renderBar : Bar -> String
 renderBar bar =
     case bar of
         Bar ( a, b, c, d ) ->
-            renderChord a
+            Chord.toString a
 
         BarRepeat ->
             "–"
 
 
-renderChord : Chord -> String
-renderChord (Chord note quality) =
-    toString note ++ renderQuality quality
-
-
-renderQuality : Quality -> String
-renderQuality quality =
-    case quality of
-        Major ->
-            ""
-
-        Minor ->
-            "m"
+renderKey : Key -> String
+renderKey (Key note) =
+    Note.toString note
