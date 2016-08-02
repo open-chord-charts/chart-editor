@@ -1,101 +1,133 @@
-module Components.ChartCard exposing (Model, view)
+module Components.ChartCard exposing (..)
 
+import Json.Decode as Json
 import Html exposing (..)
-import Html.Attributes exposing (style)
-import List.Split
-import Music.Chart exposing (..)
-import Music.Chord as Chord exposing (..)
-import Music.Note as Note
-
-
--- TYPES
-
-
-type Row
-    = Row (Maybe PartName) (List Bar)
-
-
-toRows : Part -> List Row
-toRows part =
-    case part of
-        Part name bars ->
-            let
-                barChunks =
-                    List.Split.chunksOfLeft 8 bars
-            in
-                List.indexedMap
-                    (\index barChunk ->
-                        Row
-                            (if index == 0 then
-                                Just name
-                             else
-                                Nothing
-                            )
-                            barChunk
-                    )
-                    barChunks
-
-        PartRepeat name ->
-            [ Row (Just name) (List.repeat 8 BarRepeat) ]
-
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
+import Music.Chart as Chart exposing (Chart, Key(..))
+import Music.Note as Note exposing (Note)
+import Components.Chart as ChartComponent
 
 
 -- MODEL
 
 
 type alias Model =
-    Chart
+    { chart : Chart
+    , viewKey : Key
+    }
+
+
+init : Chart -> Model
+init chart =
+    { chart = chart
+    , viewKey = chart.key
+    }
+
+
+
+-- MSG
+
+
+type Msg
+    = ChangeTransposedKey Key
+
+
+
+-- UPDATE
+
+
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        ChangeTransposedKey key ->
+            { model | viewKey = key }
 
 
 
 -- VIEW
 
 
-view : Model -> Html msg
-view { title, key, parts } =
-    article [ style [ ( "width", "400px" ) ] ]
-        [ h1 []
-            [ text <| title ++ " (" ++ renderKey key ++ ")" ]
-        , table
-            [ style [ ( "border-collapse", "collapse" ) ] ]
-            [ tbody [] (parts |> List.concatMap toRows |> List.map viewRow) ]
+view : Model -> Html Msg
+view { chart, viewKey } =
+    viewCard
+        (chart.title ++ " (" ++ renderKey viewKey ++ ")")
+        [ viewToolbar [ viewSelectKey viewKey ]
+        , ChartComponent.view <| Chart.transpose viewKey chart
         ]
 
 
-viewRow : Row -> Html msg
-viewRow (Row name bars) =
-    tr [] <|
-        td
-            [ style [ ( "width", "1em" ) ] ]
-            [ text <| Maybe.withDefault "" name ]
-            :: List.map viewBar bars
-
-
-viewBar : Bar -> Html msg
-viewBar bar =
-    td
+viewCard : String -> List (Html a) -> Html a
+viewCard title children =
+    article
         [ style
             [ ( "border", "1px solid" )
-            , ( "text-align", "center" )
-            , ( "height", "2em" )
-            , ( "width", "2.5em" )
+            , ( "margin", "1em" )
+            , ( "padding", "1em" )
+            , ( "width", "500px" )
             ]
         ]
-        [ text <| renderBar bar ]
+    <|
+        (h1 [] [ text title ])
+            :: children
+
+
+viewToolbar : List (Html msg) -> Html msg
+viewToolbar children =
+    div
+        [ style
+            [ ( "margin-top", "1em" )
+            , ( "margin-bottom", "1em" )
+            ]
+        ]
+        children
+
+
+viewSelectKey : Key -> Html Msg
+viewSelectKey key =
+    label []
+        [ text "Chart key: "
+        , select
+            [ on "change" <|
+                Json.map ChangeTransposedKey <|
+                    targetValue
+                        `Json.andThen` noteDecoder
+                        `Json.andThen` \note -> Json.succeed <| Key note
+            ]
+          <|
+            List.map (viewSelectKeyOption key) Note.notes
+        ]
+
+
+viewSelectKeyOption : Key -> Note -> Html Msg
+viewSelectKeyOption key note =
+    let
+        noteStr =
+            Note.toString note
+    in
+        option
+            [ selected <| (Key note) == key
+            , value noteStr
+            ]
+            [ text noteStr ]
+
+
+
+-- DECODER
+
+
+noteDecoder : String -> Json.Decoder Note
+noteDecoder val =
+    case Note.fromString val of
+        Just note ->
+            Json.succeed note
+
+        Nothing ->
+            Json.fail <| "Value is not of type Note: " ++ val
 
 
 
 -- RENDER
-
-
-renderBar : Bar -> String
-renderBar bar =
-    case bar of
-        Bar ( a, b, c, d ) ->
-            Chord.toString a
-
-        BarRepeat ->
-            "–"
 
 
 renderKey : Key -> String

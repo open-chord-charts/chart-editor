@@ -1,12 +1,8 @@
 module Components.ChartDemoPage exposing (..)
 
-import Json.Decode as Json
 import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html.App as App
 import Components.ChartCard as ChartCard
-import Music.Chart as Chart exposing (Chart, Key(..))
-import Music.Note as Note exposing (Note)
 import Samples
 
 
@@ -14,16 +10,14 @@ import Samples
 
 
 type alias Model =
-    { chart : Chart
-    , transposedKey : Key
-    }
+    List ChartCard.Model
 
 
 model : Model
 model =
-    { chart = Samples.allOfMe
-    , transposedKey = Key Note.noteF
-    }
+    [ ChartCard.init Samples.allOfMe
+    , ChartCard.init Samples.allOfMe
+    ]
 
 
 
@@ -31,7 +25,7 @@ model =
 
 
 type Msg
-    = ChangeTransposedKey Key
+    = ChartCard Int ChartCard.Msg
 
 
 
@@ -41,8 +35,15 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        ChangeTransposedKey key ->
-            { model | transposedKey = key }
+        ChartCard msgIndex nestedMsg ->
+            List.indexedMap
+                (\index item ->
+                    if index == msgIndex then
+                        ChartCard.update nestedMsg item
+                    else
+                        item
+                )
+                model
 
 
 
@@ -51,48 +52,7 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ ChartCard.view model.chart
-        , hr [] []
-        , ChartCard.view <| Chart.transpose model.transposedKey model.chart
-        , label []
-            [ text "Chart key: "
-            , select
-                [ on "change" <|
-                    Json.map ChangeTransposedKey <|
-                        targetValue
-                            `Json.andThen` noteDecoder
-                            `Json.andThen` \note -> Json.succeed <| Key note
-                , style [ ( "margin-top", "1em" ) ]
-                ]
-              <|
-                List.map viewSelectKeyOption Note.notes
-            ]
-        ]
-
-
-viewSelectKeyOption : Note -> Html Msg
-viewSelectKeyOption note =
-    let
-        noteStr =
-            Note.toString note
-    in
-        option
-            [ selected <| (Key note) == model.transposedKey
-            , value noteStr
-            ]
-            [ text noteStr ]
-
-
-
--- DECODER
-
-
-noteDecoder : String -> Json.Decoder Note
-noteDecoder val =
-    case Note.fromString val of
-        Just note ->
-            Json.succeed note
-
-        Nothing ->
-            Json.fail <| "Value is not of type Note: " ++ val
+    section [] <|
+        List.indexedMap
+            (\index item -> App.map (ChartCard index) (ChartCard.view item))
+            model
