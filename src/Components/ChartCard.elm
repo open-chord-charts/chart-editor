@@ -4,9 +4,10 @@ import Json.Decode as Json
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Music.Chart as Chart exposing (Chart, Key(..))
+import Music.Chart as Chart exposing (Chart, Key(..), Part(..))
 import Music.Note as Note exposing (Note)
 import Components.Chart as ChartComponent
+import Components.Types exposing (SelectedChord)
 
 
 -- MODEL
@@ -15,6 +16,7 @@ import Components.Chart as ChartComponent
 type alias Model =
     { chart : Chart
     , viewKey : Key
+    , selectedChord : Maybe SelectedChord
     }
 
 
@@ -22,6 +24,7 @@ init : Chart -> Model
 init chart =
     { chart = chart
     , viewKey = chart.key
+    , selectedChord = Nothing
     }
 
 
@@ -31,6 +34,8 @@ init chart =
 
 type Msg
     = ChangeTransposedKey Key
+    | Edit
+    | Save
 
 
 
@@ -43,17 +48,53 @@ update msg model =
         ChangeTransposedKey key ->
             { model | viewKey = key }
 
+        Edit ->
+            let
+                firstPartName =
+                    List.head <|
+                        List.filterMap
+                            (\part ->
+                                case part of
+                                    Part name _ ->
+                                        Just name
+
+                                    PartRepeat _ ->
+                                        Nothing
+                            )
+                            model.chart.parts
+            in
+                { model
+                    | selectedChord =
+                        case firstPartName of
+                            Just name ->
+                                Just { partName = name, barIndex = 0 }
+
+                            Nothing ->
+                                Nothing
+                }
+
+        Save ->
+            { model | selectedChord = Nothing }
+
 
 
 -- VIEW
 
 
 view : Model -> Html Msg
-view { chart, viewKey } =
+view { chart, selectedChord, viewKey } =
     viewCard
         (chart.title ++ " (" ++ renderKey viewKey ++ ")")
-        [ viewToolbar [ viewSelectKey viewKey ]
-        , ChartComponent.view <| Chart.transpose viewKey chart
+        [ viewToolbar
+            [ viewSelectKey viewKey
+            , case selectedChord of
+                Just _ ->
+                    button [ onClick Save ] [ text "Save" ]
+
+                Nothing ->
+                    button [ onClick Edit ] [ text "Edit" ]
+            ]
+        , ChartComponent.view selectedChord <| Chart.transpose viewKey chart
         ]
 
 
@@ -80,7 +121,10 @@ viewToolbar children =
             , ( "margin-bottom", "1em" )
             ]
         ]
-        children
+    <|
+        List.intersperse
+            (span [ style [ ( "margin-left", "1em" ) ] ] [])
+            children
 
 
 viewSelectKey : Key -> Html Msg
