@@ -11,8 +11,11 @@ import Components.Types exposing (SelectedChord)
 -- TYPES
 
 
-type Row
-    = Row (Maybe PartName) Bool (List Bar)
+type alias Row =
+    { partName : Maybe PartName
+    , isFromRepeatPart : Bool
+    , bars : List Bar
+    }
 
 
 toRows : Part -> List Row
@@ -64,29 +67,39 @@ view selectedChord { parts } =
 
 
 viewRow : Maybe SelectedChord -> Row -> Html msg
-viewRow selectedChord (Row name isFromRepeatPart bars) =
-    tr [] <|
+viewRow selectedChord { partName, isFromRepeatPart, bars } =
+    tr
+        [ style
+            (if isFromRepeatPart then
+                []
+             else
+                [ ( "height", "2em" ) ]
+            )
+        ]
+    <|
         (td
             [ style [ ( "width", "1em" ) ] ]
-            [ text <| Maybe.withDefault "" name ]
+            [ text <| Maybe.withDefault "" partName ]
         )
             :: List.indexedMap
                 (\index bar ->
-                    viewBar
-                        (case name of
-                            Just n ->
-                                (case selectedChord of
-                                    Just { partName, barIndex } ->
-                                        not isFromRepeatPart && partName == n && barIndex == index
+                    let
+                        isBarSelected =
+                            (case partName of
+                                Just n ->
+                                    (case selectedChord of
+                                        Just { partName, barIndex } ->
+                                            not isFromRepeatPart && partName == n && barIndex == index
 
-                                    Nothing ->
-                                        False
-                                )
+                                        Nothing ->
+                                            False
+                                    )
 
-                            Nothing ->
-                                False
-                        )
-                        bar
+                                Nothing ->
+                                    False
+                            )
+                    in
+                        viewBar isBarSelected bar
                 )
                 bars
 
@@ -95,14 +108,17 @@ viewBar : Bool -> Bar -> Html msg
 viewBar selected bar =
     td
         [ style
-            [ ( "border"
+            [ ( "background-color"
               , if selected then
-                    "2px solid"
+                    "lightgray"
                 else
-                    "1px solid"
+                    ""
               )
+            , ( "border", "1px solid" )
+            , ( "height", "inherit" )
+            , ( "padding", "0" )
             , ( "text-align", "center" )
-            , ( "height", "2em" )
+            , ( "vertical-align", "middle" )
             , ( "width", "2.5em" )
             ]
         ]
