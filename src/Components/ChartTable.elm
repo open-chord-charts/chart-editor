@@ -1,7 +1,8 @@
-module Components.Chart exposing (Model, view)
+module Components.ChartTable exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import List.Split
 import Music.Chart exposing (..)
 import Music.Chord as Chord exposing (..)
@@ -48,26 +49,67 @@ toRows part =
 
 
 type alias Model =
-    Chart
+    { chart : Chart
+    , selectedChord : Maybe SelectedChord
+    }
+
+
+init : Chart -> Model
+init chart =
+    { chart = chart
+    , selectedChord = Nothing
+    }
+
+
+
+-- MSG
+
+
+type Msg
+    = SelectChord Int Int
+
+
+
+-- UPDATE
+
+
+update : Msg -> Model -> Model
+update msg ({ selectedChord } as model) =
+    case msg of
+        SelectChord rowIndex barIndex ->
+            { model
+                | selectedChord =
+                    case selectedChord of
+                        Just s ->
+                            Just { s | barIndex = barIndex, partName = "A" }
+
+                        Nothing ->
+                            Nothing
+            }
 
 
 
 -- VIEW
 
 
-view : Maybe SelectedChord -> Model -> Html msg
-view selectedChord { parts } =
+view : Model -> Html Msg
+view { chart, selectedChord } =
     table
         [ style
             [ ( "border-collapse", "collapse" )
             , ( "width", "400px" )
             ]
         ]
-        [ tbody [] (parts |> List.concatMap toRows |> List.map (viewRow selectedChord)) ]
+        [ tbody []
+            (chart.parts
+                |> List.concatMap toRows
+                |> List.indexedMap (viewRow selectedChord)
+            )
+        ]
 
 
-viewRow : Maybe SelectedChord -> Row -> Html msg
-viewRow selectedChord { partName, isFromRepeatPart, bars } =
+viewRow : Maybe SelectedChord -> Int -> Row -> Html Msg
+viewRow selectedChord rowIndex { partName, isFromRepeatPart, bars } =
     tr
         [ style
             (if isFromRepeatPart then
@@ -82,14 +124,14 @@ viewRow selectedChord { partName, isFromRepeatPart, bars } =
             [ text <| Maybe.withDefault "" partName ]
         )
             :: List.indexedMap
-                (\index bar ->
+                (\barIndex bar ->
                     let
                         isBarSelected =
                             (case partName of
-                                Just n ->
+                                Just partName ->
                                     (case selectedChord of
-                                        Just { partName, barIndex } ->
-                                            not isFromRepeatPart && partName == n && barIndex == index
+                                        Just s ->
+                                            not isFromRepeatPart && partName == s.partName && barIndex == s.barIndex
 
                                         Nothing ->
                                             False
@@ -99,15 +141,16 @@ viewRow selectedChord { partName, isFromRepeatPart, bars } =
                                     False
                             )
                     in
-                        viewBar isBarSelected bar
+                        viewBar isBarSelected rowIndex barIndex bar
                 )
                 bars
 
 
-viewBar : Bool -> Bar -> Html msg
-viewBar selected bar =
+viewBar : Bool -> Int -> Int -> Bar -> Html Msg
+viewBar selected rowIndex barIndex bar =
     td
-        [ style
+        [ onClick <| SelectChord rowIndex barIndex
+        , style
             [ ( "background-color"
               , if selected then
                     "lightgray"

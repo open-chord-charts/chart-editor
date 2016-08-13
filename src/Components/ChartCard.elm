@@ -2,11 +2,12 @@ module Components.ChartCard exposing (..)
 
 import Json.Decode as Json
 import Html exposing (..)
+import Html.App as App
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Music.Chart as Chart exposing (Chart, Key(..), Part(..))
 import Music.Note as Note exposing (Note)
-import Components.Chart as ChartComponent
+import Components.ChartTable as ChartTable
 import Components.Types exposing (SelectedChord)
 
 
@@ -15,16 +16,16 @@ import Components.Types exposing (SelectedChord)
 
 type alias Model =
     { chart : Chart
-    , viewKey : Key
     , selectedChord : Maybe SelectedChord
+    , viewKey : Key
     }
 
 
 init : Chart -> Model
 init chart =
     { chart = chart
-    , viewKey = chart.key
     , selectedChord = Nothing
+    , viewKey = chart.key
     }
 
 
@@ -36,6 +37,7 @@ type Msg
     = ChangeTransposedKey Key
     | Edit
     | Save
+    | ChartTable ChartTable.Msg
 
 
 
@@ -76,6 +78,19 @@ update msg model =
         Save ->
             { model | selectedChord = Nothing }
 
+        ChartTable msg ->
+            let
+                model' =
+                    ChartTable.update msg
+                        { chart = model.chart
+                        , selectedChord = model.selectedChord
+                        }
+            in
+                { model
+                    | chart = model'.chart
+                    , selectedChord = model'.selectedChord
+                }
+
 
 
 -- VIEW
@@ -94,7 +109,11 @@ view { chart, selectedChord, viewKey } =
                 Nothing ->
                     button [ onClick Edit ] [ text "Edit" ]
             ]
-        , ChartComponent.view selectedChord <| Chart.transpose viewKey chart
+        , App.map ChartTable <|
+            ChartTable.view
+                { chart = Chart.transpose viewKey chart
+                , selectedChord = selectedChord
+                }
         ]
 
 
