@@ -2,7 +2,6 @@ module Components.ChartCard exposing (..)
 
 import Json.Decode as Json
 import Html exposing (..)
-import Html.App as App
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Music.Chart as Chart exposing (Chart, Key(..), Part(..))
@@ -80,15 +79,15 @@ update msg model =
 
         ChartTable msg ->
             let
-                model' =
+                model_ =
                     ChartTable.update msg
                         { chart = model.chart
                         , selectedChord = model.selectedChord
                         }
             in
                 { model
-                    | chart = model'.chart
-                    , selectedChord = model'.selectedChord
+                    | chart = model_.chart
+                    , selectedChord = model_.selectedChord
                 }
 
 
@@ -109,7 +108,7 @@ view { chart, selectedChord, viewKey } =
                 Nothing ->
                     button [ onClick Edit ] [ text "Edit" ]
             ]
-        , App.map ChartTable <|
+        , Html.map ChartTable <|
             ChartTable.view
                 { chart = Chart.transpose viewKey chart
                 , selectedChord = selectedChord
@@ -151,11 +150,11 @@ viewSelectKey key =
     label []
         [ text "Chart key: "
         , select
-            [ on "change" <|
-                Json.map ChangeTransposedKey <|
-                    targetValue
-                        `Json.andThen` noteDecoder
-                        `Json.andThen` \note -> Json.succeed <| Key note
+            [ on "change"
+                (targetValue
+                    |> Json.andThen noteDecoder
+                    |> Json.map (Key >> ChangeTransposedKey)
+                )
             ]
           <|
             List.map (viewSelectKeyOption key) Note.notes
@@ -169,7 +168,7 @@ viewSelectKeyOption key note =
             Note.toString note
     in
         option
-            [ selected <| (Key note) == key
+            [ selected ((Key note) == key)
             , value noteStr
             ]
             [ text noteStr ]

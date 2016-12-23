@@ -1,12 +1,12 @@
 module Main exposing (main)
 
-import Html.App
+import Html
 import Components.ChartDemoPage
 
 
-main : Program Never
+main : Program Never Components.ChartDemoPage.Model Components.ChartDemoPage.Msg
 main =
-    Html.App.beginnerProgram
+    Html.beginnerProgram
         { model = Components.ChartDemoPage.model
         , view = Components.ChartDemoPage.view
         , update = Components.ChartDemoPage.update

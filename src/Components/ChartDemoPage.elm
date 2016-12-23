@@ -1,7 +1,6 @@
 module Components.ChartDemoPage exposing (..)
 
 import Html exposing (..)
-import Html.App as App
 import Components.ChartCard as ChartCard
 import Samples
 
@@ -54,5 +53,5 @@ view : Model -> Html Msg
 view model =
     section [] <|
         List.indexedMap
-            (\index item -> App.map (ChartCard index) (ChartCard.view item))
+            (\index item -> Html.map (ChartCard index) (ChartCard.view item))
             model
