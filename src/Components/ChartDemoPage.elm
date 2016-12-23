@@ -51,7 +51,8 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    section [] <|
-        List.indexedMap
+    section []
+        (List.indexedMap
             (\index item -> Html.map (ChartCard index) (ChartCard.view item))
             model
+        )

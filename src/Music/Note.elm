@@ -110,7 +110,7 @@ noteG =
 
 transpose : Interval -> Note -> Note
 transpose interval (Note int) =
-    Note <| (int + interval) % 12
+    Note ((int + interval) % 12)
 
 
 interval : Note -> Note -> Interval

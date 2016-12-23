@@ -45,7 +45,7 @@ transpose newKey ({ key, parts } as chart) =
     in
         { chart
             | key = newKey
-            , parts = List.map (transposePart <| interval key newKey) parts
+            , parts = List.map (transposePart (interval key newKey)) parts
         }
 
 
@@ -55,8 +55,8 @@ transposePart nbSemitones part =
         Part name bars ->
             Part name (List.map (transposeBar nbSemitones) bars)
 
-        (PartRepeat name) as p ->
-            p
+        _ ->
+            part
 
 
 transposeBar : Int -> Bar -> Bar

@@ -118,11 +118,10 @@ viewRow selectedChord rowIndex { partName, isFromRepeatPart, bars } =
                 [ ( "height", "2em" ) ]
             )
         ]
-    <|
-        (td
+        ((td
             [ style [ ( "width", "1em" ) ] ]
-            [ text <| Maybe.withDefault "" partName ]
-        )
+            [ text (Maybe.withDefault "" partName) ]
+         )
             :: List.indexedMap
                 (\barIndex bar ->
                     let
@@ -144,12 +143,13 @@ viewRow selectedChord rowIndex { partName, isFromRepeatPart, bars } =
                         viewBar isBarSelected rowIndex barIndex bar
                 )
                 bars
+        )
 
 
 viewBar : Bool -> Int -> Int -> Bar -> Html Msg
 viewBar selected rowIndex barIndex bar =
     td
-        [ onClick <| SelectChord rowIndex barIndex
+        [ onClick (SelectChord rowIndex barIndex)
         , style
             [ ( "background-color"
               , if selected then
@@ -165,7 +165,7 @@ viewBar selected rowIndex barIndex bar =
             , ( "width", "2.5em" )
             ]
         ]
-        [ text <| renderBar bar ]
+        [ text (renderBar bar) ]
 
 
 

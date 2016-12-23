@@ -1,13 +1,13 @@
 module Components.ChartCard exposing (..)
 
-import Json.Decode as Json
+import Components.ChartTable as ChartTable
+import Components.Types exposing (SelectedChord)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Json.Decode as Decode exposing (Decoder)
 import Music.Chart as Chart exposing (Chart, Key(..), Part(..))
 import Music.Note as Note exposing (Note)
-import Components.ChartTable as ChartTable
-import Components.Types exposing (SelectedChord)
 
 
 -- MODEL
@@ -52,8 +52,8 @@ update msg model =
         Edit ->
             let
                 firstPartName =
-                    List.head <|
-                        List.filterMap
+                    model.chart.parts
+                        |> List.filterMap
                             (\part ->
                                 case part of
                                     Part name _ ->
@@ -62,7 +62,7 @@ update msg model =
                                     PartRepeat _ ->
                                         Nothing
                             )
-                            model.chart.parts
+                        |> List.head
             in
                 { model
                     | selectedChord =
@@ -108,11 +108,12 @@ view { chart, selectedChord, viewKey } =
                 Nothing ->
                     button [ onClick Edit ] [ text "Edit" ]
             ]
-        , Html.map ChartTable <|
-            ChartTable.view
+        , Html.map ChartTable
+            (ChartTable.view
                 { chart = Chart.transpose viewKey chart
                 , selectedChord = selectedChord
                 }
+            )
         ]
 
 
@@ -126,9 +127,9 @@ viewCard title children =
             , ( "width", "500px" )
             ]
         ]
-    <|
-        (h1 [] [ text title ])
+        ((h1 [] [ text title ])
             :: children
+        )
 
 
 viewToolbar : List (Html msg) -> Html msg
@@ -139,10 +140,10 @@ viewToolbar children =
             , ( "margin-bottom", "1em" )
             ]
         ]
-    <|
-        List.intersperse
+        (List.intersperse
             (span [ style [ ( "margin-left", "1em" ) ] ] [])
             children
+        )
 
 
 viewSelectKey : Key -> Html Msg
@@ -152,12 +153,11 @@ viewSelectKey key =
         , select
             [ on "change"
                 (targetValue
-                    |> Json.andThen noteDecoder
-                    |> Json.map (Key >> ChangeTransposedKey)
+                    |> Decode.andThen noteDecoder
+                    |> Decode.map (Key >> ChangeTransposedKey)
                 )
             ]
-          <|
-            List.map (viewSelectKeyOption key) Note.notes
+            (List.map (viewSelectKeyOption key) Note.notes)
         ]
 
 
@@ -178,14 +178,14 @@ viewSelectKeyOption key note =
 -- DECODER
 
 
-noteDecoder : String -> Json.Decoder Note
+noteDecoder : String -> Decoder Note
 noteDecoder val =
     case Note.fromString val of
         Just note ->
-            Json.succeed note
+            Decode.succeed note
 
         Nothing ->
-            Json.fail <| "Value is not of type Note: " ++ val
+            Decode.fail ("Value is not of type Note: " ++ val)
 
 
 
