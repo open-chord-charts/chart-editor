@@ -1,11 +1,17 @@
-# OpenChordCharts chart viewer/editor
+# Music chart viewer/editor
 
-Chart viewer and editor (written in Elm)
+Chart viewer and editor, part of the OpenChordCharts project.
 
 Demo: https://openchordcharts.github.io/chart-editor/
 
 ## Start
 
-- Clone this repo and go in directory
-- Start `elm-reactor`
-- Open http://localhost:8000/index.html in your browser
+This software is written in [Elm](http://elm-lang.org/) language.
+
+```sh
+git clone git@github.com:openchordcharts/chart-editor.git
+cd chart-editor
+elm-reactor
+```
+
+Open http://localhost:8000/index.html in your browser
