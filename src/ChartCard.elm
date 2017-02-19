@@ -32,15 +32,20 @@ type alias Row =
 -- MODEL
 
 
-type alias SelectedChord =
+type alias SelectedBar =
     { partName : String
     , barIndex : Int
     }
 
 
+type ChartStatus
+    = ViewStatus
+    | EditStatus SelectedBar
+
+
 type alias Model =
     { chart : Chart
-    , selectedChord : Maybe SelectedChord
+    , status : ChartStatus
     , viewKey : Key
     }
 
@@ -48,7 +53,7 @@ type alias Model =
 init : Chart -> Model
 init chart =
     { chart = chart
-    , selectedChord = Nothing
+    , status = ViewStatus
     , viewKey = chart.key
     }
 
@@ -88,27 +93,31 @@ update msg model =
                                         Nothing
                             )
                         |> List.head
-            in
-                { model
-                    | selectedChord =
-                        case firstPartName of
-                            Just name ->
-                                Just { partName = name, barIndex = 0 }
 
-                            Nothing ->
-                                Nothing
-                }
+                newStatus =
+                    case firstPartName of
+                        Just name ->
+                            EditStatus { partName = name, barIndex = 0 }
+
+                        Nothing ->
+                            ViewStatus
+            in
+                { model | status = newStatus }
 
         Save ->
-            { model | selectedChord = Nothing }
+            { model | status = ViewStatus }
 
         SelectChord rowIndex barIndex ->
             let
-                newSelectedChord =
-                    model.selectedChord
-                        |> Maybe.map (\selectedChord -> { selectedChord | barIndex = barIndex, partName = "A" })
+                newStatus =
+                    case model.status of
+                        ViewStatus ->
+                            ViewStatus
+
+                        EditStatus selectedBar ->
+                            EditStatus { barIndex = barIndex, partName = "A" }
             in
-                { model | selectedChord = newSelectedChord }
+                { model | status = newStatus }
 
 
 
@@ -116,21 +125,21 @@ update msg model =
 
 
 view : Model -> Html Msg
-view { chart, selectedChord, viewKey } =
+view { chart, status, viewKey } =
     viewCard
-        (chart.title ++ " (" ++ formatKey viewKey ++ ")")
-        [ viewToolbar
-            [ viewSelectKey viewKey
-            , case selectedChord of
-                Just _ ->
+        (chart.title ++ " (" ++ formatKey chart.key ++ ")")
+        [ viewSelectKey viewKey
+        , viewToolbar
+            [ case status of
+                EditStatus _ ->
                     button [ onClick Save ] [ text "Save" ]
 
-                Nothing ->
+                ViewStatus ->
                     button [ onClick Edit ] [ text "Edit" ]
             ]
         , viewTable
             (Music.Chart.transpose viewKey chart)
-            selectedChord
+            status
         ]
 
 
@@ -166,7 +175,7 @@ viewToolbar children =
 viewSelectKey : Key -> Html Msg
 viewSelectKey key =
     label []
-        [ text "Chart key: "
+        [ text "Transpose to: "
         , select
             [ on "change"
                 (targetValue
@@ -191,8 +200,8 @@ viewSelectKeyOption key note =
             [ text noteStr ]
 
 
-viewTable : Chart -> Maybe SelectedChord -> Html Msg
-viewTable chart selectedChord =
+viewTable : Chart -> ChartStatus -> Html Msg
+viewTable chart chartStatus =
     table
         [ style
             [ ( "border-collapse", "collapse" )
@@ -202,13 +211,13 @@ viewTable chart selectedChord =
         [ tbody []
             (chart.parts
                 |> List.concatMap toRows
-                |> List.indexedMap (viewRow selectedChord)
+                |> List.indexedMap (viewRow chartStatus)
             )
         ]
 
 
-viewRow : Maybe SelectedChord -> Int -> Row -> Html Msg
-viewRow selectedChord rowIndex { partName, isFromRepeatPart, bars } =
+viewRow : ChartStatus -> Int -> Row -> Html Msg
+viewRow chartStatus rowIndex { partName, isFromRepeatPart, bars } =
     tr
         [ style
             (if isFromRepeatPart then
@@ -227,11 +236,11 @@ viewRow selectedChord rowIndex { partName, isFromRepeatPart, bars } =
                         isBarSelected =
                             (case partName of
                                 Just partName ->
-                                    (case selectedChord of
-                                        Just s ->
-                                            not isFromRepeatPart && partName == s.partName && barIndex == s.barIndex
+                                    (case chartStatus of
+                                        EditStatus selectedBar ->
+                                            not isFromRepeatPart && partName == selectedBar.partName && barIndex == selectedBar.barIndex
 
-                                        Nothing ->
+                                        ViewStatus ->
                                             False
                                     )
 
