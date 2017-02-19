@@ -10,6 +10,15 @@ import Music.Chord exposing (..)
 import Music.Note as Note exposing (..)
 
 
+-- CONSTANTS
+
+
+nbBarsByRow : Int
+nbBarsByRow =
+    8
+
+
+
 -- TYPES
 
 
@@ -22,10 +31,28 @@ type alias RowIndex =
 
 
 type alias Row =
-    { partName : Maybe PartName
-    , isFromRepeatPart : Bool
-    , bars : List Bar
-    }
+    Part
+
+
+partToRows : Part -> List Row
+partToRows part =
+    case part of
+        Part partName bars ->
+            List.greedyGroupsOf nbBarsByRow bars
+                |> List.map (Part partName)
+
+        PartRepeat partName ->
+            [ PartRepeat partName ]
+
+
+rowToBars : Row -> List Bar
+rowToBars row =
+    case row of
+        Part _ bars ->
+            bars
+
+        PartRepeat _ ->
+            List.repeat nbBarsByRow BarRepeat
 
 
 
@@ -66,7 +93,7 @@ type Msg
     = Edit
     | Save
     | SetViewKey Key
-    | SelectChord RowIndex BarIndex
+    | SelectBar PartName BarIndex
 
 
 
@@ -107,15 +134,15 @@ update msg model =
         Save ->
             { model | status = ViewStatus }
 
-        SelectChord rowIndex barIndex ->
+        SelectBar partName barIndex ->
             let
                 newStatus =
                     case model.status of
                         ViewStatus ->
                             ViewStatus
 
-                        EditStatus selectedBar ->
-                            EditStatus { barIndex = barIndex, partName = "A" }
+                        EditStatus _ ->
+                            EditStatus { barIndex = barIndex, partName = partName }
             in
                 { model | status = newStatus }
 
@@ -210,54 +237,55 @@ viewTable chart chartStatus =
         ]
         [ tbody []
             (chart.parts
-                |> List.concatMap toRows
-                |> List.indexedMap (viewRow chartStatus)
+                |> List.concatMap partToRows
+                |> List.map (viewRow chartStatus)
             )
         ]
 
 
-viewRow : ChartStatus -> Int -> Row -> Html Msg
-viewRow chartStatus rowIndex { partName, isFromRepeatPart, bars } =
-    tr
-        [ style
-            (if isFromRepeatPart then
-                []
-             else
-                [ ( "height", "2em" ) ]
-            )
-        ]
-        ((td
-            [ style [ ( "width", "1em" ) ] ]
-            [ text (Maybe.withDefault "" partName) ]
-         )
-            :: List.indexedMap
-                (\barIndex bar ->
-                    let
-                        isBarSelected =
-                            (case partName of
-                                Just partName ->
-                                    (case chartStatus of
-                                        EditStatus selectedBar ->
-                                            not isFromRepeatPart && partName == selectedBar.partName && barIndex == selectedBar.barIndex
+viewRow : ChartStatus -> Row -> Html Msg
+viewRow chartStatus row =
+    let
+        partName =
+            getPartName row
+    in
+        tr
+            [ style
+                (case row of
+                    Part _ _ ->
+                        [ ( "height", "2em" ) ]
 
-                                        ViewStatus ->
-                                            False
-                                    )
-
-                                Nothing ->
-                                    False
-                            )
-                    in
-                        viewBar isBarSelected rowIndex barIndex bar
+                    PartRepeat _ ->
+                        []
                 )
-                bars
-        )
+            ]
+            ((td
+                [ style [ ( "width", "1em" ) ] ]
+                [ text partName ]
+             )
+                :: (row
+                        |> rowToBars
+                        |> List.indexedMap
+                            (\barIndex bar ->
+                                let
+                                    isBarSelected =
+                                        case chartStatus of
+                                            EditStatus selectedBar ->
+                                                partName == selectedBar.partName && barIndex == selectedBar.barIndex
+
+                                            ViewStatus ->
+                                                False
+                                in
+                                    viewBar isBarSelected partName barIndex bar
+                            )
+                   )
+            )
 
 
-viewBar : Bool -> Int -> Int -> Bar -> Html Msg
-viewBar selected rowIndex barIndex bar =
+viewBar : Bool -> PartName -> Int -> Bar -> Html Msg
+viewBar selected partName barIndex bar =
     td
-        [ onClick (SelectChord rowIndex barIndex)
+        [ onClick (SelectBar partName barIndex)
         , style
             [ ( "background-color"
               , if selected then
@@ -307,32 +335,3 @@ formatBar bar =
 formatKey : Key -> String
 formatKey (Key note) =
     Note.toString note
-
-
-
--- HELPERS
-
-
-toRows : Part -> List Row
-toRows part =
-    case part of
-        Part name bars ->
-            let
-                barGroups =
-                    List.greedyGroupsOf 8 bars
-            in
-                List.indexedMap
-                    (\index barGroup ->
-                        Row
-                            (if index == 0 then
-                                Just name
-                             else
-                                Nothing
-                            )
-                            False
-                            barGroup
-                    )
-                    barGroups
-
-        PartRepeat name ->
-            [ Row (Just name) True (List.repeat 8 BarRepeat) ]

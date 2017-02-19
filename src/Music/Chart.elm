@@ -23,6 +23,16 @@ type alias PartName =
     String
 
 
+getPartName : Part -> PartName
+getPartName part =
+    case part of
+        Part partName _ ->
+            partName
+
+        PartRepeat partName ->
+            partName
+
+
 type Bar
     = Bar ( Chord, Maybe Chord, Maybe Chord, Maybe Chord )
     | BarRepeat
