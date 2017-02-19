@@ -21,9 +21,6 @@ module Music.Note
         , fromString
         )
 
-import Debug
-
-
 -- TYPES
 
 
