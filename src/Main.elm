@@ -35,7 +35,7 @@ model =
 
 
 type Msg
-    = ChartCard Int ChartCard.Msg
+    = ChartCardMsg Int ChartCard.Msg
 
 
 
@@ -45,7 +45,7 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        ChartCard msgIndex nestedMsg ->
+        ChartCardMsg msgIndex nestedMsg ->
             List.indexedMap
                 (\index item ->
                     if index == msgIndex then
@@ -72,7 +72,7 @@ view model =
             ]
         , section []
             (List.indexedMap
-                (\index item -> Html.map (ChartCard index) (ChartCard.view item))
+                (\index chartModel -> Html.map (ChartCardMsg index) (ChartCard.view chartModel))
                 model
             )
         ]
