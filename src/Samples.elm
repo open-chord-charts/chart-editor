@@ -10,37 +10,37 @@ allOfMe =
     let
         partA =
             Part "A"
-                [ Bar ( Chord noteC Major, Nothing, Nothing, Nothing )
+                [ Bar [ Chord noteC Major ]
                 , BarRepeat
-                , Bar ( Chord noteE Major, Nothing, Nothing, Nothing )
+                , Bar [ Chord noteE Major ]
                 , BarRepeat
-                , Bar ( Chord noteA Major, Nothing, Nothing, Nothing )
+                , Bar [ Chord noteA Major ]
                 , BarRepeat
-                , Bar ( Chord noteD Minor, Nothing, Nothing, Nothing )
+                , Bar [ Chord noteD Minor ]
                 , BarRepeat
                 ]
 
         partB =
             Part "B"
-                [ Bar ( Chord noteE Major, Nothing, Nothing, Nothing )
+                [ Bar [ Chord noteE Major ]
                 , BarRepeat
-                , Bar ( Chord noteA Minor, Nothing, Nothing, Nothing )
+                , Bar [ Chord noteA Minor ]
                 , BarRepeat
-                , Bar ( Chord noteD Major, Nothing, Nothing, Nothing )
+                , Bar [ Chord noteD Major ]
                 , BarRepeat
-                , Bar ( Chord noteG Major, Nothing, Nothing, Nothing )
+                , Bar [ Chord noteG Major ]
                 , BarRepeat
                 ]
 
         partC =
             Part "C"
-                [ Bar ( Chord noteF Major, Nothing, Nothing, Nothing )
-                , Bar ( Chord noteF Minor, Nothing, Nothing, Nothing )
-                , Bar ( Chord noteC Major, Nothing, Nothing, Nothing )
-                , Bar ( Chord noteA Major, Nothing, Nothing, Nothing )
-                , Bar ( Chord noteD Minor, Nothing, Nothing, Nothing )
-                , Bar ( Chord noteG Major, Nothing, Nothing, Nothing )
-                , Bar ( Chord noteC Major, Nothing, Nothing, Nothing )
+                [ Bar [ Chord noteF Major ]
+                , Bar [ Chord noteF Minor ]
+                , Bar [ Chord noteC Major ]
+                , Bar [ Chord noteA Major ]
+                , Bar [ Chord noteD Minor ]
+                , Bar [ Chord noteG Major ]
+                , Bar [ Chord noteC Major ]
                 , BarRepeat
                 ]
     in

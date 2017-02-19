@@ -59,15 +59,47 @@ rowToBars row =
 -- MODEL
 
 
-type alias SelectedBar =
+type alias BarReference =
     { partName : String
     , barIndex : Int
     }
 
 
+updateChartAt : BarReference -> (Bar -> Bar) -> Chart -> Chart
+updateChartAt barReference updateBar chart =
+    let
+        newParts =
+            chart.parts
+                |> List.map
+                    (\part ->
+                        case part of
+                            Part partName bars ->
+                                if partName == barReference.partName then
+                                    let
+                                        newBars =
+                                            bars
+                                                |> List.indexedMap
+                                                    (\index bar ->
+                                                        if index == barReference.barIndex then
+                                                            updateBar bar
+                                                        else
+                                                            bar
+                                                    )
+                                    in
+                                        Part partName newBars
+                                else
+                                    part
+
+                            PartRepeat _ ->
+                                part
+                    )
+    in
+        { chart | parts = newParts }
+
+
 type ChartStatus
     = ViewStatus
-    | EditStatus SelectedBar
+    | EditStatus BarReference
 
 
 type alias Model =
@@ -92,8 +124,10 @@ init chart =
 type Msg
     = Edit
     | Save
+    | SelectBar BarReference
+    | SetBarRepeat BarReference Bool
+    | SetChord BarReference Chord
     | SetViewKey Key
-    | SelectBar PartName BarIndex
 
 
 
@@ -103,9 +137,6 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        SetViewKey key ->
-            { model | viewKey = key }
-
         Edit ->
             let
                 firstPartName =
@@ -134,7 +165,7 @@ update msg model =
         Save ->
             { model | status = ViewStatus }
 
-        SelectBar partName barIndex ->
+        SelectBar barReference ->
             let
                 newStatus =
                     case model.status of
@@ -142,9 +173,34 @@ update msg model =
                             ViewStatus
 
                         EditStatus _ ->
-                            EditStatus { barIndex = barIndex, partName = partName }
+                            EditStatus barReference
             in
                 { model | status = newStatus }
+
+        SetBarRepeat barReference checked ->
+            let
+                newChart =
+                    model.chart
+                        |> updateChartAt barReference
+                            (\_ ->
+                                if checked then
+                                    BarRepeat
+                                else
+                                    Bar []
+                            )
+            in
+                { model | chart = newChart }
+
+        SetChord barReference chord ->
+            let
+                newChart =
+                    model.chart
+                        |> updateChartAt barReference (\_ -> Bar [ chord ])
+            in
+                { model | chart = newChart }
+
+        SetViewKey key ->
+            { model | viewKey = key }
 
 
 
@@ -153,21 +209,41 @@ update msg model =
 
 view : Model -> Html Msg
 view { chart, status, viewKey } =
-    viewCard
-        (chart.title ++ " (" ++ formatKey chart.key ++ ")")
-        [ viewSelectKey viewKey
-        , viewToolbar
-            [ case status of
-                EditStatus _ ->
-                    button [ onClick Save ] [ text "Save" ]
+    let
+        (Key viewNote) =
+            viewKey
+    in
+        viewCard
+            (chart.title ++ " (" ++ keyToString chart.key ++ ")")
+            [ div [ style [ ( "margin", "1em 0" ) ] ]
+                [ label []
+                    [ text "Transpose to: "
+                    , viewSelectNote viewNote (Key >> SetViewKey)
+                    ]
+                ]
+            , viewTable (Music.Chart.transpose viewKey chart) status
+            , viewToolbar
+                (case status of
+                    EditStatus barReference ->
+                        [ button [ onClick Save ] [ text "Save" ] ]
+                            ++ (let
+                                    selectedBar =
+                                        chart
+                                            |> getBarsOfPart barReference.partName
+                                            |> List.getAt barReference.barIndex
+                                in
+                                    case selectedBar of
+                                        Nothing ->
+                                            []
 
-                ViewStatus ->
-                    button [ onClick Edit ] [ text "Edit" ]
+                                        Just selectedBar ->
+                                            [ viewBarEditor barReference selectedBar ]
+                               )
+
+                    ViewStatus ->
+                        [ button [ onClick Edit ] [ text "Edit" ] ]
+                )
             ]
-        , viewTable
-            (Music.Chart.transpose viewKey chart)
-            status
-        ]
 
 
 viewCard : String -> List (Html a) -> Html a
@@ -199,32 +275,56 @@ viewToolbar children =
         )
 
 
-viewSelectKey : Key -> Html Msg
-viewSelectKey key =
-    label []
-        [ text "Transpose to: "
-        , select
-            [ on "change"
-                (targetValue
-                    |> Decode.andThen noteDecoder
-                    |> Decode.map (Key >> SetViewKey)
+viewBarEditor : BarReference -> Bar -> Html Msg
+viewBarEditor barReference bar =
+    case bar of
+        Bar chords ->
+            span []
+                (chords
+                    |> List.map
+                        (\(Chord note quality) ->
+                            viewSelectNote note
+                                (\selectedNote ->
+                                    SetChord barReference (Chord selectedNote quality)
+                                )
+                        )
                 )
-            ]
-            (List.map (viewSelectKeyOption key) Note.notes)
+
+        BarRepeat ->
+            label []
+                [ input
+                    [ checked True
+                    , onCheck (SetBarRepeat barReference)
+                    , type_ "checkbox"
+                    ]
+                    []
+                , text "repeated bar"
+                ]
+
+
+viewSelectNote : Note -> (Note -> Msg) -> Html Msg
+viewSelectNote selectedNote tagger =
+    select
+        [ on "change"
+            (targetValue
+                |> Decode.andThen noteDecoder
+                |> Decode.map tagger
+            )
         ]
-
-
-viewSelectKeyOption : Key -> Note -> Html Msg
-viewSelectKeyOption key note =
-    let
-        noteStr =
-            Note.toString note
-    in
-        option
-            [ selected ((Key note) == key)
-            , value noteStr
-            ]
-            [ text noteStr ]
+        (Note.notes
+            |> List.map
+                (\note ->
+                    let
+                        noteStr =
+                            Note.toString note
+                    in
+                        option
+                            [ selected (note == selectedNote)
+                            , value noteStr
+                            ]
+                            [ text noteStr ]
+                )
+        )
 
 
 viewTable : Chart -> ChartStatus -> Html Msg
@@ -268,40 +368,40 @@ viewRow chartStatus row =
                         |> List.indexedMap
                             (\barIndex bar ->
                                 let
-                                    isBarSelected =
+                                    isSelected =
                                         case chartStatus of
-                                            EditStatus selectedBar ->
-                                                partName == selectedBar.partName && barIndex == selectedBar.barIndex
+                                            EditStatus barReference ->
+                                                partName == barReference.partName && barIndex == barReference.barIndex
 
                                             ViewStatus ->
                                                 False
                                 in
-                                    viewBar isBarSelected partName barIndex bar
+                                    viewBar isSelected (BarReference partName barIndex) bar
                             )
                    )
             )
 
 
-viewBar : Bool -> PartName -> Int -> Bar -> Html Msg
-viewBar selected partName barIndex bar =
+viewBar : Bool -> BarReference -> Bar -> Html Msg
+viewBar isSelected barReference bar =
     td
-        [ onClick (SelectBar partName barIndex)
+        [ onClick (SelectBar barReference)
         , style
-            [ ( "background-color"
-              , if selected then
-                    "lightgray"
-                else
-                    ""
-              )
-            , ( "border", "1px solid" )
-            , ( "height", "inherit" )
-            , ( "padding", "0" )
-            , ( "text-align", "center" )
-            , ( "vertical-align", "middle" )
-            , ( "width", "2.5em" )
-            ]
+            ([ ( "border", "1px solid" )
+             , ( "height", "inherit" )
+             , ( "padding", "0" )
+             , ( "text-align", "center" )
+             , ( "vertical-align", "middle" )
+             , ( "width", "2.5em" )
+             ]
+                ++ (if isSelected then
+                        [ ( "background-color", "lightgray" ) ]
+                    else
+                        []
+                   )
+            )
         ]
-        [ text (formatBar bar) ]
+        [ text (barToString bar) ]
 
 
 
@@ -322,16 +422,18 @@ noteDecoder val =
 -- FORMATTERS
 
 
-formatBar : Bar -> String
-formatBar bar =
+barToString : Bar -> String
+barToString bar =
     case bar of
-        Bar ( a, b, c, d ) ->
-            Music.Chord.toString a
+        Bar chords ->
+            chords
+                |> List.map Music.Chord.toString
+                |> String.join ", "
 
         BarRepeat ->
             "–"
 
 
-formatKey : Key -> String
-formatKey (Key note) =
+keyToString : Key -> String
+keyToString (Key note) =
     Note.toString note

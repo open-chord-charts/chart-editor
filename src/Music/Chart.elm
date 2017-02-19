@@ -23,6 +23,25 @@ type alias PartName =
     String
 
 
+getBarsOfPart : PartName -> Chart -> List Bar
+getBarsOfPart partName { parts } =
+    parts
+        |> List.filterMap
+            (\part ->
+                case part of
+                    Part partName1 bars ->
+                        if partName == partName1 then
+                            Just bars
+                        else
+                            Nothing
+
+                    PartRepeat _ ->
+                        Nothing
+            )
+        |> List.head
+        |> Maybe.withDefault []
+
+
 getPartName : Part -> PartName
 getPartName part =
     case part of
@@ -34,7 +53,7 @@ getPartName part =
 
 
 type Bar
-    = Bar ( Chord, Maybe Chord, Maybe Chord, Maybe Chord )
+    = Bar (List Chord)
     | BarRepeat
 
 
@@ -72,8 +91,8 @@ transposePart nbSemitones part =
 transposeBar : Int -> Bar -> Bar
 transposeBar nbSemitones bar =
     case bar of
-        Bar ( a, b, c, d ) ->
-            Bar ( Chord.transpose nbSemitones a, b, c, d )
+        Bar chords ->
+            Bar (List.map (Chord.transpose nbSemitones) chords)
 
         BarRepeat ->
             BarRepeat

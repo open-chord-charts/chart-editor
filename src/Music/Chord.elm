@@ -27,8 +27,8 @@ transpose interval (Chord note quality) =
 toString : Chord -> String
 toString (Chord note quality) =
     let
-        renderQuality : Quality -> String
-        renderQuality quality =
+        qualityToString : Quality -> String
+        qualityToString quality =
             case quality of
                 Major ->
                     ""
@@ -36,4 +36,4 @@ toString (Chord note quality) =
                 Minor ->
                     "m"
     in
-        Note.toString note ++ renderQuality quality
+        Note.toString note ++ qualityToString quality
