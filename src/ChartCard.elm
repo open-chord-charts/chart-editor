@@ -213,93 +213,92 @@ view { chart, status, viewKey } =
         (Key viewNote) =
             viewKey
     in
-        viewCard
-            (chart.title ++ " (" ++ keyToString chart.key ++ ")")
-            [ div [ style [ ( "margin", "1em 0" ) ] ]
-                [ label []
-                    [ text "Transpose to: "
-                    , viewSelectNote viewNote (Key >> SetViewKey)
-                    ]
+        div []
+            [ h1 []
+                [ text (chart.title ++ " (" ++ keyToString chart.key ++ ")")
+                ]
+            , label []
+                [ text "Transpose to: "
+                , viewSelectNote viewNote (Key >> SetViewKey)
                 ]
             , viewTable (Music.Chart.transpose viewKey chart) status
-            , viewToolbar
+            , div []
                 (case status of
                     EditStatus barReference ->
-                        [ button [ onClick Save ] [ text "Save" ] ]
-                            ++ (let
-                                    selectedBar =
-                                        chart
-                                            |> getBarsOfPart barReference.partName
-                                            |> List.getAt barReference.barIndex
-                                in
-                                    case selectedBar of
-                                        Nothing ->
-                                            []
+                        [ button [ onClick Save ]
+                            [ text "Save" ]
+                        , let
+                            selectedBar =
+                                chart
+                                    |> getBarsOfPart barReference.partName
+                                    |> List.getAt barReference.barIndex
+                          in
+                            fieldset []
+                                ([ legend []
+                                    [ text "Bar" ]
+                                 ]
+                                    ++ (case selectedBar of
+                                            Nothing ->
+                                                []
 
-                                        Just selectedBar ->
-                                            [ viewBarEditor barReference selectedBar ]
-                               )
+                                            Just selectedBar ->
+                                                [ viewBarEditor barReference selectedBar ]
+                                       )
+                                )
+                        , fieldset []
+                            [ legend []
+                                [ text "Part" ]
+                            , button []
+                                [ text "Add" ]
+                            , button []
+                                [ text "Delete" ]
+                            ]
+                        ]
 
                     ViewStatus ->
-                        [ button [ onClick Edit ] [ text "Edit" ] ]
+                        [ button [ onClick Edit ]
+                            [ text "Edit" ]
+                        ]
                 )
             ]
-
-
-viewCard : String -> List (Html a) -> Html a
-viewCard title children =
-    article
-        [ style
-            [ ( "border", "1px solid" )
-            , ( "margin", "1em" )
-            , ( "padding", "1em" )
-            , ( "width", "500px" )
-            ]
-        ]
-        ((h1 [] [ text title ])
-            :: children
-        )
-
-
-viewToolbar : List (Html msg) -> Html msg
-viewToolbar children =
-    div
-        [ style
-            [ ( "margin-top", "1em" )
-            , ( "margin-bottom", "1em" )
-            ]
-        ]
-        (List.intersperse
-            (span [ style [ ( "margin-left", "1em" ) ] ] [])
-            children
-        )
 
 
 viewBarEditor : BarReference -> Bar -> Html Msg
 viewBarEditor barReference bar =
-    case bar of
-        Bar chords ->
-            span []
-                (chords
-                    |> List.map
-                        (\(Chord note quality) ->
-                            viewSelectNote note
-                                (\selectedNote ->
-                                    SetChord barReference (Chord selectedNote quality)
-                                )
-                        )
-                )
-
-        BarRepeat ->
+    let
+        barRepeatCheckbox isChecked =
             label []
                 [ input
-                    [ checked True
+                    [ checked isChecked
                     , onCheck (SetBarRepeat barReference)
                     , type_ "checkbox"
                     ]
                     []
                 , text "repeated bar"
                 ]
+    in
+        div []
+            (case bar of
+                Bar chords ->
+                    [ div []
+                        [ barRepeatCheckbox False ]
+                    ]
+                        ++ (chords
+                                |> List.map
+                                    (\(Chord note quality) ->
+                                        viewSelectNote note
+                                            (\selectedNote ->
+                                                SetChord barReference (Chord selectedNote quality)
+                                            )
+                                    )
+                           )
+                        ++ [ button []
+                                [ text "Add chord" ]
+                           ]
+
+                BarRepeat ->
+                    [ barRepeatCheckbox True ]
+            )
 
 
 viewSelectNote : Note -> (Note -> Msg) -> Html Msg
