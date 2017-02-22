@@ -26,6 +26,10 @@ type alias BarIndex =
     Int
 
 
+type alias ChordIndex =
+    Int
+
+
 type alias RowIndex =
     Int
 
@@ -123,12 +127,14 @@ init chart =
 
 
 type Msg
-    = Edit
+    = AddChord BarReference
+    | Edit
+    | RemoveChord BarReference ChordIndex
     | Save
     | SelectBar BarReference
     | SelectPart PartIndex
     | SetBarRepeat BarReference Bool
-    | SetChord BarReference Chord
+    | SetChord BarReference ChordIndex Chord
     | SetViewKey Key
 
 
@@ -139,12 +145,28 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
     case msg of
+        AddChord barReference ->
+            let
+                newChart =
+                    model.chart
+                        |> updateBarAt barReference (mapBarChords (\chords -> chords ++ [ Chord noteC Major ]))
+            in
+                { model | chart = newChart }
+
         Edit ->
             let
                 newStatus =
                     EditStatus (BarSelection { partIndex = 0, barIndex = 0 })
             in
                 { model | status = newStatus }
+
+        RemoveChord barReference chordIndex ->
+            let
+                newChart =
+                    model.chart
+                        |> updateBarAt barReference (mapBarChords (List.removeAt chordIndex))
+            in
+                { model | chart = newChart }
 
         Save ->
             { model | status = ViewStatus }
@@ -187,11 +209,21 @@ update msg model =
             in
                 { model | chart = newChart }
 
-        SetChord barReference chord ->
+        SetChord barReference chordIndex chord ->
             let
                 newChart =
                     model.chart
-                        |> updateBarAt barReference (\_ -> Bar [ chord ])
+                        |> updateBarAt barReference
+                            (mapBarChords
+                                (List.indexedMap
+                                    (\chordIndex1 chord1 ->
+                                        if chordIndex == chordIndex1 then
+                                            chord
+                                        else
+                                            chord1
+                                    )
+                                )
+                            )
             in
                 { model | chart = newChart }
 
@@ -298,19 +330,24 @@ viewBarEditor barReference bar =
                     , br [] []
                     ]
                         ++ (chords
-                                |> List.concatMap
-                                    (\(Chord note quality) ->
+                                |> List.indexedMap
+                                    (\chordIndex (Chord note quality) ->
                                         [ viewSelectNote note
-                                            (\selectedNote -> SetChord barReference (Chord selectedNote quality))
+                                            (\selectedNote ->
+                                                SetChord barReference chordIndex (Chord selectedNote quality)
+                                            )
                                         , viewSelectQuality quality
-                                            (\selectedQuality -> SetChord barReference (Chord note selectedQuality))
-                                        , button []
+                                            (\selectedQuality ->
+                                                SetChord barReference chordIndex (Chord note selectedQuality)
+                                            )
+                                        , button [ onClick (RemoveChord barReference chordIndex) ]
                                             [ text "Delete chord" ]
+                                        , br [] []
                                         ]
                                     )
+                                |> List.concat
                            )
-                        ++ [ br [] []
-                           , button []
+                        ++ [ button [ onClick (AddChord barReference) ]
                                 [ text "Add chord in bar" ]
                            ]
 

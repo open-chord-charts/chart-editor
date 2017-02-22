@@ -79,12 +79,22 @@ type Bar
     | BarRepeat
 
 
+mapBarChords : (List Chord -> List Chord) -> Bar -> Bar
+mapBarChords f bar =
+    case bar of
+        Bar chords ->
+            Bar (f chords)
+
+        BarRepeat ->
+            BarRepeat
+
+
 type Key
     = Key Note
 
 
 
--- FUNCTIONS
+-- TRANSPOSITION FUNCTIONS
 
 
 transpose : Key -> Chart -> Chart
