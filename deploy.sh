@@ -18,7 +18,7 @@ pushd dist
 git init
 git add .
 git commit -m "Build application from commit $REV"
-git push --force git@github.com:openchordcharts/chart-editor.git master:gh-pages
+git push --force git@github.com:open-chords-charts/chart-editor.git master:gh-pages
 popd
 
 # Refresh the gh-pages branch in particular.

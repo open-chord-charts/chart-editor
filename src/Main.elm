@@ -67,7 +67,7 @@ view model =
             [ text "Music chart viewer/editor" ]
         , p []
             [ text "Source code on "
-            , a [ href "https://github.com/openchordcharts/chart-editor" ]
+            , a [ href "https://github.com/open-chords-charts/chart-editor" ]
                 [ text "GitHub" ]
             ]
         , section []
