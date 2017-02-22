@@ -302,6 +302,8 @@ viewBarEditor barReference bar =
                                     (\(Chord note quality) ->
                                         [ viewSelectNote note
                                             (\selectedNote -> SetChord barReference (Chord selectedNote quality))
+                                        , viewSelectQuality quality
+                                            (\selectedQuality -> SetChord barReference (Chord note selectedQuality))
                                         , button []
                                             [ text "Delete chord" ]
                                         ]
@@ -347,6 +349,31 @@ viewSelectNote selectedNote tagger =
                             , value noteStr
                             ]
                             [ text noteStr ]
+                )
+        )
+
+
+viewSelectQuality : Quality -> (Quality -> Msg) -> Html Msg
+viewSelectQuality selectedQuality tagger =
+    select
+        [ on "change"
+            (targetValue
+                |> Decode.andThen qualityDecoder
+                |> Decode.map tagger
+            )
+        ]
+        (Music.Chord.qualities
+            |> List.map
+                (\quality ->
+                    let
+                        qualityStr =
+                            Basics.toString quality
+                    in
+                        option
+                            [ selected (quality == selectedQuality)
+                            , value qualityStr
+                            ]
+                            [ text qualityStr ]
                 )
         )
 
@@ -432,13 +459,26 @@ viewBar isSelected barReference bar =
 
 
 noteDecoder : String -> Decoder Note
-noteDecoder val =
-    case Note.fromString val of
+noteDecoder string =
+    case Note.fromString string of
         Just note ->
             Decode.succeed note
 
         Nothing ->
-            Decode.fail ("Value is not of type Note: " ++ val)
+            Decode.fail string
+
+
+qualityDecoder : String -> Decoder Quality
+qualityDecoder string =
+    case string of
+        "Major" ->
+            Decode.succeed Major
+
+        "Minor" ->
+            Decode.succeed Minor
+
+        _ ->
+            Decode.fail string
 
 
 

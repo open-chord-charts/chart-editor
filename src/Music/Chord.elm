@@ -15,6 +15,11 @@ type Quality
     | Minor
 
 
+qualities : List Quality
+qualities =
+    [ Major, Minor ]
+
+
 
 -- FUNCTIONS
 
@@ -24,16 +29,16 @@ transpose interval (Chord note quality) =
     Chord (Note.transpose interval note) quality
 
 
+qualityToString : Quality -> String
+qualityToString quality =
+    case quality of
+        Major ->
+            ""
+
+        Minor ->
+            "m"
+
+
 toString : Chord -> String
 toString (Chord note quality) =
-    let
-        qualityToString : Quality -> String
-        qualityToString quality =
-            case quality of
-                Major ->
-                    ""
-
-                Minor ->
-                    "m"
-    in
-        Note.toString note ++ qualityToString quality
+    Note.toString note ++ qualityToString quality
