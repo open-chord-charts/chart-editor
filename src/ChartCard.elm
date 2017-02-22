@@ -367,7 +367,15 @@ viewSelectQuality selectedQuality tagger =
                 (\quality ->
                     let
                         qualityStr =
-                            Basics.toString quality
+                            case quality of
+                                Major ->
+                                    "Major"
+
+                                Minor ->
+                                    "minor"
+
+                                Seventh ->
+                                    "7th"
                     in
                         option
                             [ selected (quality == selectedQuality)
@@ -474,8 +482,11 @@ qualityDecoder string =
         "Major" ->
             Decode.succeed Major
 
-        "Minor" ->
+        "minor" ->
             Decode.succeed Minor
+
+        "7th" ->
+            Decode.succeed Seventh
 
         _ ->
             Decode.fail string

@@ -13,11 +13,12 @@ type Chord
 type Quality
     = Major
     | Minor
+    | Seventh
 
 
 qualities : List Quality
 qualities =
-    [ Major, Minor ]
+    [ Major, Minor, Seventh ]
 
 
 
@@ -37,6 +38,9 @@ qualityToString quality =
 
         Minor ->
             "m"
+
+        Seventh ->
+            "7"
 
 
 toString : Chord -> String
