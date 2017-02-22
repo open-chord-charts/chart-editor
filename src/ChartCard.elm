@@ -30,51 +30,42 @@ type alias RowIndex =
     Int
 
 
-type alias Row =
-    Part
-
-
-partToRows : Part -> List Row
-partToRows part =
-    case part of
-        Part partName bars ->
-            List.greedyGroupsOf nbBarsByRow bars
-                |> List.map (Part partName)
-
-        PartRepeat partName ->
-            [ PartRepeat partName ]
-
-
-rowToBars : Row -> List Bar
-rowToBars row =
-    case row of
-        Part _ bars ->
-            bars
-
-        PartRepeat _ ->
-            List.repeat nbBarsByRow BarRepeat
-
-
 
 -- MODEL
 
 
 type alias BarReference =
-    { partName : String
-    , barIndex : Int
+    { partIndex : PartIndex
+    , barIndex : BarIndex
     }
 
 
-updateChartAt : BarReference -> (Bar -> Bar) -> Chart -> Chart
-updateChartAt barReference updateBar chart =
+type Selection
+    = PartSelection PartIndex
+    | BarSelection BarReference
+
+
+getBarAtReference : BarReference -> Chart -> Maybe Bar
+getBarAtReference barReference chart =
+    chart.parts
+        |> List.getAt barReference.partIndex
+        |> Maybe.andThen
+            (\part ->
+                getBarsOfPart (getPartName part) chart
+                    |> List.getAt barReference.barIndex
+            )
+
+
+updateBarAt : BarReference -> (Bar -> Bar) -> Chart -> Chart
+updateBarAt barReference updateBar chart =
     let
         newParts =
             chart.parts
-                |> List.map
-                    (\part ->
+                |> List.indexedMap
+                    (\partIndex part ->
                         case part of
                             Part partName bars ->
-                                if partName == barReference.partName then
+                                if partIndex == barReference.partIndex then
                                     let
                                         newBars =
                                             bars
@@ -99,7 +90,7 @@ updateChartAt barReference updateBar chart =
 
 type ChartStatus
     = ViewStatus
-    | EditStatus BarReference
+    | EditStatus Selection
 
 
 type alias Model =
@@ -125,6 +116,7 @@ type Msg
     = Edit
     | Save
     | SelectBar BarReference
+    | SelectPart PartIndex
     | SetBarRepeat BarReference Bool
     | SetChord BarReference Chord
     | SetViewKey Key
@@ -139,26 +131,8 @@ update msg model =
     case msg of
         Edit ->
             let
-                firstPartName =
-                    model.chart.parts
-                        |> List.filterMap
-                            (\part ->
-                                case part of
-                                    Part name _ ->
-                                        Just name
-
-                                    PartRepeat _ ->
-                                        Nothing
-                            )
-                        |> List.head
-
                 newStatus =
-                    case firstPartName of
-                        Just name ->
-                            EditStatus { partName = name, barIndex = 0 }
-
-                        Nothing ->
-                            ViewStatus
+                    EditStatus (BarSelection { partIndex = 0, barIndex = 0 })
             in
                 { model | status = newStatus }
 
@@ -173,7 +147,19 @@ update msg model =
                             ViewStatus
 
                         EditStatus _ ->
-                            EditStatus barReference
+                            EditStatus (BarSelection barReference)
+            in
+                { model | status = newStatus }
+
+        SelectPart partIndex ->
+            let
+                newStatus =
+                    case model.status of
+                        ViewStatus ->
+                            ViewStatus
+
+                        EditStatus _ ->
+                            EditStatus (PartSelection partIndex)
             in
                 { model | status = newStatus }
 
@@ -181,7 +167,7 @@ update msg model =
             let
                 newChart =
                     model.chart
-                        |> updateChartAt barReference
+                        |> updateBarAt barReference
                             (\_ ->
                                 if checked then
                                     BarRepeat
@@ -195,7 +181,7 @@ update msg model =
             let
                 newChart =
                     model.chart
-                        |> updateChartAt barReference (\_ -> Bar [ chord ])
+                        |> updateBarAt barReference (\_ -> Bar [ chord ])
             in
                 { model | chart = newChart }
 
@@ -221,38 +207,49 @@ view { chart, status, viewKey } =
                 [ text "Transpose to: "
                 , viewSelectNote viewNote (Key >> SetViewKey)
                 ]
-            , viewTable (Music.Chart.transpose viewKey chart) status
+            , table
+                [ style
+                    [ ( "border-collapse", "collapse" )
+                    , ( "width", "400px" )
+                    ]
+                ]
+                [ let
+                    transposedChart =
+                        Music.Chart.transpose viewKey chart
+                  in
+                    tbody []
+                        (transposedChart.parts
+                            |> List.indexedMap (viewPart chart status)
+                        )
+                ]
             , div []
                 (case status of
-                    EditStatus barReference ->
+                    EditStatus selection ->
                         [ button [ onClick Save ]
                             [ text "Save" ]
-                        , let
-                            selectedBar =
-                                chart
-                                    |> getBarsOfPart barReference.partName
-                                    |> List.getAt barReference.barIndex
-                          in
-                            fieldset []
-                                ([ legend []
-                                    [ text "Bar" ]
-                                 ]
-                                    ++ (case selectedBar of
-                                            Nothing ->
-                                                []
-
-                                            Just selectedBar ->
-                                                [ viewBarEditor barReference selectedBar ]
-                                       )
-                                )
                         , fieldset []
-                            [ legend []
-                                [ text "Part" ]
-                            , button []
-                                [ text "Add" ]
-                            , button []
-                                [ text "Delete" ]
-                            ]
+                            (case selection of
+                                BarSelection barReference ->
+                                    [ legend []
+                                        [ text "Bar" ]
+                                    ]
+                                        ++ (case getBarAtReference barReference chart of
+                                                Nothing ->
+                                                    []
+
+                                                Just selectedBar ->
+                                                    [ viewBarEditor barReference selectedBar ]
+                                           )
+
+                                PartSelection partIndex ->
+                                    [ legend []
+                                        [ text "Part" ]
+                                    , text
+                                        (getPartNameFromIndex partIndex chart
+                                            |> Maybe.withDefault "Should never happen"
+                                        )
+                                    ]
+                            )
                         ]
 
                     ViewStatus ->
@@ -326,59 +323,67 @@ viewSelectNote selectedNote tagger =
         )
 
 
-viewTable : Chart -> ChartStatus -> Html Msg
-viewTable chart chartStatus =
-    table
+viewPart : Chart -> ChartStatus -> PartIndex -> Part -> Html Msg
+viewPart chart status partIndex part =
+    tr
         [ style
-            [ ( "border-collapse", "collapse" )
-            , ( "width", "400px" )
-            ]
-        ]
-        [ tbody []
-            (chart.parts
-                |> List.concatMap partToRows
-                |> List.map (viewRow chartStatus)
+            (if isPartRepeat part then
+                []
+             else
+                [ ( "height", "2em" ) ]
             )
         ]
+        (let
+            partTd s =
+                td
+                    [ onClick (SelectPart partIndex)
+                    , style [ ( "width", "1em" ) ]
+                    ]
+                    [ text s ]
 
+            isSelected : PartName -> BarIndex -> Bool
+            isSelected partName barIndex =
+                let
+                    isSelectedPartName partIndex =
+                        case getPartNameFromIndex partIndex chart of
+                            Nothing ->
+                                False
 
-viewRow : ChartStatus -> Row -> Html Msg
-viewRow chartStatus row =
-    let
-        partName =
-            getPartName row
-    in
-        tr
-            [ style
-                (case row of
-                    Part _ _ ->
-                        [ ( "height", "2em" ) ]
+                            Just selectedPartName ->
+                                partName == selectedPartName
+                in
+                    case status of
+                        EditStatus selection ->
+                            case selection of
+                                BarSelection barReference ->
+                                    isSelectedPartName barReference.partIndex && barIndex == barReference.barIndex
 
-                    PartRepeat _ ->
-                        []
-                )
-            ]
-            ((td
-                [ style [ ( "width", "1em" ) ] ]
-                [ text partName ]
-             )
-                :: (row
-                        |> rowToBars
-                        |> List.indexedMap
-                            (\barIndex bar ->
-                                let
-                                    isSelected =
-                                        case chartStatus of
-                                            EditStatus barReference ->
-                                                partName == barReference.partName && barIndex == barReference.barIndex
+                                PartSelection partIndex ->
+                                    isSelectedPartName partIndex
 
-                                            ViewStatus ->
-                                                False
-                                in
-                                    viewBar isSelected (BarReference partName barIndex) bar
-                            )
-                   )
-            )
+                        ViewStatus ->
+                            False
+         in
+            case part of
+                Part partName bars ->
+                    partTd partName
+                        :: (List.greedyGroupsOf nbBarsByRow bars
+                                |> List.concat
+                                |> List.indexedMap
+                                    (\barIndex bar ->
+                                        viewBar (isSelected partName barIndex) (BarReference partIndex barIndex) bar
+                                    )
+                           )
+
+                PartRepeat partName ->
+                    partTd partName
+                        :: (List.repeat nbBarsByRow BarRepeat
+                                |> List.indexedMap
+                                    (\barIndex bar ->
+                                        viewBar (isSelected partName barIndex) (BarReference partIndex barIndex) bar
+                                    )
+                           )
+        )
 
 
 viewBar : Bool -> BarReference -> Bar -> Html Msg
