@@ -1,6 +1,5 @@
 module Music.Chart exposing (..)
 
-import List.Extra as List
 import Music.Chord as Chord exposing (Chord)
 import Music.Note as Note exposing (Note, Interval)
 
@@ -18,6 +17,16 @@ type alias Chart =
 type Part
     = Part PartName (List Bar)
     | PartRepeat PartName
+
+
+mapPartBars : (List Bar -> List Bar) -> Part -> Part
+mapPartBars f part =
+    case part of
+        Part partName bars ->
+            Part partName (f bars)
+
+        PartRepeat _ ->
+            part
 
 
 type alias PartIndex =
@@ -65,13 +74,6 @@ getPartName part =
 
         PartRepeat partName ->
             partName
-
-
-getPartNameFromIndex : PartIndex -> Chart -> Maybe PartName
-getPartNameFromIndex partIndex { parts } =
-    parts
-        |> List.getAt partIndex
-        |> Maybe.map getPartName
 
 
 type Bar

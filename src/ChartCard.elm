@@ -49,16 +49,6 @@ type Selection
     | BarSelection BarReference
 
 
-isSamePartNameThan : PartName -> PartIndex -> Chart -> Bool
-isSamePartNameThan partName partIndex chart =
-    case getPartNameFromIndex partIndex chart of
-        Nothing ->
-            False
-
-        Just partNameFromIndex ->
-            partName == partNameFromIndex
-
-
 getBarAtReference : BarReference -> Chart -> Maybe Bar
 getBarAtReference barReference chart =
     chart.parts
@@ -75,28 +65,23 @@ updateBarAt barReference updateBar chart =
     let
         newParts =
             chart.parts
-                |> List.map
-                    (\part ->
-                        case part of
-                            Part partName bars ->
-                                if isSamePartNameThan partName barReference.partIndex chart then
-                                    let
-                                        newBars =
-                                            bars
-                                                |> List.indexedMap
-                                                    (\index bar ->
-                                                        if index == barReference.barIndex then
-                                                            updateBar bar
-                                                        else
-                                                            bar
-                                                    )
-                                    in
-                                        Part partName newBars
-                                else
-                                    part
-
-                            PartRepeat _ ->
-                                part
+                |> List.indexedMap
+                    (\partIndex part ->
+                        if partIndex == barReference.partIndex then
+                            part
+                                |> mapPartBars
+                                    (\bars ->
+                                        bars
+                                            |> List.indexedMap
+                                                (\barIndex bar ->
+                                                    if barIndex == barReference.barIndex then
+                                                        updateBar bar
+                                                    else
+                                                        bar
+                                                )
+                                    )
+                        else
+                            part
                     )
     in
         { chart | parts = newParts }
@@ -284,20 +269,16 @@ view { chart, status, viewKey } =
                                            )
 
                                 PartSelection partIndex ->
-                                    let
-                                        partName =
-                                            getPartNameFromIndex partIndex chart
-                                                |> Maybe.withDefault "Should never happen"
-                                    in
-                                        [ legend []
-                                            [ text ("Part " ++ partName) ]
-                                        , button []
-                                            [ text "Add part before" ]
-                                        , button []
-                                            [ text "Add part after" ]
-                                        , button []
-                                            [ text "Delete part" ]
-                                        ]
+                                    [ legend []
+                                        [ text "Part" ]
+                                    ]
+                                        ++ (case List.getAt partIndex chart.parts of
+                                                Nothing ->
+                                                    []
+
+                                                Just part ->
+                                                    [ viewPartEditor part ]
+                                           )
                             )
                         ]
 
@@ -363,6 +344,27 @@ viewBarEditor barReference bar =
                         [ text "Delete bar" ]
                    ]
             )
+
+
+viewPartEditor : Part -> Html Msg
+viewPartEditor part =
+    div []
+        [ text
+            (case part of
+                Part partName _ ->
+                    "part " ++ partName
+
+                PartRepeat partName ->
+                    "repeated part of " ++ partName
+            )
+        , br [] []
+        , button []
+            [ text "Add part before" ]
+        , button []
+            [ text "Add part after" ]
+        , button []
+            [ text "Delete part" ]
+        ]
 
 
 viewSelectNote : Note -> (Note -> Msg) -> Html Msg
@@ -441,16 +443,16 @@ viewPart chart status partIndex part =
                     ]
                     [ text s ]
 
-            isSelected : PartName -> BarIndex -> Bool
-            isSelected partName barIndex =
+            isSelected : BarIndex -> Bool
+            isSelected barIndex =
                 case status of
                     EditStatus selection ->
                         case selection of
                             BarSelection barReference ->
-                                isSamePartNameThan partName barReference.partIndex chart && barIndex == barReference.barIndex
+                                partIndex == barReference.partIndex && barIndex == barReference.barIndex
 
-                            PartSelection partIndex ->
-                                isSamePartNameThan partName partIndex chart
+                            PartSelection partIndex1 ->
+                                partIndex == partIndex1
 
                     ViewStatus ->
                         False
@@ -462,7 +464,7 @@ viewPart chart status partIndex part =
                                 |> List.concat
                                 |> List.indexedMap
                                     (\barIndex bar ->
-                                        viewBar (isSelected partName barIndex) (BarReference partIndex barIndex) bar
+                                        viewBar (isSelected barIndex) (SelectBar (BarReference partIndex barIndex)) bar
                                     )
                            )
 
@@ -471,16 +473,16 @@ viewPart chart status partIndex part =
                         :: (List.repeat nbBarsByRow BarRepeat
                                 |> List.indexedMap
                                     (\barIndex bar ->
-                                        viewBar (isSelected partName barIndex) (BarReference partIndex barIndex) bar
+                                        viewBar (isSelected barIndex) (SelectPart partIndex) bar
                                     )
                            )
         )
 
 
-viewBar : Bool -> BarReference -> Bar -> Html Msg
-viewBar isSelected barReference bar =
+viewBar : Bool -> Msg -> Bar -> Html Msg
+viewBar isSelected msg bar =
     td
-        [ onClick (SelectBar barReference)
+        [ onClick msg
         , style
             ([ ( "border", "1px solid" )
              , ( "height", "inherit" )
