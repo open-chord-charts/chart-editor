@@ -45,6 +45,16 @@ type Selection
     | BarSelection BarReference
 
 
+isSamePartNameThan : PartName -> PartIndex -> Chart -> Bool
+isSamePartNameThan partName partIndex chart =
+    case getPartNameFromIndex partIndex chart of
+        Nothing ->
+            False
+
+        Just partNameFromIndex ->
+            partName == partNameFromIndex
+
+
 getBarAtReference : BarReference -> Chart -> Maybe Bar
 getBarAtReference barReference chart =
     chart.parts
@@ -61,11 +71,11 @@ updateBarAt barReference updateBar chart =
     let
         newParts =
             chart.parts
-                |> List.indexedMap
-                    (\partIndex part ->
+                |> List.map
+                    (\part ->
                         case part of
                             Part partName bars ->
-                                if partIndex == barReference.partIndex then
+                                if isSamePartNameThan partName barReference.partIndex chart then
                                     let
                                         newBars =
                                             bars
@@ -361,26 +371,17 @@ viewPart chart status partIndex part =
 
             isSelected : PartName -> BarIndex -> Bool
             isSelected partName barIndex =
-                let
-                    isSelectedPartName partIndex =
-                        case getPartNameFromIndex partIndex chart of
-                            Nothing ->
-                                False
+                case status of
+                    EditStatus selection ->
+                        case selection of
+                            BarSelection barReference ->
+                                isSamePartNameThan partName barReference.partIndex chart && barIndex == barReference.barIndex
 
-                            Just selectedPartName ->
-                                partName == selectedPartName
-                in
-                    case status of
-                        EditStatus selection ->
-                            case selection of
-                                BarSelection barReference ->
-                                    isSelectedPartName barReference.partIndex && barIndex == barReference.barIndex
+                            PartSelection partIndex ->
+                                isSamePartNameThan partName partIndex chart
 
-                                PartSelection partIndex ->
-                                    isSelectedPartName partIndex
-
-                        ViewStatus ->
-                            False
+                    ViewStatus ->
+                        False
          in
             case part of
                 Part partName bars ->
