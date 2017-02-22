@@ -242,13 +242,20 @@ view { chart, status, viewKey } =
                                            )
 
                                 PartSelection partIndex ->
-                                    [ legend []
-                                        [ text "Part" ]
-                                    , text
-                                        (getPartNameFromIndex partIndex chart
-                                            |> Maybe.withDefault "Should never happen"
-                                        )
-                                    ]
+                                    let
+                                        partName =
+                                            getPartNameFromIndex partIndex chart
+                                                |> Maybe.withDefault "Should never happen"
+                                    in
+                                        [ legend []
+                                            [ text ("Part " ++ partName) ]
+                                        , button []
+                                            [ text "Add part before" ]
+                                        , button []
+                                            [ text "Add part after" ]
+                                        , button []
+                                            [ text "Delete part" ]
+                                        ]
                             )
                         ]
 
@@ -277,20 +284,29 @@ viewBarEditor barReference bar =
         div []
             (case bar of
                 Bar chords ->
-                    [ div []
-                        [ barRepeatCheckbox False ]
+                    [ barRepeatCheckbox False
+                    , br [] []
                     ]
                         ++ (chords
-                                |> List.map
+                                |> List.concatMap
                                     (\(Chord note quality) ->
-                                        viewSelectNote note
-                                            (\selectedNote ->
-                                                SetChord barReference (Chord selectedNote quality)
-                                            )
+                                        [ viewSelectNote note
+                                            (\selectedNote -> SetChord barReference (Chord selectedNote quality))
+                                        , button []
+                                            [ text "Delete chord" ]
+                                        ]
                                     )
                            )
-                        ++ [ button []
-                                [ text "Add chord" ]
+                        ++ [ br [] []
+                           , button []
+                                [ text "Add chord in bar" ]
+                           , br [] []
+                           , button []
+                                [ text "Add bar before" ]
+                           , button []
+                                [ text "Add bar after" ]
+                           , button []
+                                [ text "Delete bar" ]
                            ]
 
                 BarRepeat ->
