@@ -282,7 +282,7 @@ viewBarEditor barReference bar =
                 ]
     in
         div []
-            (case bar of
+            ((case bar of
                 Bar chords ->
                     [ barRepeatCheckbox False
                     , br [] []
@@ -300,17 +300,19 @@ viewBarEditor barReference bar =
                         ++ [ br [] []
                            , button []
                                 [ text "Add chord in bar" ]
-                           , br [] []
-                           , button []
-                                [ text "Add bar before" ]
-                           , button []
-                                [ text "Add bar after" ]
-                           , button []
-                                [ text "Delete bar" ]
                            ]
 
                 BarRepeat ->
                     [ barRepeatCheckbox True ]
+             )
+                ++ [ br [] []
+                   , button []
+                        [ text "Add bar before" ]
+                   , button []
+                        [ text "Add bar after" ]
+                   , button []
+                        [ text "Delete bar" ]
+                   ]
             )
 
 
