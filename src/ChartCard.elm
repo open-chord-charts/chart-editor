@@ -62,26 +62,50 @@ getBarAtReference barReference chart =
 
 updateBarAt : BarReference -> (Bar -> Bar) -> Chart -> Chart
 updateBarAt barReference updateBar chart =
+    updatePartAtIndex barReference.partIndex
+        (mapPartBars
+            (\bars ->
+                bars
+                    |> List.indexedMap
+                        (\barIndex bar ->
+                            if barIndex == barReference.barIndex then
+                                updateBar bar
+                            else
+                                bar
+                        )
+            )
+        )
+        chart
+
+
+updatePartAtIndex : PartIndex -> (Part -> Part) -> Chart -> Chart
+updatePartAtIndex partIndex updatePart chart =
     let
         newParts =
             chart.parts
                 |> List.indexedMap
-                    (\partIndex part ->
-                        if partIndex == barReference.partIndex then
-                            part
-                                |> mapPartBars
-                                    (\bars ->
-                                        bars
-                                            |> List.indexedMap
-                                                (\barIndex bar ->
-                                                    if barIndex == barReference.barIndex then
-                                                        updateBar bar
-                                                    else
-                                                        bar
-                                                )
-                                    )
+                    (\partIndex1 part ->
+                        if partIndex == partIndex1 then
+                            updatePart part
                         else
                             part
+                    )
+    in
+        { chart | parts = newParts }
+
+
+removePartAtIndex : PartIndex -> Chart -> Chart
+removePartAtIndex partIndex chart =
+    let
+        newParts =
+            chart.parts
+                |> List.indexedMap (,)
+                |> List.filterMap
+                    (\( partIndex1, part ) ->
+                        if partIndex == partIndex1 then
+                            Nothing
+                        else
+                            Just part
                     )
     in
         { chart | parts = newParts }
@@ -114,11 +138,14 @@ init chart =
 type Msg
     = AddChord BarReference
     | Edit
+      -- | RemoveBar BarReference
     | RemoveChord BarReference ChordIndex
+    | RemovePart PartIndex
     | Save
     | SelectBar BarReference
     | SelectPart PartIndex
     | SetBarRepeat BarReference Bool
+    | SetPartRepeat PartIndex Bool
     | SetChord BarReference ChordIndex Chord
     | SetViewKey Key
 
@@ -152,6 +179,30 @@ update msg model =
                         |> updateBarAt barReference (mapBarChords (List.removeAt chordIndex))
             in
                 { model | chart = newChart }
+
+        RemovePart partIndex ->
+            let
+                newChart =
+                    model.chart
+                        |> removePartAtIndex partIndex
+
+                nbParts =
+                    List.length newChart.parts
+
+                newStatus =
+                    EditStatus
+                        (PartSelection
+                            (if partIndex > nbParts - 1 then
+                                Basics.max 0 (nbParts - 1)
+                             else
+                                partIndex
+                            )
+                        )
+            in
+                { model
+                    | chart = newChart
+                    , status = newStatus
+                }
 
         Save ->
             { model | status = ViewStatus }
@@ -190,6 +241,24 @@ update msg model =
                                     BarRepeat
                                 else
                                     Bar []
+                            )
+            in
+                { model | chart = newChart }
+
+        SetPartRepeat partIndex checked ->
+            let
+                newChart =
+                    model.chart
+                        |> updatePartAtIndex partIndex
+                            (\part ->
+                                let
+                                    partName =
+                                        getPartName part
+                                in
+                                    if checked then
+                                        PartRepeat partName
+                                    else
+                                        Part partName [ Bar [] ]
                             )
             in
                 { model | chart = newChart }
@@ -277,7 +346,11 @@ view { chart, status, viewKey } =
                                                     []
 
                                                 Just part ->
-                                                    [ viewPartEditor part ]
+                                                    let
+                                                        removeDisabled =
+                                                            List.length chart.parts == 1
+                                                    in
+                                                        [ viewPartEditor removeDisabled partIndex part ]
                                            )
                             )
                         ]
@@ -322,7 +395,7 @@ viewBarEditor barReference bar =
                                                 SetChord barReference chordIndex (Chord note selectedQuality)
                                             )
                                         , button [ onClick (RemoveChord barReference chordIndex) ]
-                                            [ text "Delete chord" ]
+                                            [ text "Remove chord" ]
                                         , br [] []
                                         ]
                                     )
@@ -341,30 +414,58 @@ viewBarEditor barReference bar =
                    , button []
                         [ text "Add bar after" ]
                    , button []
-                        [ text "Delete bar" ]
+                        [ text "Remove bar" ]
+                   , br [] []
+                   , button [ onClick (SelectPart barReference.partIndex) ]
+                        [ text "Select part" ]
                    ]
             )
 
 
-viewPartEditor : Part -> Html Msg
-viewPartEditor part =
-    div []
-        [ text
-            (case part of
-                Part partName _ ->
-                    "part " ++ partName
+viewPartEditor : Bool -> PartIndex -> Part -> Html Msg
+viewPartEditor removeDisabled partIndex part =
+    let
+        partRepeatCheckbox isChecked =
+            label []
+                [ input
+                    [ checked isChecked
+                    , onCheck (SetPartRepeat partIndex)
+                    , type_ "checkbox"
+                    ]
+                    []
+                , text "repeated part"
+                ]
 
-                PartRepeat partName ->
-                    "repeated part of " ++ partName
+        isRepeat =
+            isPartRepeat part
+    in
+        div []
+            ([ partRepeatCheckbox isRepeat
+             , br [] []
+             , input [ value (getPartName part) ] []
+             ]
+                ++ (if isRepeat then
+                        []
+                    else
+                        [ br [] []
+                        , button []
+                            [ text "Add bar at start" ]
+                        , button []
+                            [ text "Add bar at end" ]
+                        ]
+                   )
+                ++ [ br [] []
+                   , button []
+                        [ text "Add part before" ]
+                   , button []
+                        [ text "Add part after" ]
+                   , button
+                        [ disabled removeDisabled
+                        , onClick (RemovePart partIndex)
+                        ]
+                        [ text "Remove part" ]
+                   ]
             )
-        , br [] []
-        , button []
-            [ text "Add part before" ]
-        , button []
-            [ text "Add part after" ]
-        , button []
-            [ text "Delete part" ]
-        ]
 
 
 viewSelectNote : Note -> (Note -> Msg) -> Html Msg
@@ -436,15 +537,35 @@ viewPart chart status partIndex part =
             )
         ]
         (let
+            isPartSelected =
+                case status of
+                    EditStatus selection ->
+                        case selection of
+                            BarSelection _ ->
+                                False
+
+                            PartSelection partIndex1 ->
+                                partIndex == partIndex1
+
+                    ViewStatus ->
+                        False
+
             partTd s =
                 td
                     [ onClick (SelectPart partIndex)
-                    , style [ ( "width", "1em" ) ]
+                    , style
+                        ([ ( "width", "1em" ) ]
+                            ++ (if isPartSelected then
+                                    [ ( "background-color", "lightgray" ) ]
+                                else
+                                    []
+                               )
+                        )
                     ]
                     [ text s ]
 
-            isSelected : BarIndex -> Bool
-            isSelected barIndex =
+            isBarSelected : BarIndex -> Bool
+            isBarSelected barIndex =
                 case status of
                     EditStatus selection ->
                         case selection of
@@ -464,7 +585,7 @@ viewPart chart status partIndex part =
                                 |> List.concat
                                 |> List.indexedMap
                                     (\barIndex bar ->
-                                        viewBar (isSelected barIndex) (SelectBar (BarReference partIndex barIndex)) bar
+                                        viewBar (isBarSelected barIndex) (SelectBar (BarReference partIndex barIndex)) bar
                                     )
                            )
 
@@ -473,7 +594,7 @@ viewPart chart status partIndex part =
                         :: (List.repeat nbBarsByRow BarRepeat
                                 |> List.indexedMap
                                     (\barIndex bar ->
-                                        viewBar (isSelected barIndex) (SelectPart partIndex) bar
+                                        viewBar (isBarSelected barIndex) (SelectPart partIndex) bar
                                     )
                            )
         )
