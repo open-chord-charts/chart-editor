@@ -550,6 +550,10 @@ viewPartEditor removeDisabled partIndex part =
                         [ text "Add part after" ]
                    , button []
                         [ text "Duplicate part" ]
+                   , button []
+                        [ text "Move part up" ]
+                   , button []
+                        [ text "Move part down" ]
                    , button
                         [ disabled removeDisabled
                         , onClick (RemovePart partIndex)
