@@ -13,6 +13,16 @@ import Music.Note as Note exposing (..)
 -- CONSTANTS
 
 
+defaultChord : Chord
+defaultChord =
+    Chord noteC Major
+
+
+defaultBar : Bar
+defaultBar =
+    Bar [ defaultChord ]
+
+
 nbBarsByRow : Int
 nbBarsByRow =
     8
@@ -51,28 +61,21 @@ type Selection
 
 getBarAtReference : BarReference -> Chart -> Maybe Bar
 getBarAtReference barReference chart =
-    chart.parts
-        |> List.getAt barReference.partIndex
-        |> Maybe.andThen
-            (\part ->
-                getBarsOfPart (getPartName part) chart
-                    |> List.getAt barReference.barIndex
-            )
+    getBarsOfPartByIndex barReference.partIndex chart
+        |> List.getAt barReference.barIndex
 
 
 updateBarAt : BarReference -> (Bar -> Bar) -> Chart -> Chart
 updateBarAt barReference updateBar chart =
     updatePartAtIndex barReference.partIndex
         (mapPartBars
-            (\bars ->
-                bars
-                    |> List.indexedMap
-                        (\barIndex bar ->
-                            if barIndex == barReference.barIndex then
-                                updateBar bar
-                            else
-                                bar
-                        )
+            (List.indexedMap
+                (\barIndex bar ->
+                    if barIndex == barReference.barIndex then
+                        updateBar bar
+                    else
+                        bar
+                )
             )
         )
         chart
@@ -136,15 +139,18 @@ init chart =
 
 
 type Msg
-    = AddChord BarReference
+    = AddBar BarReference
+    | AddChord BarReference
+    | AddPart PartIndex
     | Edit
-      -- | RemoveBar BarReference
+    | RemoveBar BarReference
     | RemoveChord BarReference ChordIndex
     | RemovePart PartIndex
     | Save
     | SelectBar BarReference
     | SelectPart PartIndex
     | SetBarRepeat BarReference Bool
+    | SetPartName PartIndex PartName
     | SetPartRepeat PartIndex Bool
     | SetChord BarReference ChordIndex Chord
     | SetViewKey Key
@@ -157,13 +163,53 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
     case msg of
+        AddBar barReference ->
+            let
+                newChart =
+                    model.chart
+                        |> updatePartAtIndex barReference.partIndex
+                            (mapPartBars
+                                (List.splitAt barReference.barIndex
+                                    >> (\( init, tail ) -> init ++ [ defaultBar ] ++ tail)
+                                )
+                            )
+
+                newStatus =
+                    EditStatus (BarSelection barReference)
+            in
+                { model
+                    | chart = newChart
+                    , status = newStatus
+                }
+
         AddChord barReference ->
             let
                 newChart =
                     model.chart
-                        |> updateBarAt barReference (mapBarChords (\chords -> chords ++ [ Chord noteC Major ]))
+                        |> updateBarAt barReference (mapBarChords (\chords -> chords ++ [ defaultChord ]))
             in
                 { model | chart = newChart }
+
+        AddPart partIndex ->
+            let
+                newParts =
+                    model.chart.parts
+                        |> List.splitAt partIndex
+                        |> (\( init, tail ) -> init ++ [ Part "" [ defaultBar ] ] ++ tail)
+
+                chart =
+                    model.chart
+
+                newChart =
+                    { chart | parts = newParts }
+
+                newStatus =
+                    EditStatus (PartSelection partIndex)
+            in
+                { model
+                    | chart = newChart
+                    , status = newStatus
+                }
 
         Edit ->
             let
@@ -171,6 +217,32 @@ update msg model =
                     EditStatus (BarSelection { partIndex = 0, barIndex = 0 })
             in
                 { model | status = newStatus }
+
+        RemoveBar barReference ->
+            let
+                newChart =
+                    model.chart
+                        |> updatePartAtIndex barReference.partIndex
+                            (mapPartBars (List.removeAt barReference.barIndex))
+
+                nbBars =
+                    getBarsOfPartByIndex barReference.partIndex newChart
+                        |> List.length
+
+                newBarIndex =
+                    if barReference.barIndex > nbBars - 1 then
+                        Basics.max 0 (nbBars - 1)
+                    else
+                        barReference.barIndex
+
+                newStatus =
+                    EditStatus
+                        (BarSelection { barReference | barIndex = newBarIndex })
+            in
+                { model
+                    | chart = newChart
+                    , status = newStatus
+                }
 
         RemoveChord barReference chordIndex ->
             let
@@ -210,24 +282,14 @@ update msg model =
         SelectBar barReference ->
             let
                 newStatus =
-                    case model.status of
-                        ViewStatus ->
-                            ViewStatus
-
-                        EditStatus _ ->
-                            EditStatus (BarSelection barReference)
+                    EditStatus (BarSelection barReference)
             in
                 { model | status = newStatus }
 
         SelectPart partIndex ->
             let
                 newStatus =
-                    case model.status of
-                        ViewStatus ->
-                            ViewStatus
-
-                        EditStatus _ ->
-                            EditStatus (PartSelection partIndex)
+                    EditStatus (PartSelection partIndex)
             in
                 { model | status = newStatus }
 
@@ -240,7 +302,23 @@ update msg model =
                                 if checked then
                                     BarRepeat
                                 else
-                                    Bar []
+                                    defaultBar
+                            )
+            in
+                { model | chart = newChart }
+
+        SetPartName partIndex partName ->
+            let
+                newChart =
+                    model.chart
+                        |> updatePartAtIndex partIndex
+                            (\part ->
+                                case part of
+                                    Part _ bars ->
+                                        Part partName bars
+
+                                    PartRepeat _ ->
+                                        PartRepeat partName
                             )
             in
                 { model | chart = newChart }
@@ -258,7 +336,7 @@ update msg model =
                                     if checked then
                                         PartRepeat partName
                                     else
-                                        Part partName [ Bar [] ]
+                                        Part partName [ defaultBar ]
                             )
             in
                 { model | chart = newChart }
@@ -334,7 +412,7 @@ view { chart, status, viewKey } =
                                                     []
 
                                                 Just selectedBar ->
-                                                    [ viewBarEditor barReference selectedBar ]
+                                                    [ viewBarEditor chart barReference selectedBar ]
                                            )
 
                                 PartSelection partIndex ->
@@ -363,8 +441,8 @@ view { chart, status, viewKey } =
             ]
 
 
-viewBarEditor : BarReference -> Bar -> Html Msg
-viewBarEditor barReference bar =
+viewBarEditor : Chart -> BarReference -> Bar -> Html Msg
+viewBarEditor chart barReference bar =
     let
         barRepeatCheckbox isChecked =
             label []
@@ -409,12 +487,19 @@ viewBarEditor barReference bar =
                     [ barRepeatCheckbox True ]
              )
                 ++ [ br [] []
-                   , button []
+                   , button [ onClick (AddBar barReference) ]
                         [ text "Add bar before" ]
-                   , button []
+                   , button [ onClick (AddBar { barReference | barIndex = barReference.barIndex + 1 }) ]
                         [ text "Add bar after" ]
-                   , button []
-                        [ text "Remove bar" ]
+                   , let
+                        removeDisabled =
+                            (getBarsOfPartByIndex barReference.partIndex chart |> List.length) == 1
+                     in
+                        button
+                            [ disabled removeDisabled
+                            , onClick (RemoveBar barReference)
+                            ]
+                            [ text "Remove bar" ]
                    , br [] []
                    , button [ onClick (SelectPart barReference.partIndex) ]
                         [ text "Select part" ]
@@ -442,7 +527,11 @@ viewPartEditor removeDisabled partIndex part =
         div []
             ([ partRepeatCheckbox isRepeat
              , br [] []
-             , input [ value (getPartName part) ] []
+             , input
+                [ onInput (SetPartName partIndex)
+                , value (getPartName part)
+                ]
+                []
              ]
                 ++ (if isRepeat then
                         []
@@ -455,10 +544,12 @@ viewPartEditor removeDisabled partIndex part =
                         ]
                    )
                 ++ [ br [] []
-                   , button []
+                   , button [ onClick (AddPart partIndex) ]
                         [ text "Add part before" ]
-                   , button []
+                   , button [ onClick (AddPart (partIndex + 1)) ]
                         [ text "Add part after" ]
+                   , button []
+                        [ text "Duplicate part" ]
                    , button
                         [ disabled removeDisabled
                         , onClick (RemovePart partIndex)

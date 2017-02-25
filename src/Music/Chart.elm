@@ -1,5 +1,6 @@
 module Music.Chart exposing (..)
 
+import List.Extra as List
 import Music.Chord as Chord exposing (Chord)
 import Music.Note as Note exposing (Note, Interval)
 
@@ -47,23 +48,19 @@ isPartRepeat part =
             True
 
 
-getBarsOfPart : PartName -> Chart -> List Bar
-getBarsOfPart partName { parts } =
-    parts
-        |> List.filterMap
-            (\part ->
-                case part of
-                    Part partName1 bars ->
-                        if partName == partName1 then
-                            Just bars
-                        else
-                            Nothing
+getBarsOfPartByIndex : PartIndex -> Chart -> List Bar
+getBarsOfPartByIndex partIndex chart =
+    case List.getAt partIndex chart.parts of
+        Nothing ->
+            []
 
-                    PartRepeat _ ->
-                        Nothing
-            )
-        |> List.head
-        |> Maybe.withDefault []
+        Just part ->
+            case part of
+                Part _ bars ->
+                    bars
+
+                PartRepeat _ ->
+                    []
 
 
 getPartName : Part -> PartName
