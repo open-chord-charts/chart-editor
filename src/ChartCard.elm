@@ -28,6 +28,11 @@ nbBarsByRow =
     8
 
 
+youFoundABugMessage : String
+youFoundABugMessage =
+    "Should never happen – you found a bug :-)"
+
+
 
 -- TYPES
 
@@ -409,7 +414,7 @@ view { chart, status, viewKey } =
                                     ]
                                         ++ (case getBarAtReference barReference chart of
                                                 Nothing ->
-                                                    []
+                                                    [ text youFoundABugMessage ]
 
                                                 Just selectedBar ->
                                                     [ viewBarEditor chart barReference selectedBar ]
@@ -421,7 +426,7 @@ view { chart, status, viewKey } =
                                     ]
                                         ++ (case List.getAt partIndex chart.parts of
                                                 Nothing ->
-                                                    []
+                                                    [ text youFoundABugMessage ]
 
                                                 Just part ->
                                                     let
@@ -464,11 +469,11 @@ viewBarEditor chart barReference bar =
                         ++ (chords
                                 |> List.indexedMap
                                     (\chordIndex (Chord note quality) ->
-                                        [ viewSelectNote note
+                                        [ viewNoteSelector note
                                             (\selectedNote ->
                                                 SetChord barReference chordIndex (Chord selectedNote quality)
                                             )
-                                        , viewSelectQuality quality
+                                        , viewQualitySelector quality
                                             (\selectedQuality ->
                                                 SetChord barReference chordIndex (Chord note selectedQuality)
                                             )
@@ -588,15 +593,31 @@ viewSelectNote selectedNote tagger =
         )
 
 
-viewSelectQuality : Quality -> (Quality -> Msg) -> Html Msg
-viewSelectQuality selectedQuality tagger =
-    select
-        [ on "change"
-            (targetValue
-                |> Decode.andThen qualityDecoder
-                |> Decode.map tagger
-            )
-        ]
+viewNoteSelector : Note -> (Note -> Msg) -> Html Msg
+viewNoteSelector preSelectedNote noteToMsg =
+    div []
+        (Note.notes
+            |> List.map
+                (\note ->
+                    let
+                        noteStr =
+                            Note.toString note
+                    in
+                        button [ onClick (noteToMsg note) ]
+                            [ text
+                                (if note == preSelectedNote then
+                                    "[" ++ noteStr ++ "]"
+                                 else
+                                    noteStr
+                                )
+                            ]
+                )
+        )
+
+
+viewQualitySelector : Quality -> (Quality -> Msg) -> Html Msg
+viewQualitySelector preSelectedQuality qualityToMsg =
+    div []
         (Music.Chord.qualities
             |> List.map
                 (\quality ->
@@ -612,11 +633,14 @@ viewSelectQuality selectedQuality tagger =
                                 Seventh ->
                                     "7th"
                     in
-                        option
-                            [ selected (quality == selectedQuality)
-                            , value qualityStr
+                        button [ onClick (qualityToMsg quality) ]
+                            [ text
+                                (if quality == preSelectedQuality then
+                                    "[" ++ qualityStr ++ "]"
+                                 else
+                                    qualityStr
+                                )
                             ]
-                            [ text qualityStr ]
                 )
         )
 
