@@ -23,6 +23,11 @@ defaultBar =
     Bar [ defaultChord ]
 
 
+defaultPart : Part
+defaultPart =
+    Part "" [ defaultBar ]
+
+
 nbBarsByRow : Int
 nbBarsByRow =
     8
@@ -147,6 +152,7 @@ type Msg
     = AddBar BarReference
     | AddChord BarReference
     | AddPart PartIndex
+    | DuplicatePart PartIndex
     | Edit
     | RemoveBar BarReference
     | RemoveChord BarReference ChordIndex
@@ -167,40 +173,14 @@ type Msg
 
 update : Msg -> Model -> Model
 update msg model =
-    case msg of
-        AddBar barReference ->
-            let
-                newChart =
-                    model.chart
-                        |> updatePartAtIndex barReference.partIndex
-                            (mapPartBars
-                                (List.splitAt barReference.barIndex
-                                    >> (\( init, tail ) -> init ++ [ defaultBar ] ++ tail)
-                                )
-                            )
-
-                newStatus =
-                    EditStatus (BarSelection barReference)
-            in
-                { model
-                    | chart = newChart
-                    , status = newStatus
-                }
-
-        AddChord barReference ->
-            let
-                newChart =
-                    model.chart
-                        |> updateBarAt barReference (mapBarChords (\chords -> chords ++ [ defaultChord ]))
-            in
-                { model | chart = newChart }
-
-        AddPart partIndex ->
+    let
+        addPart : PartIndex -> Part -> Model
+        addPart partIndex part =
             let
                 newParts =
                     model.chart.parts
                         |> List.splitAt partIndex
-                        |> (\( init, tail ) -> init ++ [ Part "" [ defaultBar ] ] ++ tail)
+                        |> (\( init, tail ) -> init ++ [ part ] ++ tail)
 
                 chart =
                     model.chart
@@ -215,157 +195,196 @@ update msg model =
                     | chart = newChart
                     , status = newStatus
                 }
-
-        Edit ->
-            let
-                newStatus =
-                    EditStatus (BarSelection { partIndex = 0, barIndex = 0 })
-            in
-                { model | status = newStatus }
-
-        RemoveBar barReference ->
-            let
-                newChart =
-                    model.chart
-                        |> updatePartAtIndex barReference.partIndex
-                            (mapPartBars (List.removeAt barReference.barIndex))
-
-                nbBars =
-                    getBarsOfPartByIndex barReference.partIndex newChart
-                        |> List.length
-
-                newBarIndex =
-                    if barReference.barIndex > nbBars - 1 then
-                        Basics.max 0 (nbBars - 1)
-                    else
-                        barReference.barIndex
-
-                newStatus =
-                    EditStatus
-                        (BarSelection { barReference | barIndex = newBarIndex })
-            in
-                { model
-                    | chart = newChart
-                    , status = newStatus
-                }
-
-        RemoveChord barReference chordIndex ->
-            let
-                newChart =
-                    model.chart
-                        |> updateBarAt barReference (mapBarChords (List.removeAt chordIndex))
-            in
-                { model | chart = newChart }
-
-        RemovePart partIndex ->
-            let
-                newChart =
-                    model.chart
-                        |> removePartAtIndex partIndex
-
-                nbParts =
-                    List.length newChart.parts
-
-                newStatus =
-                    EditStatus
-                        (PartSelection
-                            (if partIndex > nbParts - 1 then
-                                Basics.max 0 (nbParts - 1)
-                             else
-                                partIndex
-                            )
-                        )
-            in
-                { model
-                    | chart = newChart
-                    , status = newStatus
-                }
-
-        Save ->
-            { model | status = ViewStatus }
-
-        SelectBar barReference ->
-            let
-                newStatus =
-                    EditStatus (BarSelection barReference)
-            in
-                { model | status = newStatus }
-
-        SelectPart partIndex ->
-            let
-                newStatus =
-                    EditStatus (PartSelection partIndex)
-            in
-                { model | status = newStatus }
-
-        SetBarRepeat barReference checked ->
-            let
-                newChart =
-                    model.chart
-                        |> updateBarAt barReference
-                            (\_ ->
-                                if checked then
-                                    BarRepeat
-                                else
-                                    defaultBar
-                            )
-            in
-                { model | chart = newChart }
-
-        SetPartName partIndex partName ->
-            let
-                newChart =
-                    model.chart
-                        |> updatePartAtIndex partIndex
-                            (\part ->
-                                case part of
-                                    Part _ bars ->
-                                        Part partName bars
-
-                                    PartRepeat _ ->
-                                        PartRepeat partName
-                            )
-            in
-                { model | chart = newChart }
-
-        SetPartRepeat partIndex checked ->
-            let
-                newChart =
-                    model.chart
-                        |> updatePartAtIndex partIndex
-                            (\part ->
-                                let
-                                    partName =
-                                        getPartName part
-                                in
-                                    if checked then
-                                        PartRepeat partName
-                                    else
-                                        Part partName [ defaultBar ]
-                            )
-            in
-                { model | chart = newChart }
-
-        SetChord barReference chordIndex chord ->
-            let
-                newChart =
-                    model.chart
-                        |> updateBarAt barReference
-                            (mapBarChords
-                                (List.indexedMap
-                                    (\chordIndex1 chord1 ->
-                                        if chordIndex == chordIndex1 then
-                                            chord
-                                        else
-                                            chord1
+    in
+        case msg of
+            AddBar barReference ->
+                let
+                    newChart =
+                        model.chart
+                            |> updatePartAtIndex barReference.partIndex
+                                (mapPartBars
+                                    (List.splitAt barReference.barIndex
+                                        >> (\( init, tail ) -> init ++ [ defaultBar ] ++ tail)
                                     )
                                 )
-                            )
-            in
-                { model | chart = newChart }
 
-        SetViewKey key ->
-            { model | viewKey = key }
+                    newStatus =
+                        EditStatus (BarSelection barReference)
+                in
+                    { model
+                        | chart = newChart
+                        , status = newStatus
+                    }
+
+            AddChord barReference ->
+                let
+                    newChart =
+                        model.chart
+                            |> updateBarAt barReference (mapBarChords (\chords -> chords ++ [ defaultChord ]))
+                in
+                    { model | chart = newChart }
+
+            AddPart partIndex ->
+                addPart partIndex defaultPart
+
+            DuplicatePart partIndex ->
+                case List.getAt partIndex model.chart.parts of
+                    Nothing ->
+                        model
+
+                    Just part ->
+                        addPart (partIndex + 1) part
+
+            Edit ->
+                let
+                    newStatus =
+                        EditStatus (BarSelection { partIndex = 0, barIndex = 0 })
+                in
+                    { model | status = newStatus }
+
+            RemoveBar barReference ->
+                let
+                    newChart =
+                        model.chart
+                            |> updatePartAtIndex barReference.partIndex
+                                (mapPartBars (List.removeAt barReference.barIndex))
+
+                    nbBars =
+                        getBarsOfPartByIndex barReference.partIndex newChart
+                            |> List.length
+
+                    newBarIndex =
+                        if barReference.barIndex > nbBars - 1 then
+                            Basics.max 0 (nbBars - 1)
+                        else
+                            barReference.barIndex
+
+                    newStatus =
+                        EditStatus
+                            (BarSelection { barReference | barIndex = newBarIndex })
+                in
+                    { model
+                        | chart = newChart
+                        , status = newStatus
+                    }
+
+            RemoveChord barReference chordIndex ->
+                let
+                    newChart =
+                        model.chart
+                            |> updateBarAt barReference (mapBarChords (List.removeAt chordIndex))
+                in
+                    { model | chart = newChart }
+
+            RemovePart partIndex ->
+                let
+                    newChart =
+                        model.chart
+                            |> removePartAtIndex partIndex
+
+                    nbParts =
+                        List.length newChart.parts
+
+                    newStatus =
+                        EditStatus
+                            (PartSelection
+                                (if partIndex > nbParts - 1 then
+                                    Basics.max 0 (nbParts - 1)
+                                 else
+                                    partIndex
+                                )
+                            )
+                in
+                    { model
+                        | chart = newChart
+                        , status = newStatus
+                    }
+
+            Save ->
+                { model | status = ViewStatus }
+
+            SelectBar barReference ->
+                let
+                    newStatus =
+                        EditStatus (BarSelection barReference)
+                in
+                    { model | status = newStatus }
+
+            SelectPart partIndex ->
+                let
+                    newStatus =
+                        EditStatus (PartSelection partIndex)
+                in
+                    { model | status = newStatus }
+
+            SetBarRepeat barReference checked ->
+                let
+                    newChart =
+                        model.chart
+                            |> updateBarAt barReference
+                                (\_ ->
+                                    if checked then
+                                        BarRepeat
+                                    else
+                                        defaultBar
+                                )
+                in
+                    { model | chart = newChart }
+
+            SetPartName partIndex partName ->
+                let
+                    newChart =
+                        model.chart
+                            |> updatePartAtIndex partIndex
+                                (\part ->
+                                    case part of
+                                        Part _ bars ->
+                                            Part partName bars
+
+                                        PartRepeat _ ->
+                                            PartRepeat partName
+                                )
+                in
+                    { model | chart = newChart }
+
+            SetPartRepeat partIndex checked ->
+                let
+                    newChart =
+                        model.chart
+                            |> updatePartAtIndex partIndex
+                                (\part ->
+                                    let
+                                        partName =
+                                            getPartName part
+                                    in
+                                        if checked then
+                                            PartRepeat partName
+                                        else
+                                            Part partName [ defaultBar ]
+                                )
+                in
+                    { model | chart = newChart }
+
+            SetChord barReference chordIndex chord ->
+                let
+                    newChart =
+                        model.chart
+                            |> updateBarAt barReference
+                                (mapBarChords
+                                    (List.indexedMap
+                                        (\chordIndex1 chord1 ->
+                                            if chordIndex == chordIndex1 then
+                                                chord
+                                            else
+                                                chord1
+                                        )
+                                    )
+                                )
+                in
+                    { model | chart = newChart }
+
+            SetViewKey key ->
+                { model | viewKey = key }
 
 
 
@@ -525,12 +544,9 @@ viewPartEditor removeDisabled partIndex part =
                     []
                 , text "repeated part"
                 ]
-
-        isRepeat =
-            isPartRepeat part
     in
         div []
-            ([ partRepeatCheckbox isRepeat
+            ([ partRepeatCheckbox (isPartRepeat part)
              , br [] []
              , input
                 [ onInput (SetPartName partIndex)
@@ -538,22 +554,24 @@ viewPartEditor removeDisabled partIndex part =
                 ]
                 []
              ]
-                ++ (if isRepeat then
-                        []
-                    else
-                        [ br [] []
-                        , button []
-                            [ text "Add bar at start" ]
-                        , button []
-                            [ text "Add bar at end" ]
-                        ]
+                ++ (case part of
+                        PartRepeat _ ->
+                            []
+
+                        Part _ bars ->
+                            [ br [] []
+                            , button [ onClick (AddBar (BarReference partIndex 0)) ]
+                                [ text "Add bar at start" ]
+                            , button [ onClick (AddBar (BarReference partIndex (List.length bars))) ]
+                                [ text "Add bar at end" ]
+                            ]
                    )
                 ++ [ br [] []
                    , button [ onClick (AddPart partIndex) ]
                         [ text "Add part before" ]
                    , button [ onClick (AddPart (partIndex + 1)) ]
                         [ text "Add part after" ]
-                   , button []
+                   , button [ onClick (DuplicatePart partIndex) ]
                         [ text "Duplicate part" ]
                    , button []
                         [ text "Move part up" ]
