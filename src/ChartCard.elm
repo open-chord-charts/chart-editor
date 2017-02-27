@@ -154,6 +154,7 @@ type Msg
     | AddPart PartIndex
     | DuplicatePart PartIndex
     | Edit
+    | MovePart PartIndex PartIndex
     | RemoveBar BarReference
     | RemoveChord BarReference ChordIndex
     | RemovePart PartIndex
@@ -174,8 +175,8 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
     let
-        addPart : PartIndex -> Part -> Model
-        addPart partIndex part =
+        addPart : PartIndex -> Part -> Model -> Model
+        addPart partIndex part model =
             let
                 newParts =
                     model.chart.parts
@@ -190,6 +191,31 @@ update msg model =
 
                 newStatus =
                     EditStatus (PartSelection partIndex)
+            in
+                { model
+                    | chart = newChart
+                    , status = newStatus
+                }
+
+        removePart : PartIndex -> Model -> Model
+        removePart partIndex model =
+            let
+                newChart =
+                    model.chart
+                        |> removePartAtIndex partIndex
+
+                nbParts =
+                    List.length newChart.parts
+
+                newStatus =
+                    EditStatus
+                        (PartSelection
+                            (if partIndex > nbParts - 1 then
+                                Basics.max 0 (nbParts - 1)
+                             else
+                                partIndex
+                            )
+                        )
             in
                 { model
                     | chart = newChart
@@ -225,7 +251,7 @@ update msg model =
                     { model | chart = newChart }
 
             AddPart partIndex ->
-                addPart partIndex defaultPart
+                addPart partIndex defaultPart model
 
             DuplicatePart partIndex ->
                 case List.getAt partIndex model.chart.parts of
@@ -233,7 +259,7 @@ update msg model =
                         model
 
                     Just part ->
-                        addPart (partIndex + 1) part
+                        addPart (partIndex + 1) part model
 
             Edit ->
                 let
@@ -241,6 +267,16 @@ update msg model =
                         EditStatus (BarSelection { partIndex = 0, barIndex = 0 })
                 in
                     { model | status = newStatus }
+
+            MovePart fromPartIndex toPartIndex ->
+                case List.getAt fromPartIndex model.chart.parts of
+                    Nothing ->
+                        model
+
+                    Just part ->
+                        model
+                            |> removePart fromPartIndex
+                            |> addPart toPartIndex part
 
             RemoveBar barReference ->
                 let
@@ -277,28 +313,7 @@ update msg model =
                     { model | chart = newChart }
 
             RemovePart partIndex ->
-                let
-                    newChart =
-                        model.chart
-                            |> removePartAtIndex partIndex
-
-                    nbParts =
-                        List.length newChart.parts
-
-                    newStatus =
-                        EditStatus
-                            (PartSelection
-                                (if partIndex > nbParts - 1 then
-                                    Basics.max 0 (nbParts - 1)
-                                 else
-                                    partIndex
-                                )
-                            )
-                in
-                    { model
-                        | chart = newChart
-                        , status = newStatus
-                    }
+                removePart partIndex model
 
             Save ->
                 { model | status = ViewStatus }
@@ -448,11 +463,7 @@ view { chart, status, viewKey } =
                                                     [ text youFoundABugMessage ]
 
                                                 Just part ->
-                                                    let
-                                                        removeDisabled =
-                                                            List.length chart.parts == 1
-                                                    in
-                                                        [ viewPartEditor removeDisabled partIndex part ]
+                                                    [ viewPartEditor chart partIndex part ]
                                            )
                             )
                         ]
@@ -531,8 +542,8 @@ viewBarEditor chart barReference bar =
             )
 
 
-viewPartEditor : Bool -> PartIndex -> Part -> Html Msg
-viewPartEditor removeDisabled partIndex part =
+viewPartEditor : Chart -> PartIndex -> Part -> Html Msg
+viewPartEditor chart partIndex part =
     let
         partRepeatCheckbox isChecked =
             label []
@@ -573,12 +584,18 @@ viewPartEditor removeDisabled partIndex part =
                         [ text "Add part after" ]
                    , button [ onClick (DuplicatePart partIndex) ]
                         [ text "Duplicate part" ]
-                   , button []
+                   , button
+                        [ disabled (partIndex == 0)
+                        , onClick (MovePart partIndex (partIndex - 1))
+                        ]
                         [ text "Move part up" ]
-                   , button []
+                   , button
+                        [ disabled (partIndex == List.length chart.parts - 1)
+                        , onClick (MovePart partIndex (partIndex + 1))
+                        ]
                         [ text "Move part down" ]
                    , button
-                        [ disabled removeDisabled
+                        [ disabled (List.length chart.parts == 1)
                         , onClick (RemovePart partIndex)
                         ]
                         [ text "Remove part" ]
