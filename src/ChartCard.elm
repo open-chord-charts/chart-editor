@@ -706,16 +706,23 @@ viewPart chart status partIndex part =
 
             partTd s =
                 td
-                    [ onClick (SelectPart partIndex)
-                    , style
-                        ([ ( "width", "1em" ) ]
-                            ++ (if isPartSelected then
-                                    [ ( "background-color", "lightgray" ) ]
-                                else
-                                    []
-                               )
-                        )
-                    ]
+                    ((case status of
+                        EditStatus _ ->
+                            [ onClick (SelectPart partIndex) ]
+
+                        ViewStatus ->
+                            []
+                     )
+                        ++ [ style
+                                ([ ( "width", "1em" ) ]
+                                    ++ (if isPartSelected then
+                                            [ ( "background-color", "lightgray" ) ]
+                                        else
+                                            []
+                                       )
+                                )
+                           ]
+                    )
                     [ text s ]
 
             isBarSelected : BarIndex -> Bool
@@ -739,7 +746,11 @@ viewPart chart status partIndex part =
                                 |> List.concat
                                 |> List.indexedMap
                                     (\barIndex bar ->
-                                        viewBar (isBarSelected barIndex) (SelectBar (BarReference partIndex barIndex)) bar
+                                        viewBar
+                                            status
+                                            (isBarSelected barIndex)
+                                            (SelectBar (BarReference partIndex barIndex))
+                                            bar
                                     )
                            )
 
@@ -748,31 +759,38 @@ viewPart chart status partIndex part =
                         :: (List.repeat nbBarsByRow BarRepeat
                                 |> List.indexedMap
                                     (\barIndex bar ->
-                                        viewBar (isBarSelected barIndex) (SelectPart partIndex) bar
+                                        viewBar status (isBarSelected barIndex) (SelectPart partIndex) bar
                                     )
                            )
         )
 
 
-viewBar : Bool -> Msg -> Bar -> Html Msg
-viewBar isSelected msg bar =
+viewBar : ChartStatus -> Bool -> Msg -> Bar -> Html Msg
+viewBar status isSelected msg bar =
     td
-        [ onClick msg
-        , style
-            ([ ( "border", "1px solid" )
-             , ( "height", "inherit" )
-             , ( "padding", "0" )
-             , ( "text-align", "center" )
-             , ( "vertical-align", "middle" )
-             , ( "width", "2.5em" )
-             ]
-                ++ (if isSelected then
-                        [ ( "background-color", "lightgray" ) ]
-                    else
-                        []
-                   )
-            )
-        ]
+        ((case status of
+            EditStatus _ ->
+                [ onClick msg ]
+
+            ViewStatus ->
+                []
+         )
+            ++ [ style
+                    ([ ( "border", "1px solid" )
+                     , ( "height", "inherit" )
+                     , ( "padding", "0" )
+                     , ( "text-align", "center" )
+                     , ( "vertical-align", "middle" )
+                     , ( "width", "2.5em" )
+                     ]
+                        ++ (if isSelected then
+                                [ ( "background-color", "lightgray" ) ]
+                            else
+                                []
+                           )
+                    )
+               ]
+        )
         [ text (barToString bar) ]
 
 
