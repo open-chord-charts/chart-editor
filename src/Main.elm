@@ -63,16 +63,21 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ h1 []
-            [ text "Music chart viewer/editor" ]
-        , p []
-            [ text "Source code on "
-            , a [ href "https://github.com/open-chords-charts/chart-editor" ]
-                [ text "GitHub" ]
+        [ header [ class "tc ph4" ]
+            [ h1 [ class "f3 f2-m f1-l fw2 black-90 mv3" ]
+                [ text "Open Chords Charts" ]
+            , h2 [ class "f5 f4-m f3-l fw2 black-50 mt0 lh-copy" ]
+                [ text "Chart viewer / editor – "
+                , a [ href "https://github.com/open-chords-charts/chart-editor" ]
+                    [ text "GitHub" ]
+                ]
             ]
-        , section []
-            (List.indexedMap
-                (\index chartModel -> Html.map (ChartCardMsg index) (ChartCard.view chartModel))
-                model
+        , div [ class "ph4" ]
+            (model
+                |> List.indexedMap
+                    (\index chartModel ->
+                        ChartCard.view chartModel
+                            |> Html.map (ChartCardMsg index)
+                    )
             )
         ]

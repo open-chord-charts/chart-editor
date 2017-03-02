@@ -413,18 +413,16 @@ view { chart, status, viewKey } =
             viewKey
     in
         div []
-            [ h1 []
+            [ h3 []
                 [ text (chart.title ++ " (" ++ keyToString chart.key ++ ")")
                 ]
-            , label []
+            , label [ class "db mv3" ]
                 [ text "Transpose to: "
                 , viewSelectNote viewNote (Key >> SetViewKey)
                 ]
             , table
-                [ style
-                    [ ( "border-collapse", "collapse" )
-                    , ( "width", "400px" )
-                    ]
+                [ class "mv3 collapse"
+                , style [ ( "width", "400px" ) ]
                 ]
                 [ let
                     transposedChart =
@@ -440,7 +438,7 @@ view { chart, status, viewKey } =
                     EditStatus selection ->
                         [ button [ onClick Save ]
                             [ text "Save" ]
-                        , fieldset []
+                        , fieldset [ class "mv3" ]
                             (case selection of
                                 BarSelection barReference ->
                                     [ legend []
@@ -487,57 +485,64 @@ viewBarEditor chart barReference bar =
                     , type_ "checkbox"
                     ]
                     []
-                , text "repeated bar"
+                , text " repeated bar"
                 ]
     in
         div []
             ((case bar of
                 Bar chords ->
-                    [ barRepeatCheckbox False
-                    , br [] []
+                    [ div [ class "mv3" ]
+                        [ barRepeatCheckbox False ]
                     ]
                         ++ (chords
                                 |> List.indexedMap
                                     (\chordIndex (Chord note quality) ->
-                                        [ viewNoteSelector note
-                                            (\selectedNote ->
-                                                SetChord barReference chordIndex (Chord selectedNote quality)
-                                            )
-                                        , viewQualitySelector quality
-                                            (\selectedQuality ->
-                                                SetChord barReference chordIndex (Chord note selectedQuality)
-                                            )
-                                        , button [ onClick (RemoveChord barReference chordIndex) ]
-                                            [ text "Remove chord" ]
-                                        , br [] []
-                                        ]
+                                        div [ class "mv3" ]
+                                            [ viewNoteSelector note
+                                                (\selectedNote ->
+                                                    SetChord barReference chordIndex (Chord selectedNote quality)
+                                                )
+                                            , viewQualitySelector quality
+                                                (\selectedQuality ->
+                                                    SetChord barReference chordIndex (Chord note selectedQuality)
+                                                )
+                                            , button [ onClick (RemoveChord barReference chordIndex) ]
+                                                [ text "Remove chord" ]
+                                            ]
                                     )
-                                |> List.concat
                            )
-                        ++ [ button [ onClick (AddChord barReference) ]
-                                [ text "Add chord in bar" ]
+                        ++ [ div [ class "mv3" ]
+                                [ button
+                                    [ onClick (AddChord barReference)
+                                    ]
+                                    [ text "Add chord in bar" ]
+                                ]
                            ]
 
                 BarRepeat ->
-                    [ barRepeatCheckbox True ]
+                    [ div [ class "mv3" ]
+                        [ barRepeatCheckbox True ]
+                    ]
              )
-                ++ [ br [] []
-                   , button [ onClick (AddBar barReference) ]
-                        [ text "Add bar before" ]
-                   , button [ onClick (AddBar { barReference | barIndex = barReference.barIndex + 1 }) ]
-                        [ text "Add bar after" ]
-                   , let
-                        removeDisabled =
-                            (getBarsOfPartByIndex barReference.partIndex chart |> List.length) == 1
-                     in
-                        button
-                            [ disabled removeDisabled
-                            , onClick (RemoveBar barReference)
-                            ]
-                            [ text "Remove bar" ]
-                   , br [] []
-                   , button [ onClick (SelectPart barReference.partIndex) ]
-                        [ text "Select part" ]
+                ++ [ div [ class "mv3" ]
+                        [ button [ onClick (AddBar barReference) ]
+                            [ text "Add bar before" ]
+                        , button [ onClick (AddBar { barReference | barIndex = barReference.barIndex + 1 }) ]
+                            [ text "Add bar after" ]
+                        , let
+                            removeDisabled =
+                                (getBarsOfPartByIndex barReference.partIndex chart |> List.length) == 1
+                          in
+                            button
+                                [ disabled removeDisabled
+                                , onClick (RemoveBar barReference)
+                                ]
+                                [ text "Remove bar" ]
+                        ]
+                   , div [ class "mv3" ]
+                        [ button [ onClick (SelectPart barReference.partIndex) ]
+                            [ text "Select part" ]
+                        ]
                    ]
             )
 
@@ -553,52 +558,57 @@ viewPartEditor chart partIndex part =
                     , type_ "checkbox"
                     ]
                     []
-                , text "repeated part"
+                , text " repeated part"
                 ]
     in
         div []
-            ([ partRepeatCheckbox (isPartRepeat part)
-             , br [] []
-             , input
-                [ onInput (SetPartName partIndex)
-                , value (getPartName part)
+            ([ div [ class "mv3" ]
+                [ partRepeatCheckbox (isPartRepeat part)
                 ]
-                []
+             , div [ class "mv3" ]
+                [ input
+                    [ onInput (SetPartName partIndex)
+                    , value (getPartName part)
+                    ]
+                    []
+                ]
              ]
                 ++ (case part of
                         PartRepeat _ ->
                             []
 
                         Part _ bars ->
-                            [ br [] []
-                            , button [ onClick (AddBar (BarReference partIndex 0)) ]
-                                [ text "Add bar at start" ]
-                            , button [ onClick (AddBar (BarReference partIndex (List.length bars))) ]
-                                [ text "Add bar at end" ]
+                            [ div [ class "mv3" ]
+                                [ button [ onClick (AddBar (BarReference partIndex 0)) ]
+                                    [ text "Add bar at start" ]
+                                , button [ onClick (AddBar (BarReference partIndex (List.length bars))) ]
+                                    [ text "Add bar at end" ]
+                                ]
                             ]
                    )
-                ++ [ br [] []
-                   , button [ onClick (AddPart partIndex) ]
-                        [ text "Add part before" ]
-                   , button [ onClick (AddPart (partIndex + 1)) ]
-                        [ text "Add part after" ]
-                   , button [ onClick (DuplicatePart partIndex) ]
-                        [ text "Duplicate part" ]
-                   , button
-                        [ disabled (partIndex == 0)
-                        , onClick (MovePart partIndex (partIndex - 1))
+                ++ [ div [ class "mv3" ]
+                        [ button [ onClick (AddPart partIndex) ]
+                            [ text "Add part before" ]
+                        , button [ onClick (AddPart (partIndex + 1)) ]
+                            [ text "Add part after" ]
+                        , button [ onClick (DuplicatePart partIndex) ]
+                            [ text "Duplicate part" ]
+                        , button
+                            [ disabled (partIndex == 0)
+                            , onClick (MovePart partIndex (partIndex - 1))
+                            ]
+                            [ text "Move part up" ]
+                        , button
+                            [ disabled (partIndex == List.length chart.parts - 1)
+                            , onClick (MovePart partIndex (partIndex + 1))
+                            ]
+                            [ text "Move part down" ]
+                        , button
+                            [ disabled (List.length chart.parts == 1)
+                            , onClick (RemovePart partIndex)
+                            ]
+                            [ text "Remove part" ]
                         ]
-                        [ text "Move part up" ]
-                   , button
-                        [ disabled (partIndex == List.length chart.parts - 1)
-                        , onClick (MovePart partIndex (partIndex + 1))
-                        ]
-                        [ text "Move part down" ]
-                   , button
-                        [ disabled (List.length chart.parts == 1)
-                        , onClick (RemovePart partIndex)
-                        ]
-                        [ text "Remove part" ]
                    ]
             )
 
