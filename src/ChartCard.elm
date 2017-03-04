@@ -575,7 +575,8 @@ viewPartEditor chart partIndex part =
                 ]
              , toolbar
                 [ input
-                    [ onInput (SetPartName partIndex)
+                    [ class "pa2 w3 ba br2 b--mid-gray"
+                    , onInput (SetPartName partIndex)
                     , value (getPartName part)
                     ]
                     []
