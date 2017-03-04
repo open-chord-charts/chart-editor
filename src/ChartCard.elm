@@ -535,10 +535,6 @@ viewBarEditor chart barReference bar =
                                 ]
                                 [ text "Remove bar" ]
                         ]
-                   , toolbar
-                        [ button [ onClick (SelectPart barReference.partIndex) ]
-                            [ text "Select part" ]
-                        ]
                    ]
             )
 
