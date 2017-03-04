@@ -435,7 +435,9 @@ view { chart, status, viewKey } =
             , (case status of
                 EditStatus selection ->
                     div []
-                        [ button [ onClick Save ]
+                        [ button Primary
+                            NotPressed
+                            [ onClick Save ]
                             [ text "Save" ]
                         , fieldset [ class "mv3" ]
                             (case selection of
@@ -466,7 +468,9 @@ view { chart, status, viewKey } =
                         ]
 
                 ViewStatus ->
-                    button [ onClick Edit ]
+                    button Primary
+                        NotPressed
+                        [ onClick Edit ]
                         [ text "Edit" ]
               )
             ]
@@ -502,15 +506,17 @@ viewBarEditor chart barReference bar =
                                                 (\selectedQuality ->
                                                     SetChord barReference chordIndex (Chord note selectedQuality)
                                                 )
-                                            , button [ onClick (RemoveChord barReference chordIndex) ]
+                                            , button Secondary
+                                                NotPressed
+                                                [ onClick (RemoveChord barReference chordIndex) ]
                                                 [ text "Remove chord" ]
                                             ]
                                     )
                            )
                         ++ [ toolbar
-                                [ button
-                                    [ onClick (AddChord barReference)
-                                    ]
+                                [ button Secondary
+                                    NotPressed
+                                    [ onClick (AddChord barReference) ]
                                     [ text "Add chord in bar" ]
                                 ]
                            ]
@@ -521,16 +527,26 @@ viewBarEditor chart barReference bar =
                     ]
              )
                 ++ [ toolbar
-                        [ button [ onClick (AddBar barReference) ]
+                        [ button Secondary
+                            NotPressed
+                            [ class "mh1"
+                            , onClick (AddBar barReference)
+                            ]
                             [ text "Add bar before" ]
-                        , button [ onClick (AddBar { barReference | barIndex = barReference.barIndex + 1 }) ]
+                        , button Secondary
+                            NotPressed
+                            [ class "mh1"
+                            , onClick (AddBar { barReference | barIndex = barReference.barIndex + 1 })
+                            ]
                             [ text "Add bar after" ]
                         , let
                             removeDisabled =
                                 (getBarsOfPartByIndex barReference.partIndex chart |> List.length) == 1
                           in
-                            button
-                                [ disabled removeDisabled
+                            button Secondary
+                                NotPressed
+                                [ class "mh1"
+                                , disabled removeDisabled
                                 , onClick (RemoveBar barReference)
                                 ]
                                 [ text "Remove bar" ]
@@ -571,31 +587,44 @@ viewPartEditor chart partIndex part =
 
                         Part _ bars ->
                             [ toolbar
-                                [ button [ onClick (AddBar (BarReference partIndex 0)) ]
+                                [ button Secondary
+                                    NotPressed
+                                    [ onClick (AddBar (BarReference partIndex 0)) ]
                                     [ text "Add bar at start" ]
-                                , button [ onClick (AddBar (BarReference partIndex (List.length bars))) ]
+                                , button Secondary
+                                    NotPressed
+                                    [ onClick (AddBar (BarReference partIndex (List.length bars))) ]
                                     [ text "Add bar at end" ]
                                 ]
                             ]
                    )
                 ++ [ toolbar
-                        [ button [ onClick (AddPart partIndex) ]
+                        [ button Secondary
+                            NotPressed
+                            [ onClick (AddPart partIndex) ]
                             [ text "Add part before" ]
-                        , button [ onClick (AddPart (partIndex + 1)) ]
+                        , button Secondary
+                            NotPressed
+                            [ onClick (AddPart (partIndex + 1)) ]
                             [ text "Add part after" ]
-                        , button [ onClick (DuplicatePart partIndex) ]
+                        , button Secondary
+                            NotPressed
+                            [ onClick (DuplicatePart partIndex) ]
                             [ text "Duplicate part" ]
-                        , button
+                        , button Secondary
+                            NotPressed
                             [ disabled (partIndex == 0)
                             , onClick (MovePart partIndex (partIndex - 1))
                             ]
                             [ text "Move part up" ]
-                        , button
+                        , button Secondary
+                            NotPressed
                             [ disabled (partIndex == List.length chart.parts - 1)
                             , onClick (MovePart partIndex (partIndex + 1))
                             ]
                             [ text "Move part down" ]
-                        , button
+                        , button Secondary
+                            NotPressed
                             [ disabled (List.length chart.parts == 1)
                             , onClick (RemovePart partIndex)
                             ]
@@ -640,14 +669,16 @@ viewNoteSelector preSelectedNote noteToMsg =
                         noteStr =
                             Note.toString note
                     in
-                        button [ onClick (noteToMsg note) ]
-                            [ text
-                                (if note == preSelectedNote then
-                                    "[" ++ noteStr ++ "]"
-                                 else
-                                    noteStr
-                                )
+                        button Secondary
+                            (if note == preSelectedNote then
+                                Pressed
+                             else
+                                NotPressed
+                            )
+                            [ class "mh1 w3 tc"
+                            , onClick (noteToMsg note)
                             ]
+                            [ text noteStr ]
                 )
         )
 
@@ -670,14 +701,16 @@ viewQualitySelector preSelectedQuality qualityToMsg =
                                 Seventh ->
                                     "7th"
                     in
-                        button [ onClick (qualityToMsg quality) ]
-                            [ text
-                                (if quality == preSelectedQuality then
-                                    "[" ++ qualityStr ++ "]"
-                                 else
-                                    qualityStr
-                                )
+                        button Secondary
+                            (if quality == preSelectedQuality then
+                                Pressed
+                             else
+                                NotPressed
+                            )
+                            [ class "mh1 w4 tc"
+                            , onClick (qualityToMsg quality)
                             ]
+                            [ text qualityStr ]
                 )
         )
 
@@ -791,7 +824,7 @@ viewPart chart status partIndex part =
 viewBar : ChartStatus -> Bool -> Msg -> Bar -> Html Msg
 viewBar status isSelected msg bar =
     td
-        ([ class "ba tc w2 ph2"
+        ([ class "ba b--mid-gray tc w2 ph2"
          , classList [ ( "bg-moon-gray", isSelected ) ]
          ]
             ++ (case status of
@@ -807,6 +840,41 @@ viewBar status isSelected msg bar =
 
 
 -- WIDGETS
+
+
+type Purpose
+    = Primary
+    | Secondary
+
+
+type ButtonState
+    = Pressed
+    | NotPressed
+
+
+button : Purpose -> ButtonState -> List (Attribute msg) -> List (Html msg) -> Html msg
+button purpose state attributes =
+    Html.button
+        (attributes
+            ++ [ class
+                    ("pointer f5 fw4 lh-title ba br2 ph3 pv2 mb2 dib "
+                        ++ (case purpose of
+                                Primary ->
+                                    "b--transparent bg-blue hover-bg-dark-blue white"
+
+                                Secondary ->
+                                    "b--mid-gray hover-bg-moon-gray "
+                                        ++ (case state of
+                                                Pressed ->
+                                                    "bg-light-silver"
+
+                                                NotPressed ->
+                                                    "bg-transparent"
+                                           )
+                           )
+                    )
+               ]
+        )
 
 
 card : String -> String -> List (Html msg) -> Html msg
@@ -830,8 +898,8 @@ card titleLeft titleRight children =
 
 
 toolbar : List (Html msg) -> Html msg
-toolbar children =
-    div [ class "mv3" ] children
+toolbar =
+    div [ class "mv3" ]
 
 
 
