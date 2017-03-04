@@ -439,32 +439,23 @@ view { chart, status, viewKey } =
                             NotPressed
                             [ onClick Save ]
                             [ text "Save" ]
-                        , fieldset [ class "mv3" ]
-                            (case selection of
-                                BarSelection barReference ->
-                                    [ legend []
-                                        [ text "Bar" ]
-                                    ]
-                                        ++ (case getBarAtReference barReference chart of
-                                                Nothing ->
-                                                    [ text youFoundABugMessage ]
+                        , (case selection of
+                            BarSelection barReference ->
+                                case getBarAtReference barReference chart of
+                                    Nothing ->
+                                        text youFoundABugMessage
 
-                                                Just selectedBar ->
-                                                    [ viewBarEditor chart barReference selectedBar ]
-                                           )
+                                    Just selectedBar ->
+                                        viewBarEditor chart barReference selectedBar
 
-                                PartSelection partIndex ->
-                                    [ legend []
-                                        [ text "Part" ]
-                                    ]
-                                        ++ (case List.getAt partIndex chart.parts of
-                                                Nothing ->
-                                                    [ text youFoundABugMessage ]
+                            PartSelection partIndex ->
+                                case List.getAt partIndex chart.parts of
+                                    Nothing ->
+                                        text youFoundABugMessage
 
-                                                Just part ->
-                                                    [ viewPartEditor chart partIndex part ]
-                                           )
-                            )
+                                    Just part ->
+                                        viewPartEditor chart partIndex part
+                          )
                         ]
 
                 ViewStatus ->
