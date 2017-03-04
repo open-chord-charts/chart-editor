@@ -520,13 +520,13 @@ viewBarEditor chart barReference bar =
                 ++ [ toolbar
                         [ button Secondary
                             NotPressed
-                            [ class "mh1"
+                            [ class "mr1"
                             , onClick (AddBar barReference)
                             ]
                             [ text "Add bar before" ]
                         , button Secondary
                             NotPressed
-                            [ class "mh1"
+                            [ class "mr1"
                             , onClick (AddBar { barReference | barIndex = barReference.barIndex + 1 })
                             ]
                             [ text "Add bar after" ]
@@ -536,7 +536,7 @@ viewBarEditor chart barReference bar =
                           in
                             button Secondary
                                 NotPressed
-                                [ class "mh1"
+                                [ class "mr1"
                                 , disabled removeDisabled
                                 , onClick (RemoveBar barReference)
                                 ]
@@ -581,11 +581,15 @@ viewPartEditor chart partIndex part =
                             [ toolbar
                                 [ button Secondary
                                     NotPressed
-                                    [ onClick (AddBar (BarReference partIndex 0)) ]
+                                    [ class "mr1"
+                                    , onClick (AddBar (BarReference partIndex 0))
+                                    ]
                                     [ text "Add bar at start" ]
                                 , button Secondary
                                     NotPressed
-                                    [ onClick (AddBar (BarReference partIndex (List.length bars))) ]
+                                    [ class "mr1"
+                                    , onClick (AddBar (BarReference partIndex (List.length bars)))
+                                    ]
                                     [ text "Add bar at end" ]
                                 ]
                             ]
@@ -593,31 +597,40 @@ viewPartEditor chart partIndex part =
                 ++ [ toolbar
                         [ button Secondary
                             NotPressed
-                            [ onClick (AddPart partIndex) ]
+                            [ class "mr1"
+                            , onClick (AddPart partIndex)
+                            ]
                             [ text "Add part before" ]
                         , button Secondary
                             NotPressed
-                            [ onClick (AddPart (partIndex + 1)) ]
+                            [ class "mr1"
+                            , onClick (AddPart (partIndex + 1))
+                            ]
                             [ text "Add part after" ]
                         , button Secondary
                             NotPressed
-                            [ onClick (DuplicatePart partIndex) ]
+                            [ class "mr1"
+                            , onClick (DuplicatePart partIndex)
+                            ]
                             [ text "Duplicate part" ]
                         , button Secondary
                             NotPressed
-                            [ disabled (partIndex == 0)
+                            [ class "mr1"
+                            , disabled (partIndex == 0)
                             , onClick (MovePart partIndex (partIndex - 1))
                             ]
                             [ text "Move part up" ]
                         , button Secondary
                             NotPressed
-                            [ disabled (partIndex == List.length chart.parts - 1)
+                            [ class "mr1"
+                            , disabled (partIndex == List.length chart.parts - 1)
                             , onClick (MovePart partIndex (partIndex + 1))
                             ]
                             [ text "Move part down" ]
                         , button Secondary
                             NotPressed
-                            [ disabled (List.length chart.parts == 1)
+                            [ class "mr1"
+                            , disabled (List.length chart.parts == 1)
                             , onClick (RemovePart partIndex)
                             ]
                             [ text "Remove part" ]
@@ -667,7 +680,7 @@ viewNoteSelector preSelectedNote noteToMsg =
                              else
                                 NotPressed
                             )
-                            [ class "mh1 w3 tc"
+                            [ class "mr1 w3 tc"
                             , onClick (noteToMsg note)
                             ]
                             [ text noteStr ]
@@ -699,7 +712,7 @@ viewQualitySelector preSelectedQuality qualityToMsg =
                              else
                                 NotPressed
                             )
-                            [ class "mh1 w4 tc"
+                            [ class "mr1 w4 tc"
                             , onClick (qualityToMsg quality)
                             ]
                             [ text qualityStr ]
@@ -873,7 +886,7 @@ card : String -> String -> List (Html msg) -> Html msg
 card titleLeft titleRight children =
     article [ class "br2 ba-ns dark-gray b--black-10 mv4 mw6" ]
         [ div [ class "ph3 pv2" ]
-            [ div [ class "cf w-100 mt1" ]
+            ([ div [ class "cf w-100 mt1" ]
                 [ div [ class "fl w-90" ]
                     [ h1 [ class "f5 mv0" ]
                         [ text titleLeft ]
@@ -883,9 +896,9 @@ card titleLeft titleRight children =
                         [ text titleRight ]
                     ]
                 ]
-            , p [ class "f6 mt2" ]
-                children
-            ]
+             ]
+                ++ children
+            )
         ]
 
 
