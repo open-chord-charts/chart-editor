@@ -423,6 +423,7 @@ view { chart, status, viewKey } =
                     tbody []
                         (transposedChart.parts
                             |> List.indexedMap (viewPart chart status)
+                            |> List.concat
                         )
                 ]
             , toolbar
@@ -685,83 +686,110 @@ viewQualitySelector preSelectedQuality qualityToMsg =
         )
 
 
-viewPart : Chart -> ChartStatus -> PartIndex -> Part -> Html Msg
+viewPart : Chart -> ChartStatus -> PartIndex -> Part -> List (Html Msg)
 viewPart chart status partIndex part =
-    tr
-        [ class
-            (if isPartRepeat part then
-                "h1"
-             else
-                "h2"
-            )
-        ]
-        (let
-            isPartSelected =
-                case status of
-                    EditStatus selection ->
-                        case selection of
-                            BarSelection _ ->
-                                False
+    let
+        isPartSelected =
+            case status of
+                EditStatus selection ->
+                    case selection of
+                        BarSelection _ ->
+                            False
 
-                            PartSelection partIndex1 ->
-                                partIndex == partIndex1
+                        PartSelection partIndex1 ->
+                            partIndex == partIndex1
 
-                    ViewStatus ->
-                        False
+                ViewStatus ->
+                    False
 
-            partTd s =
-                td
-                    ((case status of
-                        EditStatus _ ->
-                            [ onClick (SelectPart partIndex) ]
-
-                        ViewStatus ->
-                            []
-                     )
-                        ++ [ class "w1"
-                           , classList [ ( "bg-moon-gray", isPartSelected ) ]
-                           ]
-                    )
-                    [ text s ]
-
-            isBarSelected : BarIndex -> Bool
-            isBarSelected barIndex =
-                case status of
-                    EditStatus selection ->
-                        case selection of
-                            BarSelection barReference ->
-                                partIndex == barReference.partIndex && barIndex == barReference.barIndex
-
-                            PartSelection partIndex1 ->
-                                partIndex == partIndex1
+        partTd s =
+            td
+                ((case status of
+                    EditStatus _ ->
+                        [ onClick (SelectPart partIndex) ]
 
                     ViewStatus ->
-                        False
-         in
-            case part of
-                Part partName bars ->
-                    partTd partName
-                        :: (List.greedyGroupsOf nbBarsByRow bars
-                                |> List.concat
-                                |> List.indexedMap
-                                    (\barIndex bar ->
-                                        viewBar
-                                            status
-                                            (isBarSelected barIndex)
-                                            (SelectBar (BarReference partIndex barIndex))
-                                            bar
+                        []
+                 )
+                    ++ [ class "w1"
+                       , classList [ ( "bg-moon-gray", isPartSelected ) ]
+                       ]
+                )
+                [ text s ]
+
+        isBarSelected : BarIndex -> Bool
+        isBarSelected barIndex =
+            case status of
+                EditStatus selection ->
+                    case selection of
+                        BarSelection barReference ->
+                            partIndex == barReference.partIndex && barIndex == barReference.barIndex
+
+                        PartSelection partIndex1 ->
+                            partIndex == partIndex1
+
+                ViewStatus ->
+                    False
+    in
+        case part of
+            Part partName bars ->
+                bars
+                    |> List.greedyGroupsOf nbBarsByRow
+                    |> List.indexedMap
+                        (\rowIndex rowBars ->
+                            tr [ class "h2" ]
+                                (partTd
+                                    (if rowIndex == 0 then
+                                        partName
+                                     else
+                                        ""
                                     )
-                           )
+                                    :: (let
+                                            nonEmptyBars =
+                                                rowBars
+                                                    |> List.indexedMap
+                                                        (\barIndexInRow bar ->
+                                                            let
+                                                                barIndex =
+                                                                    rowIndex * nbBarsByRow + barIndexInRow
+                                                            in
+                                                                viewBar
+                                                                    status
+                                                                    (isBarSelected barIndex)
+                                                                    (SelectBar (BarReference partIndex barIndex))
+                                                                    bar
+                                                        )
 
-                PartRepeat partName ->
-                    partTd partName
+                                            nbPaddingBars =
+                                                nbBarsByRow - List.length nonEmptyBars
+
+                                            emptyBar =
+                                                td [ class "w2" ] []
+
+                                            paddingBars =
+                                                List.repeat nbPaddingBars emptyBar
+                                        in
+                                            case status of
+                                                EditStatus _ ->
+                                                    nonEmptyBars ++ paddingBars
+
+                                                ViewStatus ->
+                                                    paddingBars ++ nonEmptyBars
+                                       )
+                                )
+                        )
+
+            PartRepeat partName ->
+                [ tr [ class "h1" ]
+                    (partTd partName
                         :: (List.repeat nbBarsByRow BarRepeat
                                 |> List.indexedMap
                                     (\barIndex bar ->
                                         viewBar status (isBarSelected barIndex) (SelectPart partIndex) bar
                                     )
                            )
-        )
+                    )
+                ]
 
 
 viewBar : ChartStatus -> Bool -> Msg -> Bar -> Html Msg
