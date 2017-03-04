@@ -824,7 +824,7 @@ viewPart chart status partIndex part =
 viewBar : ChartStatus -> Bool -> Msg -> Bar -> Html Msg
 viewBar status isSelected msg bar =
     td
-        ([ class "ba b--mid-gray tc w2 ph2"
+        ([ class "ba b--mid-gray tc w2 ph2 f4 athelas"
          , classList [ ( "bg-moon-gray", isSelected ) ]
          ]
             ++ (case status of
