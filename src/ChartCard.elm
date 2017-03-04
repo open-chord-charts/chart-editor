@@ -412,18 +412,10 @@ view { chart, status, viewKey } =
         (Key viewNote) =
             viewKey
     in
-        div []
-            [ h3 []
-                [ text (chart.title ++ " (" ++ keyToString chart.key ++ ")")
-                ]
-            , label [ class "db mv3" ]
-                [ text "Transpose to: "
-                , viewSelectNote viewNote (Key >> SetViewKey)
-                ]
-            , table
-                [ class "mv3 collapse"
-                , style [ ( "width", "400px" ) ]
-                ]
+        card chart.title
+            (keyToString chart.key)
+            [ table
+                [ class "mv3 dt--fixed collapse" ]
                 [ let
                     transposedChart =
                         Music.Chart.transpose viewKey chart
@@ -433,9 +425,15 @@ view { chart, status, viewKey } =
                             |> List.indexedMap (viewPart chart status)
                         )
                 ]
-            , div []
-                (case status of
-                    EditStatus selection ->
+            , toolbar
+                [ label []
+                    [ text "Transpose to: "
+                    , viewSelectNote viewNote (Key >> SetViewKey)
+                    ]
+                ]
+            , (case status of
+                EditStatus selection ->
+                    div []
                         [ button [ onClick Save ]
                             [ text "Save" ]
                         , fieldset [ class "mv3" ]
@@ -466,11 +464,10 @@ view { chart, status, viewKey } =
                             )
                         ]
 
-                    ViewStatus ->
-                        [ button [ onClick Edit ]
-                            [ text "Edit" ]
-                        ]
-                )
+                ViewStatus ->
+                    button [ onClick Edit ]
+                        [ text "Edit" ]
+              )
             ]
 
 
@@ -491,13 +488,11 @@ viewBarEditor chart barReference bar =
         div []
             ((case bar of
                 Bar chords ->
-                    [ div [ class "mv3" ]
-                        [ barRepeatCheckbox False ]
-                    ]
+                    [ toolbar [ barRepeatCheckbox False ] ]
                         ++ (chords
                                 |> List.indexedMap
                                     (\chordIndex (Chord note quality) ->
-                                        div [ class "mv3" ]
+                                        toolbar
                                             [ viewNoteSelector note
                                                 (\selectedNote ->
                                                     SetChord barReference chordIndex (Chord selectedNote quality)
@@ -511,7 +506,7 @@ viewBarEditor chart barReference bar =
                                             ]
                                     )
                            )
-                        ++ [ div [ class "mv3" ]
+                        ++ [ toolbar
                                 [ button
                                     [ onClick (AddChord barReference)
                                     ]
@@ -520,11 +515,11 @@ viewBarEditor chart barReference bar =
                            ]
 
                 BarRepeat ->
-                    [ div [ class "mv3" ]
+                    [ toolbar
                         [ barRepeatCheckbox True ]
                     ]
              )
-                ++ [ div [ class "mv3" ]
+                ++ [ toolbar
                         [ button [ onClick (AddBar barReference) ]
                             [ text "Add bar before" ]
                         , button [ onClick (AddBar { barReference | barIndex = barReference.barIndex + 1 }) ]
@@ -539,7 +534,7 @@ viewBarEditor chart barReference bar =
                                 ]
                                 [ text "Remove bar" ]
                         ]
-                   , div [ class "mv3" ]
+                   , toolbar
                         [ button [ onClick (SelectPart barReference.partIndex) ]
                             [ text "Select part" ]
                         ]
@@ -562,10 +557,10 @@ viewPartEditor chart partIndex part =
                 ]
     in
         div []
-            ([ div [ class "mv3" ]
+            ([ toolbar
                 [ partRepeatCheckbox (isPartRepeat part)
                 ]
-             , div [ class "mv3" ]
+             , toolbar
                 [ input
                     [ onInput (SetPartName partIndex)
                     , value (getPartName part)
@@ -578,7 +573,7 @@ viewPartEditor chart partIndex part =
                             []
 
                         Part _ bars ->
-                            [ div [ class "mv3" ]
+                            [ toolbar
                                 [ button [ onClick (AddBar (BarReference partIndex 0)) ]
                                     [ text "Add bar at start" ]
                                 , button [ onClick (AddBar (BarReference partIndex (List.length bars))) ]
@@ -586,7 +581,7 @@ viewPartEditor chart partIndex part =
                                 ]
                             ]
                    )
-                ++ [ div [ class "mv3" ]
+                ++ [ toolbar
                         [ button [ onClick (AddPart partIndex) ]
                             [ text "Add part before" ]
                         , button [ onClick (AddPart (partIndex + 1)) ]
@@ -693,11 +688,11 @@ viewQualitySelector preSelectedQuality qualityToMsg =
 viewPart : Chart -> ChartStatus -> PartIndex -> Part -> Html Msg
 viewPart chart status partIndex part =
     tr
-        [ style
+        [ class
             (if isPartRepeat part then
-                []
+                "h1"
              else
-                [ ( "height", "2em" ) ]
+                "h2"
             )
         ]
         (let
@@ -723,14 +718,8 @@ viewPart chart status partIndex part =
                         ViewStatus ->
                             []
                      )
-                        ++ [ style
-                                ([ ( "width", "1em" ) ]
-                                    ++ (if isPartSelected then
-                                            [ ( "background-color", "lightgray" ) ]
-                                        else
-                                            []
-                                       )
-                                )
+                        ++ [ class "w1"
+                           , classList [ ( "bg-moon-gray", isPartSelected ) ]
                            ]
                     )
                     [ text s ]
@@ -778,30 +767,47 @@ viewPart chart status partIndex part =
 viewBar : ChartStatus -> Bool -> Msg -> Bar -> Html Msg
 viewBar status isSelected msg bar =
     td
-        ((case status of
-            EditStatus _ ->
-                [ onClick msg ]
+        ([ class "ba tc w2 ph2"
+         , classList [ ( "bg-moon-gray", isSelected ) ]
+         ]
+            ++ (case status of
+                    EditStatus _ ->
+                        [ onClick msg ]
 
-            ViewStatus ->
-                []
-         )
-            ++ [ style
-                    ([ ( "border", "1px solid" )
-                     , ( "height", "inherit" )
-                     , ( "padding", "0" )
-                     , ( "text-align", "center" )
-                     , ( "vertical-align", "middle" )
-                     , ( "width", "2.5em" )
-                     ]
-                        ++ (if isSelected then
-                                [ ( "background-color", "lightgray" ) ]
-                            else
-                                []
-                           )
-                    )
-               ]
+                    ViewStatus ->
+                        []
+               )
         )
         [ text (barToString bar) ]
+
+
+
+-- WIDGETS
+
+
+card : String -> String -> List (Html msg) -> Html msg
+card titleLeft titleRight children =
+    article [ class "br2 ba-ns dark-gray b--black-10 mv4 mw6" ]
+        [ div [ class "ph3 pv2" ]
+            [ div [ class "cf w-100 mt1" ]
+                [ div [ class "fl w-90" ]
+                    [ h1 [ class "f5 mv0" ]
+                        [ text titleLeft ]
+                    ]
+                , div [ class "fl w-10 tr" ]
+                    [ h2 [ class "f5 mv0" ]
+                        [ text titleRight ]
+                    ]
+                ]
+            , p [ class "f6 mt2" ]
+                children
+            ]
+        ]
+
+
+toolbar : List (Html msg) -> Html msg
+toolbar children =
+    div [ class "mv3" ] children
 
 
 
