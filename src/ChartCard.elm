@@ -412,7 +412,7 @@ view : Model -> Html Msg
 view { chart, status, viewedKey } =
     card chart.title
         (keyToString chart.key)
-        ([ div [ class "mv3 dt dt--fixed collapse athelas" ]
+        ([ div [ class "dt dt--fixed collapse mv3 athelas" ]
             (let
                 viewedChart =
                     case status of
@@ -721,11 +721,14 @@ viewQualitySelector preSelectedQuality qualityToMsg =
                                 Sixth ->
                                     "6th"
 
+                                Seventh ->
+                                    "7th"
+
                                 MinorSeventh ->
                                     "minor 7th"
 
-                                Seventh ->
-                                    "7th"
+                                SemiDiminished ->
+                                    "minor 7th b5 (semi-diminished)"
                     in
                         button Secondary
                             (if quality == preSelectedQuality then
@@ -766,7 +769,7 @@ viewPart chart status partIndex part =
                     ViewStatus ->
                         []
                  )
-                    ++ [ class "dtc w1 sans-serif h-inherit v-mid tc"
+                    ++ [ class "dtc w2 v-mid tc sans-serif"
                        , classList [ ( "bg-moon-gray", isPartSelected ) ]
                        ]
                 )
@@ -819,7 +822,8 @@ viewPart chart status partIndex part =
                                                 nbBarsByRow - List.length nonEmptyBars
 
                                             emptyBar =
-                                                div [ class "dtc w2" ] []
+                                                div [ class "dtc" ]
+                                                    [ barCell [] ]
 
                                             paddingBars =
                                                 List.repeat nbPaddingBars emptyBar
@@ -851,7 +855,7 @@ viewBar : ChartStatus -> Bool -> Msg -> Bar -> Html Msg
 viewBar status isSelected msg bar =
     div
         ([ class
-            ("dtc w2 h-inherit ba b--mid-gray v-mid f3 f2-ns "
+            ("dtc ba b--mid-gray f3 f2-ns "
                 ++ (case status of
                         ViewStatus ->
                             "cursor-default"
@@ -871,23 +875,28 @@ viewBar status isSelected msg bar =
                )
         )
         [ let
-            barCell s =
-                div [ class "tc" ]
-                    [ text s ]
+            barCellWithSvg children =
+                barCell
+                    [ svg [ Svg.Attributes.class "h-100 w-100 v-mid" ]
+                        children
+                    ]
           in
             case bar of
                 Bar chords ->
                     case chords of
                         [ chord ] ->
-                            chord
-                                |> Music.Chord.toString
-                                |> barCell
+                            barCellWithSvg
+                                [ Svg.text_
+                                    [ Svg.Attributes.x "50%"
+                                    , Svg.Attributes.y "50%"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord) ]
+                                ]
 
                         [ chord1, chord2 ] ->
-                            svg
-                                [ Svg.Attributes.class "h-100 w-100 v-mid"
-                                , Svg.Attributes.preserveAspectRatio "none"
-                                ]
+                            barCellWithSvg
                                 [ Svg.line
                                     [ Svg.Attributes.x1 "0"
                                     , Svg.Attributes.y1 "100%"
@@ -915,10 +924,7 @@ viewBar status isSelected msg bar =
                                 ]
 
                         [ chord1, chord2, chord3 ] ->
-                            svg
-                                [ Svg.Attributes.class "h-100 w-100 v-mid"
-                                , Svg.Attributes.preserveAspectRatio "none"
-                                ]
+                            barCellWithSvg
                                 [ Svg.line
                                     [ Svg.Attributes.x1 "0"
                                     , Svg.Attributes.y1 "50%"
@@ -959,10 +965,7 @@ viewBar status isSelected msg bar =
                                 ]
 
                         [ chord1, chord2, chord3, chord4 ] ->
-                            svg
-                                [ Svg.Attributes.class "h-100 w-100 v-mid"
-                                , Svg.Attributes.preserveAspectRatio "none"
-                                ]
+                            barCellWithSvg
                                 [ Svg.line
                                     [ Svg.Attributes.x1 "0"
                                     , Svg.Attributes.y1 "50%"
@@ -1013,7 +1016,23 @@ viewBar status isSelected msg bar =
                             text "TODO"
 
                 BarRepeat ->
-                    barCell "–"
+                    barCellWithSvg
+                        [ Svg.text_
+                            [ Svg.Attributes.x "50%"
+                            , Svg.Attributes.y "50%"
+                            , Svg.Attributes.textAnchor "middle"
+                            , Svg.Attributes.dominantBaseline "central"
+                            ]
+                            [ Svg.text "–" ]
+                        ]
+        ]
+
+
+barCell : List (Html msg) -> Html msg
+barCell children =
+    div [ class "aspect-ratio aspect-ratio--4x3" ]
+        [ div [ class "aspect-ratio--object" ]
+            children
         ]
 
 
@@ -1058,7 +1077,7 @@ button purpose state attributes =
 
 card : String -> String -> List (Html msg) -> Html msg
 card titleLeft titleRight children =
-    div []
+    div [ class "w-60-l mv5" ]
         ([ div [ class "cf w-100 mt1" ]
             [ div [ class "fl w-90" ]
                 [ h1 [ class "f5 mv0" ]

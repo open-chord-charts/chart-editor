@@ -16,11 +16,12 @@ type Quality
     | Sixth
     | Seventh
     | MinorSeventh
+    | SemiDiminished
 
 
 qualities : List Quality
 qualities =
-    [ Major, Minor, Sixth, Seventh, MinorSeventh ]
+    [ Major, Minor, Sixth, Seventh, MinorSeventh, SemiDiminished ]
 
 
 
@@ -52,5 +53,8 @@ toString (Chord note quality) =
 
                 MinorSeventh ->
                     "m7"
+
+                SemiDiminished ->
+                    "m7b5"
     in
         Note.toString note ++ qualityToString quality
