@@ -1,8 +1,24 @@
-module Samples exposing (allOfMe)
+module Samples exposing (..)
 
 import Music.Chart exposing (..)
 import Music.Chord exposing (..)
 import Music.Note exposing (..)
+
+
+grammar : Chart
+grammar =
+    { title = "Chords chart grammar"
+    , key = Key noteC
+    , parts =
+        [ Part "A"
+            [ Bar [ Chord noteC Major ]
+            , BarRepeat
+            , Bar [ Chord noteC Major, Chord noteD Minor ]
+            , Bar [ Chord noteC Major, Chord noteD Minor, Chord noteE Seventh ]
+            , Bar [ Chord noteAb Major, Chord noteC Seventh, Chord noteF Minor, Chord noteEb Major ]
+            ]
+        ]
+    }
 
 
 allOfMe : Chart

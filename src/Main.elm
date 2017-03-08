@@ -25,8 +25,8 @@ type alias Model =
 
 model : Model
 model =
-    [ ChartCard.init Samples.allOfMe
-      -- , ChartCard.init Samples.allOfMe
+    [ ChartCard.init Samples.grammar
+    , ChartCard.init Samples.allOfMe
     ]
 
 

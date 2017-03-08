@@ -881,6 +881,101 @@ viewBar status isSelected msg bar =
                                     [ Svg.text (Music.Chord.toString chord2) ]
                                 ]
 
+                        [ chord1, chord2, chord3 ] ->
+                            svg
+                                [ Svg.Attributes.class "h-100 w-100 v-mid"
+                                , Svg.Attributes.preserveAspectRatio "none"
+                                ]
+                                [ Svg.line
+                                    [ Svg.Attributes.x1 "0"
+                                    , Svg.Attributes.y1 "50%"
+                                    , Svg.Attributes.x2 "100%"
+                                    , Svg.Attributes.y2 "50%"
+                                    , Svg.Attributes.class "stroke-mid-gray"
+                                    ]
+                                    []
+                                , Svg.line
+                                    [ Svg.Attributes.x1 "50%"
+                                    , Svg.Attributes.y1 "50%"
+                                    , Svg.Attributes.x2 "50%"
+                                    , Svg.Attributes.y2 "100%"
+                                    , Svg.Attributes.class "stroke-mid-gray"
+                                    ]
+                                    []
+                                , Svg.text_
+                                    [ Svg.Attributes.x "50%"
+                                    , Svg.Attributes.y "25%"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord1) ]
+                                , Svg.text_
+                                    [ Svg.Attributes.x "25%"
+                                    , Svg.Attributes.y "75%"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord2) ]
+                                , Svg.text_
+                                    [ Svg.Attributes.x "75%"
+                                    , Svg.Attributes.y "75%"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord3) ]
+                                ]
+
+                        [ chord1, chord2, chord3, chord4 ] ->
+                            svg
+                                [ Svg.Attributes.class "h-100 w-100 v-mid"
+                                , Svg.Attributes.preserveAspectRatio "none"
+                                ]
+                                [ Svg.line
+                                    [ Svg.Attributes.x1 "0"
+                                    , Svg.Attributes.y1 "50%"
+                                    , Svg.Attributes.x2 "100%"
+                                    , Svg.Attributes.y2 "50%"
+                                    , Svg.Attributes.class "stroke-mid-gray"
+                                    ]
+                                    []
+                                , Svg.line
+                                    [ Svg.Attributes.x1 "50%"
+                                    , Svg.Attributes.y1 "0"
+                                    , Svg.Attributes.x2 "50%"
+                                    , Svg.Attributes.y2 "100%"
+                                    , Svg.Attributes.class "stroke-mid-gray"
+                                    ]
+                                    []
+                                , Svg.text_
+                                    [ Svg.Attributes.x "25%"
+                                    , Svg.Attributes.y "25%"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord1) ]
+                                , Svg.text_
+                                    [ Svg.Attributes.x "75%"
+                                    , Svg.Attributes.y "25%"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord2) ]
+                                , Svg.text_
+                                    [ Svg.Attributes.x "25%"
+                                    , Svg.Attributes.y "75%"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord3) ]
+                                , Svg.text_
+                                    [ Svg.Attributes.x "75%"
+                                    , Svg.Attributes.y "75%"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord4) ]
+                                ]
+
                         _ ->
                             text "TODO"
 
