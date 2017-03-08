@@ -134,7 +134,7 @@ type ChartStatus
 type alias Model =
     { chart : Chart
     , status : ChartStatus
-    , viewKey : Key
+    , viewedKey : Key
     }
 
 
@@ -142,7 +142,7 @@ init : Chart -> Model
 init chart =
     { chart = chart
     , status = ViewStatus
-    , viewKey = chart.key
+    , viewedKey = chart.key
     }
 
 
@@ -401,7 +401,7 @@ update msg model =
                     { model | chart = newChart }
 
             SetViewKey key ->
-                { model | viewKey = key }
+                { model | viewedKey = key }
 
 
 
@@ -409,59 +409,77 @@ update msg model =
 
 
 view : Model -> Html Msg
-view { chart, status, viewKey } =
-    let
-        (Key viewNote) =
-            viewKey
-    in
-        card chart.title
-            (keyToString chart.key)
-            [ div [ class "mv3 dt dt--fixed collapse athelas" ]
-                (chart
-                    |> Music.Chart.transpose viewKey
+view { chart, status, viewedKey } =
+    card chart.title
+        (keyToString chart.key)
+        ([ div [ class "mv3 dt dt--fixed collapse athelas" ]
+            (let
+                viewedChart =
+                    case status of
+                        EditStatus _ ->
+                            chart
+
+                        ViewStatus ->
+                            chart
+                                |> Music.Chart.transpose viewedKey
+             in
+                viewedChart
                     |> .parts
                     |> List.indexedMap (viewPart chart status)
                     |> List.concat
-                )
-            , toolbar
-                [ label []
-                    [ text "Transpose to: "
-                    , viewSelectNote viewNote (Key >> SetViewKey)
-                    ]
-                ]
-            , (case status of
-                EditStatus selection ->
-                    div []
-                        [ button Primary
-                            NotPressed
-                            [ onClick Save ]
-                            [ text "Save" ]
-                        , (case selection of
-                            BarSelection barReference ->
-                                case getBarAtReference barReference chart of
-                                    Nothing ->
-                                        text youFoundABugMessage
+            )
+         ]
+            ++ (case status of
+                    EditStatus _ ->
+                        []
 
-                                    Just selectedBar ->
-                                        viewBarEditor chart barReference selectedBar
-
-                            PartSelection partIndex ->
-                                case List.getAt partIndex chart.parts of
-                                    Nothing ->
-                                        text youFoundABugMessage
-
-                                    Just part ->
-                                        viewPartEditor chart partIndex part
-                          )
+                    ViewStatus ->
+                        [ toolbar
+                            [ label []
+                                [ text "Transpose to: "
+                                , let
+                                    (Key viewedNote) =
+                                        viewedKey
+                                  in
+                                    viewSelectNote viewedNote (Key >> SetViewKey)
+                                ]
+                            ]
                         ]
+               )
+            ++ [ (case status of
+                    EditStatus selection ->
+                        div []
+                            [ button Primary
+                                NotPressed
+                                [ onClick Save ]
+                                [ text "Save" ]
+                            , (case selection of
+                                BarSelection barReference ->
+                                    case getBarAtReference barReference chart of
+                                        Nothing ->
+                                            text youFoundABugMessage
 
-                ViewStatus ->
-                    button Primary
-                        NotPressed
-                        [ onClick Edit ]
-                        [ text "Edit" ]
-              )
-            ]
+                                        Just selectedBar ->
+                                            viewBarEditor chart barReference selectedBar
+
+                                PartSelection partIndex ->
+                                    case List.getAt partIndex chart.parts of
+                                        Nothing ->
+                                            text youFoundABugMessage
+
+                                        Just part ->
+                                            viewPartEditor chart partIndex part
+                              )
+                            ]
+
+                    ViewStatus ->
+                        button Primary
+                            NotPressed
+                            [ onClick Edit ]
+                            [ text "Edit" ]
+                 )
+               ]
+        )
 
 
 viewBarEditor : Chart -> BarReference -> Bar -> Html Msg
@@ -832,7 +850,16 @@ viewPart chart status partIndex part =
 viewBar : ChartStatus -> Bool -> Msg -> Bar -> Html Msg
 viewBar status isSelected msg bar =
     div
-        ([ class "dtc w2 h-inherit ba b--mid-gray v-mid f3 f2-ns"
+        ([ class
+            ("dtc w2 h-inherit ba b--mid-gray v-mid f3 f2-ns "
+                ++ (case status of
+                        ViewStatus ->
+                            "cursor-default"
+
+                        EditStatus _ ->
+                            "pointer"
+                   )
+            )
          , classList [ ( "bg-moon-gray", isSelected ) ]
          ]
             ++ (case status of
