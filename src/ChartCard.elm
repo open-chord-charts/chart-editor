@@ -8,6 +8,8 @@ import List.Extra as List
 import Music.Chart exposing (..)
 import Music.Chord exposing (..)
 import Music.Note as Note exposing (..)
+import Svg exposing (svg)
+import Svg.Attributes
 
 
 -- CONSTANTS
@@ -414,18 +416,13 @@ view { chart, status, viewKey } =
     in
         card chart.title
             (keyToString chart.key)
-            [ table
-                [ class "mv3 dt--fixed collapse" ]
-                [ let
-                    transposedChart =
-                        Music.Chart.transpose viewKey chart
-                  in
-                    tbody []
-                        (transposedChart.parts
-                            |> List.indexedMap (viewPart chart status)
-                            |> List.concat
-                        )
-                ]
+            [ div [ class "mv3 dt dt--fixed collapse athelas" ]
+                (chart
+                    |> Music.Chart.transpose viewKey
+                    |> .parts
+                    |> List.indexedMap (viewPart chart status)
+                    |> List.concat
+                )
             , toolbar
                 [ label []
                     [ text "Transpose to: "
@@ -736,8 +733,8 @@ viewPart chart status partIndex part =
                 ViewStatus ->
                     False
 
-        partTd s =
-            td
+        partCell s =
+            div
                 ((case status of
                     EditStatus _ ->
                         [ onClick (SelectPart partIndex) ]
@@ -745,7 +742,7 @@ viewPart chart status partIndex part =
                     ViewStatus ->
                         []
                  )
-                    ++ [ class "w1"
+                    ++ [ class "dtc w1 sans-serif h-inherit v-mid tc"
                        , classList [ ( "bg-moon-gray", isPartSelected ) ]
                        ]
                 )
@@ -771,8 +768,8 @@ viewPart chart status partIndex part =
                     |> List.greedyGroupsOf nbBarsByRow
                     |> List.indexedMap
                         (\rowIndex rowBars ->
-                            tr [ class "h2" ]
-                                (partTd
+                            div [ class "dt-row h3" ]
+                                (partCell
                                     (if rowIndex == 0 then
                                         partName
                                      else
@@ -798,7 +795,7 @@ viewPart chart status partIndex part =
                                                 nbBarsByRow - List.length nonEmptyBars
 
                                             emptyBar =
-                                                td [ class "w2" ] []
+                                                div [ class "dtc w2" ] []
 
                                             paddingBars =
                                                 List.repeat nbPaddingBars emptyBar
@@ -814,8 +811,8 @@ viewPart chart status partIndex part =
                         )
 
             PartRepeat partName ->
-                [ tr [ class "h1" ]
-                    (partTd partName
+                [ div [ class "dt-row h2" ]
+                    (partCell partName
                         :: (List.repeat nbBarsByRow BarRepeat
                                 |> List.indexedMap
                                     (\barIndex bar ->
@@ -828,8 +825,8 @@ viewPart chart status partIndex part =
 
 viewBar : ChartStatus -> Bool -> Msg -> Bar -> Html Msg
 viewBar status isSelected msg bar =
-    td
-        ([ class "ba b--mid-gray tc w2 ph2 f4 athelas"
+    div
+        ([ class "dtc w2 h-inherit ba b--mid-gray v-mid f3 f2-ns"
          , classList [ ( "bg-moon-gray", isSelected ) ]
          ]
             ++ (case status of
@@ -840,7 +837,56 @@ viewBar status isSelected msg bar =
                         []
                )
         )
-        [ text (barToString bar) ]
+        [ let
+            barCell s =
+                div [ class "tc" ]
+                    [ text s ]
+          in
+            case bar of
+                Bar chords ->
+                    case chords of
+                        [ chord ] ->
+                            chord
+                                |> Music.Chord.toString
+                                |> barCell
+
+                        [ chord1, chord2 ] ->
+                            svg
+                                [ Svg.Attributes.class "h-100 w-100 v-mid"
+                                , Svg.Attributes.preserveAspectRatio "none"
+                                ]
+                                [ Svg.line
+                                    [ Svg.Attributes.x1 "0"
+                                    , Svg.Attributes.y1 "100%"
+                                    , Svg.Attributes.x2 "100%"
+                                    , Svg.Attributes.y2 "0"
+                                    , Svg.Attributes.class "stroke-mid-gray"
+                                    ]
+                                    []
+                                , Svg.text_
+                                    [ Svg.Attributes.x "25%"
+                                    , Svg.Attributes.y "25%"
+                                    , Svg.Attributes.dy "0.1em"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord1) ]
+                                , Svg.text_
+                                    [ Svg.Attributes.x "75%"
+                                    , Svg.Attributes.y "75%"
+                                    , Svg.Attributes.dy "-0.1em"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord2) ]
+                                ]
+
+                        _ ->
+                            text "TODO"
+
+                BarRepeat ->
+                    barCell "–"
+        ]
 
 
 
@@ -884,22 +930,20 @@ button purpose state attributes =
 
 card : String -> String -> List (Html msg) -> Html msg
 card titleLeft titleRight children =
-    article [ class "br2 ba-ns dark-gray b--black-10 mv4 mw6" ]
-        [ div [ class "ph3 pv2" ]
-            ([ div [ class "cf w-100 mt1" ]
-                [ div [ class "fl w-90" ]
-                    [ h1 [ class "f5 mv0" ]
-                        [ text titleLeft ]
-                    ]
-                , div [ class "fl w-10 tr" ]
-                    [ h2 [ class "f5 mv0" ]
-                        [ text titleRight ]
-                    ]
+    div []
+        ([ div [ class "cf w-100 mt1" ]
+            [ div [ class "fl w-90" ]
+                [ h1 [ class "f5 mv0" ]
+                    [ text titleLeft ]
                 ]
-             ]
-                ++ children
-            )
-        ]
+            , div [ class "fl w-10 tr" ]
+                [ h2 [ class "f5 mv0" ]
+                    [ text titleRight ]
+                ]
+            ]
+         ]
+            ++ children
+        )
 
 
 toolbar : List (Html msg) -> Html msg
@@ -939,18 +983,6 @@ qualityDecoder string =
 
 
 -- FORMATTERS
-
-
-barToString : Bar -> String
-barToString bar =
-    case bar of
-        Bar chords ->
-            chords
-                |> List.map Music.Chord.toString
-                |> String.join ", "
-
-        BarRepeat ->
-            "–"
 
 
 keyToString : Key -> String
