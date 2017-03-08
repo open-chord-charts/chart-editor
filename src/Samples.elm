@@ -13,9 +13,9 @@ grammar =
         [ Part "A"
             [ Bar [ Chord noteC Major ]
             , BarRepeat
-            , Bar [ Chord noteC Major, Chord noteD Minor ]
-            , Bar [ Chord noteC Major, Chord noteD Minor, Chord noteE Seventh ]
-            , Bar [ Chord noteAb Major, Chord noteC Seventh, Chord noteF Minor, Chord noteEb Major ]
+            , Bar [ Chord noteA MinorSeventh, Chord noteD Seventh ]
+            , Bar [ Chord noteG Minor, Chord noteEb Seventh, Chord noteD Seventh ]
+            , Bar [ Chord noteAb Major, Chord noteC Seventh, Chord noteF Minor, Chord noteEb Sixth ]
             ]
         ]
     }

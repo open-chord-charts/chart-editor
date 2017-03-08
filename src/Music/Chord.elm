@@ -13,12 +13,14 @@ type Chord
 type Quality
     = Major
     | Minor
+    | Sixth
     | Seventh
+    | MinorSeventh
 
 
 qualities : List Quality
 qualities =
-    [ Major, Minor, Seventh ]
+    [ Major, Minor, Sixth, Seventh, MinorSeventh ]
 
 
 
@@ -30,19 +32,25 @@ transpose interval (Chord note quality) =
     Chord (Note.transpose interval note) quality
 
 
-qualityToString : Quality -> String
-qualityToString quality =
-    case quality of
-        Major ->
-            ""
-
-        Minor ->
-            "m"
-
-        Seventh ->
-            "7"
-
-
 toString : Chord -> String
 toString (Chord note quality) =
-    Note.toString note ++ qualityToString quality
+    let
+        qualityToString : Quality -> String
+        qualityToString quality =
+            case quality of
+                Major ->
+                    ""
+
+                Minor ->
+                    "m"
+
+                Sixth ->
+                    "6"
+
+                Seventh ->
+                    "7"
+
+                MinorSeventh ->
+                    "m7"
+    in
+        Note.toString note ++ qualityToString quality

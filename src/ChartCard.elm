@@ -700,6 +700,12 @@ viewQualitySelector preSelectedQuality qualityToMsg =
                                 Minor ->
                                     "minor"
 
+                                Sixth ->
+                                    "6th"
+
+                                MinorSeventh ->
+                                    "minor 7th"
+
                                 Seventh ->
                                     "7th"
                     in
