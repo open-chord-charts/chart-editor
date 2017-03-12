@@ -266,7 +266,7 @@ update msg model =
                     newStatus =
                         EditStatus (BarSelection { partIndex = 0, barIndex = 0 })
                 in
-                    { model | status = newStatus }
+                    { model | status = newStatus, viewKey = model.chart.key }
 
             MovePart fromPartIndex toPartIndex ->
                 case List.getAt fromPartIndex model.chart.parts of
@@ -426,12 +426,18 @@ view { chart, status, viewKey } =
                             |> List.concat
                         )
                 ]
-            , toolbar
-                [ label []
-                    [ text "Transpose to: "
-                    , viewSelectNote viewNote (Key >> SetViewKey)
-                    ]
-                ]
+            , (case status of
+                EditStatus selection ->
+                    Html.text ""
+
+                ViewStatus ->
+                    toolbar
+                        [ label []
+                            [ text "Transpose to: "
+                            , viewSelectNote viewNote (Key >> SetViewKey)
+                            ]
+                        ]
+              )
             , (case status of
                 EditStatus selection ->
                     div []
