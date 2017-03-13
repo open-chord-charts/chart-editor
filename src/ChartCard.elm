@@ -8,6 +8,8 @@ import List.Extra as List
 import Music.Chart exposing (..)
 import Music.Chord exposing (..)
 import Music.Note as Note exposing (..)
+import Svg exposing (svg)
+import Svg.Attributes
 
 
 -- CONSTANTS
@@ -132,7 +134,7 @@ type ChartStatus
 type alias Model =
     { chart : Chart
     , status : ChartStatus
-    , viewKey : Key
+    , viewedKey : Key
     }
 
 
@@ -140,7 +142,7 @@ init : Chart -> Model
 init chart =
     { chart = chart
     , status = ViewStatus
-    , viewKey = chart.key
+    , viewedKey = chart.key
     }
 
 
@@ -399,7 +401,7 @@ update msg model =
                     { model | chart = newChart }
 
             SetViewKey key ->
-                { model | viewKey = key }
+                { model | viewedKey = key }
 
 
 
@@ -407,70 +409,67 @@ update msg model =
 
 
 view : Model -> Html Msg
-view { chart, status, viewKey } =
-    let
-        (Key viewNote) =
-            viewKey
-    in
-        card chart.title
-            (keyToString chart.key)
-            [ table
-                [ class "mv3 dt--fixed collapse" ]
-                [ let
-                    viewedChart =
-                        case status of
-                            EditStatus _ ->
-                                chart
+view { chart, status, viewedKey } =
+    card chart.title
+        (keyToString chart.key)
+        [ div [ class "dt dt--fixed collapse mv3 athelas" ]
+            (let
+                viewedChart =
+                    case status of
+                        EditStatus _ ->
+                            chart
 
-                            ViewStatus ->
-                                chart
-                                    |> Music.Chart.transpose viewKey
-                  in
-                    tbody []
-                        (viewedChart.parts
-                            |> List.indexedMap (viewPart chart status)
-                            |> List.concat
-                        )
-                ]
-            , case status of
-                EditStatus selection ->
-                    div []
-                        [ button Primary
-                            NotPressed
-                            [ onClick Save ]
-                            [ text "Save" ]
-                        , case selection of
-                            BarSelection barReference ->
-                                case getBarAtReference barReference chart of
-                                    Nothing ->
-                                        text youFoundABugMessage
+                        ViewStatus ->
+                            chart
+                                |> Music.Chart.transpose viewedKey
+             in
+                viewedChart.parts
+                    |> List.indexedMap (viewPart chart status)
+                    |> List.concat
+            )
+        , case status of
+            EditStatus selection ->
+                div []
+                    [ button Primary
+                        NotPressed
+                        [ onClick Save ]
+                        [ text "Save" ]
+                    , case selection of
+                        BarSelection barReference ->
+                            case getBarAtReference barReference chart of
+                                Nothing ->
+                                    text youFoundABugMessage
 
-                                    Just selectedBar ->
-                                        viewBarEditor chart barReference selectedBar
+                                Just selectedBar ->
+                                    viewBarEditor chart barReference selectedBar
 
-                            PartSelection partIndex ->
-                                case List.getAt partIndex chart.parts of
-                                    Nothing ->
-                                        text youFoundABugMessage
+                        PartSelection partIndex ->
+                            case List.getAt partIndex chart.parts of
+                                Nothing ->
+                                    text youFoundABugMessage
 
-                                    Just part ->
-                                        viewPartEditor chart partIndex part
-                        ]
+                                Just part ->
+                                    viewPartEditor chart partIndex part
+                    ]
 
-                ViewStatus ->
-                    div []
-                        [ toolbar
-                            [ label []
-                                [ text "Transpose to: "
-                                , viewSelectNote viewNote (Key >> SetViewKey)
-                                ]
+            ViewStatus ->
+                div []
+                    [ toolbar
+                        [ label []
+                            [ text "Transpose to: "
+                            , let
+                                (Key viewedNote) =
+                                    viewedKey
+                              in
+                                viewSelectNote viewedNote (Key >> SetViewKey)
                             ]
-                        , button Primary
-                            NotPressed
-                            [ onClick Edit ]
-                            [ text "Edit" ]
                         ]
-            ]
+                    , button Primary
+                        NotPressed
+                        [ onClick Edit ]
+                        [ text "Edit" ]
+                    ]
+        ]
 
 
 viewBarEditor : Chart -> BarReference -> Bar -> Html Msg
@@ -709,8 +708,17 @@ viewQualitySelector preSelectedQuality qualityToMsg =
                                 Minor ->
                                     "minor"
 
+                                Sixth ->
+                                    "6th"
+
                                 Seventh ->
                                     "7th"
+
+                                MinorSeventh ->
+                                    "minor 7th"
+
+                                SemiDiminished ->
+                                    "minor 7th b5 (semi-diminished)"
                     in
                         button Secondary
                             (if quality == preSelectedQuality then
@@ -742,8 +750,8 @@ viewPart chart status partIndex part =
                 ViewStatus ->
                     False
 
-        partTd s =
-            td
+        partCell s =
+            div
                 ((case status of
                     EditStatus _ ->
                         [ onClick (SelectPart partIndex) ]
@@ -751,7 +759,7 @@ viewPart chart status partIndex part =
                     ViewStatus ->
                         []
                  )
-                    ++ [ class "w1"
+                    ++ [ class "dtc w2 v-mid tc sans-serif"
                        , classList [ ( "bg-moon-gray", isPartSelected ) ]
                        ]
                 )
@@ -777,8 +785,8 @@ viewPart chart status partIndex part =
                     |> List.greedyGroupsOf nbBarsByRow
                     |> List.indexedMap
                         (\rowIndex rowBars ->
-                            tr [ class "h2" ]
-                                (partTd
+                            div [ class "dt-row h3" ]
+                                (partCell
                                     (if rowIndex == 0 then
                                         partName
                                      else
@@ -804,7 +812,8 @@ viewPart chart status partIndex part =
                                                 nbBarsByRow - List.length nonEmptyBars
 
                                             emptyBar =
-                                                td [ class "w2" ] []
+                                                div [ class "dtc" ]
+                                                    [ barCell [] ]
 
                                             paddingBars =
                                                 List.repeat nbPaddingBars emptyBar
@@ -820,8 +829,8 @@ viewPart chart status partIndex part =
                         )
 
             PartRepeat partName ->
-                [ tr [ class "h1" ]
-                    (partTd partName
+                [ div [ class "dt-row h2" ]
+                    (partCell partName
                         :: (List.repeat nbBarsByRow BarRepeat
                                 |> List.indexedMap
                                     (\barIndex bar ->
@@ -834,8 +843,17 @@ viewPart chart status partIndex part =
 
 viewBar : ChartStatus -> Bool -> Msg -> Bar -> Html Msg
 viewBar status isSelected msg bar =
-    td
-        ([ class "ba b--mid-gray tc w2 ph2 f4 athelas"
+    div
+        ([ class
+            ("dtc ba b--mid-gray f3 f2-ns "
+                ++ (case status of
+                        ViewStatus ->
+                            "cursor-default"
+
+                        EditStatus _ ->
+                            "pointer"
+                   )
+            )
          , classList [ ( "bg-moon-gray", isSelected ) ]
          ]
             ++ (case status of
@@ -846,7 +864,166 @@ viewBar status isSelected msg bar =
                         []
                )
         )
-        [ text (barToString bar) ]
+        [ let
+            barCellWithSvg children =
+                barCell
+                    [ svg [ Svg.Attributes.class "h-100 w-100 v-mid" ]
+                        children
+                    ]
+          in
+            case bar of
+                Bar chords ->
+                    case chords of
+                        [ chord ] ->
+                            barCellWithSvg
+                                [ Svg.text_
+                                    [ Svg.Attributes.x "50%"
+                                    , Svg.Attributes.y "50%"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord) ]
+                                ]
+
+                        [ chord1, chord2 ] ->
+                            barCellWithSvg
+                                [ Svg.line
+                                    [ Svg.Attributes.x1 "0"
+                                    , Svg.Attributes.y1 "100%"
+                                    , Svg.Attributes.x2 "100%"
+                                    , Svg.Attributes.y2 "0"
+                                    , Svg.Attributes.class "stroke-mid-gray"
+                                    ]
+                                    []
+                                , Svg.text_
+                                    [ Svg.Attributes.x "25%"
+                                    , Svg.Attributes.y "25%"
+                                    , Svg.Attributes.dy "0.1em"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord1) ]
+                                , Svg.text_
+                                    [ Svg.Attributes.x "75%"
+                                    , Svg.Attributes.y "75%"
+                                    , Svg.Attributes.dy "-0.1em"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord2) ]
+                                ]
+
+                        [ chord1, chord2, chord3 ] ->
+                            barCellWithSvg
+                                [ Svg.line
+                                    [ Svg.Attributes.x1 "0"
+                                    , Svg.Attributes.y1 "50%"
+                                    , Svg.Attributes.x2 "100%"
+                                    , Svg.Attributes.y2 "50%"
+                                    , Svg.Attributes.class "stroke-mid-gray"
+                                    ]
+                                    []
+                                , Svg.line
+                                    [ Svg.Attributes.x1 "50%"
+                                    , Svg.Attributes.y1 "50%"
+                                    , Svg.Attributes.x2 "50%"
+                                    , Svg.Attributes.y2 "100%"
+                                    , Svg.Attributes.class "stroke-mid-gray"
+                                    ]
+                                    []
+                                , Svg.text_
+                                    [ Svg.Attributes.x "50%"
+                                    , Svg.Attributes.y "25%"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord1) ]
+                                , Svg.text_
+                                    [ Svg.Attributes.x "25%"
+                                    , Svg.Attributes.y "75%"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord2) ]
+                                , Svg.text_
+                                    [ Svg.Attributes.x "75%"
+                                    , Svg.Attributes.y "75%"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord3) ]
+                                ]
+
+                        [ chord1, chord2, chord3, chord4 ] ->
+                            barCellWithSvg
+                                [ Svg.line
+                                    [ Svg.Attributes.x1 "0"
+                                    , Svg.Attributes.y1 "50%"
+                                    , Svg.Attributes.x2 "100%"
+                                    , Svg.Attributes.y2 "50%"
+                                    , Svg.Attributes.class "stroke-mid-gray"
+                                    ]
+                                    []
+                                , Svg.line
+                                    [ Svg.Attributes.x1 "50%"
+                                    , Svg.Attributes.y1 "0"
+                                    , Svg.Attributes.x2 "50%"
+                                    , Svg.Attributes.y2 "100%"
+                                    , Svg.Attributes.class "stroke-mid-gray"
+                                    ]
+                                    []
+                                , Svg.text_
+                                    [ Svg.Attributes.x "25%"
+                                    , Svg.Attributes.y "25%"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord1) ]
+                                , Svg.text_
+                                    [ Svg.Attributes.x "75%"
+                                    , Svg.Attributes.y "25%"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord2) ]
+                                , Svg.text_
+                                    [ Svg.Attributes.x "25%"
+                                    , Svg.Attributes.y "75%"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord3) ]
+                                , Svg.text_
+                                    [ Svg.Attributes.x "75%"
+                                    , Svg.Attributes.y "75%"
+                                    , Svg.Attributes.textAnchor "middle"
+                                    , Svg.Attributes.dominantBaseline "central"
+                                    ]
+                                    [ Svg.text (Music.Chord.toString chord4) ]
+                                ]
+
+                        _ ->
+                            text "TODO"
+
+                BarRepeat ->
+                    barCellWithSvg
+                        [ Svg.text_
+                            [ Svg.Attributes.x "50%"
+                            , Svg.Attributes.y "50%"
+                            , Svg.Attributes.textAnchor "middle"
+                            , Svg.Attributes.dominantBaseline "central"
+                            ]
+                            [ Svg.text "–" ]
+                        ]
+        ]
+
+
+barCell : List (Html msg) -> Html msg
+barCell children =
+    div [ class "aspect-ratio aspect-ratio--4x3" ]
+        [ div [ class "aspect-ratio--object" ]
+            children
+        ]
 
 
 
@@ -890,22 +1067,20 @@ button purpose state attributes =
 
 card : String -> String -> List (Html msg) -> Html msg
 card titleLeft titleRight children =
-    article [ class "br2 ba-ns dark-gray b--black-10 mv4 mw6" ]
-        [ div [ class "ph3 pv2" ]
-            ([ div [ class "cf w-100 mt1" ]
-                [ div [ class "fl w-90" ]
-                    [ h1 [ class "f5 mv0" ]
-                        [ text titleLeft ]
-                    ]
-                , div [ class "fl w-10 tr" ]
-                    [ h2 [ class "f5 mv0" ]
-                        [ text titleRight ]
-                    ]
+    div [ class "w-60-l mv5" ]
+        ([ div [ class "cf w-100 mt1" ]
+            [ div [ class "fl w-90" ]
+                [ h1 [ class "f5 mv0" ]
+                    [ text titleLeft ]
                 ]
-             ]
-                ++ children
-            )
-        ]
+            , div [ class "fl w-10 tr" ]
+                [ h2 [ class "f5 mv0" ]
+                    [ text titleRight ]
+                ]
+            ]
+         ]
+            ++ children
+        )
 
 
 toolbar : List (Html msg) -> Html msg
@@ -945,18 +1120,6 @@ qualityDecoder string =
 
 
 -- FORMATTERS
-
-
-barToString : Bar -> String
-barToString bar =
-    case bar of
-        Bar chords ->
-            chords
-                |> List.map Music.Chord.toString
-                |> String.join ", "
-
-        BarRepeat ->
-            "–"
 
 
 keyToString : Key -> String

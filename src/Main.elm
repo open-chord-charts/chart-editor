@@ -25,8 +25,8 @@ type alias Model =
 
 model : Model
 model =
-    [ ChartCard.init Samples.allOfMe
-      -- , ChartCard.init Samples.allOfMe
+    [ ChartCard.init Samples.grammar
+    , ChartCard.init Samples.allOfMe
     ]
 
 
@@ -77,7 +77,7 @@ view model =
                             |> Html.map (ChartCardMsg index)
                     )
             )
-        , footer [ class "pv4 ph3 ph5-m ph6-l bg-near-black" ]
+        , footer [ class "pa3 ph5-m ph6-l bg-near-black" ]
             [ a
                 [ class "f6 ph2 link dim moon-gray"
                 , href "https://github.com/open-chords-charts/chart-editor"
