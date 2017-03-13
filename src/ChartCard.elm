@@ -428,7 +428,7 @@ view { chart, status, viewKey } =
                 ]
             , (case status of
                 EditStatus selection ->
-                    Html.text ""
+                    text ""
 
                 ViewStatus ->
                     toolbar
