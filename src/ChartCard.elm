@@ -427,7 +427,7 @@ view { chart, status, viewKey } =
                         )
                 ]
             , (case status of
-                EditStatus selection ->
+                EditStatus _ ->
                     text ""
 
                 ViewStatus ->
