@@ -426,26 +426,14 @@ view { chart, status, viewKey } =
                             |> List.concat
                         )
                 ]
-            , (case status of
-                EditStatus _ ->
-                    text ""
-
-                ViewStatus ->
-                    toolbar
-                        [ label []
-                            [ text "Transpose to: "
-                            , viewSelectNote viewNote (Key >> SetViewKey)
-                            ]
-                        ]
-              )
-            , (case status of
+            , case status of
                 EditStatus selection ->
                     div []
                         [ button Primary
                             NotPressed
                             [ onClick Save ]
                             [ text "Save" ]
-                        , (case selection of
+                        , case selection of
                             BarSelection barReference ->
                                 case getBarAtReference barReference chart of
                                     Nothing ->
@@ -461,15 +449,21 @@ view { chart, status, viewKey } =
 
                                     Just part ->
                                         viewPartEditor chart partIndex part
-                          )
                         ]
 
                 ViewStatus ->
-                    button Primary
-                        NotPressed
-                        [ onClick Edit ]
-                        [ text "Edit" ]
-              )
+                    div []
+                        [ toolbar
+                            [ label []
+                                [ text "Transpose to: "
+                                , viewSelectNote viewNote (Key >> SetViewKey)
+                                ]
+                            ]
+                        , button Primary
+                            NotPressed
+                            [ onClick Edit ]
+                            [ text "Edit" ]
+                        ]
             ]
 
 
