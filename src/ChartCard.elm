@@ -266,7 +266,7 @@ update msg model =
                     newStatus =
                         EditStatus (BarSelection { partIndex = 0, barIndex = 0 })
                 in
-                    { model | status = newStatus, viewKey = model.chart.key }
+                    { model | status = newStatus }
 
             MovePart fromPartIndex toPartIndex ->
                 case List.getAt fromPartIndex model.chart.parts of
@@ -417,11 +417,17 @@ view { chart, status, viewKey } =
             [ table
                 [ class "mv3 dt--fixed collapse" ]
                 [ let
-                    transposedChart =
-                        Music.Chart.transpose viewKey chart
+                    viewedChart =
+                        case status of
+                            EditStatus _ ->
+                                chart
+
+                            ViewStatus ->
+                                chart
+                                    |> Music.Chart.transpose viewKey
                   in
                     tbody []
-                        (transposedChart.parts
+                        (viewedChart.parts
                             |> List.indexedMap (viewPart chart status)
                             |> List.concat
                         )
