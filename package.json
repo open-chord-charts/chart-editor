@@ -11,7 +11,7 @@
   },
   "scripts": {
     "prebuild": "npm run clean",
-    "build": "elm make src/Main.elm --warn --output=dist/main.js",
+    "build": "elm make src/Main.elm --yes --warn --output=dist/main.js",
     "clean": "del dist elm-stuff/build-artifacts",
     "deploy": "sh deploy.sh",
     "start": "elm reactor",
