@@ -1,4 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+if [ $CI == "true" ]; then
+    git config --global user.email "deploy@circleci"
+    git config --global user.name "CircleCI deployment"
+fi
 
 cp index.html dist
 sed -i -- 's~/_compile/src/Main.elm~main.js~' dist/index.html
