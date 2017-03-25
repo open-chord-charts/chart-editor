@@ -12,3 +12,8 @@ dependencies:
 test:
   override:
     - npm run test:ci
+deployment:
+  production:
+    branch: master
+    commands:
+      - npm run deploy
