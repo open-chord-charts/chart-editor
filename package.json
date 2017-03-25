@@ -1,0 +1,29 @@
+{
+  "name": "chart-editor",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Chart viewer and editor, part of the Open Chords Charts project.",
+  "devDependencies": {
+    "cpy-cli": "^1.0.1",
+    "del-cli": "^0.2.1",
+    "gh-pages": "^0.12.0"
+  },
+  "scripts": {
+    "prebuild": "npm run clean",
+    "build": "elm make src/Main.elm --warn --output=dist/main.js",
+    "clean": "del dist elm-stuff/build-artifacts",
+    "deploy": "sh deploy.sh",
+    "start": "elm reactor",
+    "test": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-chords-charts/chart-editor.git"
+  },
+  "author": "Christophe Benz <christophe.benz@gmail.com>",
+  "license": "AGPLv3+",
+  "bugs": {
+    "url": "https://github.com/open-chords-charts/chart-editor/issues"
+  },
+  "homepage": "https://github.com/open-chords-charts/chart-editor"
+}
