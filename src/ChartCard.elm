@@ -785,7 +785,7 @@ viewPart chart status partIndex part =
                     |> List.greedyGroupsOf nbBarsByRow
                     |> List.indexedMap
                         (\rowIndex rowBars ->
-                            div [ class "dt-row h3" ]
+                            div [ class "dt-row" ]
                                 (partCell
                                     (if rowIndex == 0 then
                                         partName
@@ -845,7 +845,7 @@ viewBar : ChartStatus -> Bool -> Msg -> Bar -> Html Msg
 viewBar status isSelected msg bar =
     div
         ([ class
-            ("dtc ba b--mid-gray f3 f2-ns "
+            ("dtc ba b--mid-gray f5 f2-m "
                 ++ (case status of
                         ViewStatus ->
                             "cursor-default"
@@ -1067,7 +1067,7 @@ button purpose state attributes =
 
 card : String -> String -> List (Html msg) -> Html msg
 card titleLeft titleRight children =
-    div [ class "w-60-l mv5" ]
+    div [ class "mw8 mv5" ]
         ([ div [ class "cf w-100 mt1" ]
             [ div [ class "fl w-90" ]
                 [ h1 [ class "f5 mv0" ]

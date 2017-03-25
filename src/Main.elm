@@ -69,7 +69,7 @@ view model =
             , h2 [ class "f5 f4-m f3-l fw2 black-50 mt0 lh-copy" ]
                 [ text "Chart viewer and editor" ]
             ]
-        , section [ class "ph4-ns flex-auto" ]
+        , section [ class "flex-auto ph1 ph4-ns" ]
             (model
                 |> List.indexedMap
                     (\index chartModel ->
