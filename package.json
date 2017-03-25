@@ -12,10 +12,12 @@
   "scripts": {
     "prebuild": "npm run clean",
     "build": "elm make src/Main.elm --yes --warn --output=dist/main.js",
+    "build:ci": "sysconfcpus --num 1 npm run build",
     "clean": "del dist elm-stuff/build-artifacts",
-    "deploy": "sh deploy.sh",
+    "deploy": "npm run build && sh deploy.sh",
+    "deploy:ci": "sh deploy.sh",
     "start": "elm reactor",
-    "test:ci": "sysconfcpus --num 1 npm run build"
+    "test": "npm run build:ci"
   },
   "repository": {
     "type": "git",

@@ -9,11 +9,8 @@ dependencies:
     - cd libsysconfcpus && ./configure && make && sudo make install
   cache_directories:
     - libsysconfcpus
-test:
-  override:
-    - npm run test:ci
 deployment:
   production:
     branch: master
     commands:
-      - npm run deploy
+      - npm run deploy:ci
