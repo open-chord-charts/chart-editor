@@ -15,7 +15,7 @@
     "clean": "del dist elm-stuff/build-artifacts",
     "deploy": "sh deploy.sh",
     "start": "elm reactor",
-    "test": "npm run build"
+    "test:ci": "sysconfcpus --num 1 npm run build"
   },
   "repository": {
     "type": "git",

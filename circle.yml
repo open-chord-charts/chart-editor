@@ -2,3 +2,13 @@ general:
   branches:
     ignore:
       - gh-pages
+dependencies:
+  post:
+    # Workaround to Elm CI test suite timeout: https://github.com/elm-lang/elm-compiler/issues/1473.
+    - if [ ! -d libsysconfcpus ]; then git clone https://github.com/obmarg/libsysconfcpus.git; fi
+    - cd libsysconfcpus && ./configure && make && sudo make install
+  cache_directories:
+    - libsysconfcpus
+test:
+  override:
+    - npm run test:ci
