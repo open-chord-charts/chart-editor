@@ -845,7 +845,7 @@ viewBar : ChartStatus -> Bool -> Msg -> Bar -> Html Msg
 viewBar status isSelected msg bar =
     div
         ([ class
-            ("dtc ba b--mid-gray f5 f2-m "
+            ("dtc ba b--mid-gray f5 f2-ns "
                 ++ (case status of
                         ViewStatus ->
                             "cursor-default"
