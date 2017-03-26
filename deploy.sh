@@ -5,7 +5,7 @@ if [ $CI = "true" ]; then
     git config --global user.name "CircleCI deployment"
 fi
 
-cp index.html dist
+cp index.html style.css dist
 sed -i -- 's~/_compile/src/Main.elm~main.js~' dist/index.html
 sed -i -- 's~runElmProgram~Elm.Main.fullscreen~' dist/index.html
 
