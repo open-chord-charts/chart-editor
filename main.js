@@ -10437,7 +10437,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F4(
 					_0: _elm_lang$html$Html_Attributes$class(
 						A2(
 							_elm_lang$core$Basics_ops['++'],
-							'dtc ba b--mid-gray f5 f2-m ',
+							'dtc ba b--mid-gray f5 f2-ns ',
 							function () {
 								var _p6 = status;
 								if (_p6.ctor === 'ViewStatus') {
