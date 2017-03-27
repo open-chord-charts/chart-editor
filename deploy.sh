@@ -1,15 +1,19 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
-if [ $CI = "true" ]; then
+DIST_DIR="dist"
+
+if [ ! -d "$DIST_DIR" ]; then
+    echo "$DIST_DIR does not exist"
+    exit 1
+fi
+
+if [ "$CI" = "true" ]; then
     git config --global user.email "deploy@circleci"
     git config --global user.name "CircleCI deployment"
 fi
 
-cp index.html style.css dist
-sed -i -- 's~/_compile/src/Main.elm~main.js~' dist/index.html
-sed -i -- 's~runElmProgram~Elm.Main.fullscreen~' dist/index.html
+cp index.html style.css "$DIST_DIR"
+sed -i -- 's~/_compile/src/Main.elm~main.js~' "$DIST_DIR"/index.html
+sed -i -- 's~runElmProgram~Elm.Main.fullscreen~' "$DIST_DIR"/index.html
 
-gh-pages --dist dist
-
-# Refresh the gh-pages branch in particular.
-git fetch
+gh-pages --dist "$DIST_DIR"

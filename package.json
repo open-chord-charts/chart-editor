@@ -10,12 +10,10 @@
     "gh-pages": "^0.12.0"
   },
   "scripts": {
-    "prebuild": "npm run clean",
     "build": "elm make src/Main.elm --yes --warn --output=dist/main.js",
-    "build:ci": "sysconfcpus --num 1 npm run build",
+    "build:ci": "sysconfcpus --num 2 npm run build",
     "clean": "del dist elm-stuff/build-artifacts",
-    "deploy": "npm run build && sh deploy.sh",
-    "deploy:ci": "sh deploy.sh",
+    "deploy": "sh deploy.sh",
     "start": "elm reactor",
     "test": "npm run build:ci"
   },

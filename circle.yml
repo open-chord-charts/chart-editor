@@ -13,4 +13,4 @@ deployment:
   production:
     branch: master
     commands:
-      - npm run deploy:ci
+      - npm run deploy
