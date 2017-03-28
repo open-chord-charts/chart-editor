@@ -11,7 +11,7 @@
   },
   "scripts": {
     "build": "elm make src/Main.elm --yes --warn --output=dist/main.js",
-    "build:ci": "sysconfcpus --num 2 npm run build",
+    "build:ci": "sysconfcpus --num $(nproc) npm run build",
     "clean": "del dist elm-stuff/build-artifacts",
     "deploy": "sh deploy.sh",
     "start": "elm reactor",
