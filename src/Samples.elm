@@ -54,7 +54,7 @@ allOfMe =
                 , Bar [ Chord noteF Minor ]
                 , Bar [ Chord noteC Major ]
                 , Bar [ Chord noteA Major ]
-                , Bar [ Chord noteD SemiDiminished ]
+                , Bar [ Chord noteD HalfDiminished ]
                 , Bar [ Chord noteG Major ]
                 , Bar [ Chord noteC Major ]
                 , BarRepeat
