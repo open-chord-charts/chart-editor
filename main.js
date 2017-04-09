@@ -10093,7 +10093,7 @@ var _open_chords_charts$chart_editor$Music_Chord$toString = function (_p0) {
 			case 'MinorSeventh':
 				return 'm7';
 			default:
-				return 'm7b5';
+				return 'ø';
 		}
 	};
 	return A2(
@@ -10113,7 +10113,7 @@ var _open_chords_charts$chart_editor$Music_Chord$transpose = F2(
 			A2(_open_chords_charts$chart_editor$Music_Note$transpose, interval, _p4._0),
 			_p4._1);
 	});
-var _open_chords_charts$chart_editor$Music_Chord$SemiDiminished = {ctor: 'SemiDiminished'};
+var _open_chords_charts$chart_editor$Music_Chord$HalfDiminished = {ctor: 'HalfDiminished'};
 var _open_chords_charts$chart_editor$Music_Chord$MinorSeventh = {ctor: 'MinorSeventh'};
 var _open_chords_charts$chart_editor$Music_Chord$Seventh = {ctor: 'Seventh'};
 var _open_chords_charts$chart_editor$Music_Chord$Sixth = {ctor: 'Sixth'};
@@ -10136,7 +10136,7 @@ var _open_chords_charts$chart_editor$Music_Chord$qualities = {
 					_0: _open_chords_charts$chart_editor$Music_Chord$MinorSeventh,
 					_1: {
 						ctor: '::',
-						_0: _open_chords_charts$chart_editor$Music_Chord$SemiDiminished,
+						_0: _open_chords_charts$chart_editor$Music_Chord$HalfDiminished,
 						_1: {ctor: '[]'}
 					}
 				}
@@ -11899,7 +11899,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewQualitySelector = F2(
 							case 'MinorSeventh':
 								return 'minor 7th';
 							default:
-								return 'minor 7th b5 (semi-diminished)';
+								return 'semi-diminished';
 						}
 					}();
 					return A4(
@@ -11908,7 +11908,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewQualitySelector = F2(
 						_elm_lang$core$Native_Utils.eq(quality, preSelectedQuality) ? _open_chords_charts$chart_editor$ChartCard$Pressed : _open_chords_charts$chart_editor$ChartCard$NotPressed,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('mr1 w4 tc'),
+							_0: _elm_lang$html$Html_Attributes$class('mr1 tc'),
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onClick(
@@ -12338,7 +12338,7 @@ var _open_chords_charts$chart_editor$Samples$allOfMe = function () {
 							_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
 								{
 									ctor: '::',
-									_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteD, _open_chords_charts$chart_editor$Music_Chord$SemiDiminished),
+									_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteD, _open_chords_charts$chart_editor$Music_Chord$HalfDiminished),
 									_1: {ctor: '[]'}
 								}),
 							_1: {
