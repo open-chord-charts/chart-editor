@@ -726,7 +726,7 @@ viewQualitySelector preSelectedQuality qualityToMsg =
                              else
                                 NotPressed
                             )
-                            [ class "mr1 w4 tc"
+                            [ class "mr1 tc"
                             , onClick (qualityToMsg quality)
                             ]
                             [ text qualityStr ]
