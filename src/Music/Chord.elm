@@ -54,7 +54,7 @@ toString (Chord note quality) =
                 MinorSeventh ->
                     "m7"
 
-                    "m7b5"
                 HalfDiminished ->
+                    "ø"
     in
         Note.toString note ++ qualityToString quality
