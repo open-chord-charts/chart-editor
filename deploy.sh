@@ -12,7 +12,7 @@ if [ "$CI" = "true" ]; then
     git config --global user.name "CircleCI deployment"
 fi
 
-cp index.html style.css "$DIST_DIR"
+cp circle-gh-pages.yml index.html style.css "$DIST_DIR"
 sed -i -- 's~/_compile/src/Main.elm~main.js~' "$DIST_DIR"/index.html
 sed -i -- 's~runElmProgram~Elm.Main.fullscreen~' "$DIST_DIR"/index.html
 
