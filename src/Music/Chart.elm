@@ -85,7 +85,7 @@ mapBarChords f bar =
             Bar (f chords)
 
         BarRepeat ->
-            BarRepeat
+            bar
 
 
 type Key
@@ -121,9 +121,5 @@ transposePart nbSemitones part =
 
 transposeBar : Int -> Bar -> Bar
 transposeBar nbSemitones bar =
-    case bar of
-        Bar chords ->
-            Bar (List.map (Chord.transpose nbSemitones) chords)
-
-        BarRepeat ->
-            BarRepeat
+    bar
+        |> mapBarChords (List.map (Chord.transpose nbSemitones))
