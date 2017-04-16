@@ -800,12 +800,17 @@ viewPart chart status partIndex part =
                                                             let
                                                                 barIndex =
                                                                     rowIndex * nbBarsByRow + barIndexInRow
+
+                                                                previousBar =
+                                                                    rowBars
+                                                                        |> List.getAt (barIndexInRow - 1)
                                                             in
                                                                 viewBar
                                                                     status
                                                                     (isBarSelected barIndex)
                                                                     (SelectBar (BarReference partIndex barIndex))
                                                                     bar
+                                                                    previousBar
                                                         )
 
                                             nbPaddingBars =
@@ -834,15 +839,15 @@ viewPart chart status partIndex part =
                         :: (List.repeat nbBarsByRow BarRepeat
                                 |> List.indexedMap
                                     (\barIndex bar ->
-                                        viewBar status (isBarSelected barIndex) (SelectPart partIndex) bar
+                                        viewBar status (isBarSelected barIndex) (SelectPart partIndex) bar Nothing
                                     )
                            )
                     )
                 ]
 
 
-viewBar : ChartStatus -> Bool -> Msg -> Bar -> Html Msg
-viewBar status isSelected msg bar =
+viewBar : ChartStatus -> Bool -> Msg -> Bar -> Maybe Bar -> Html Msg
+viewBar status isSelected msg bar previousBar =
     let
         defaultFontSizeClasses =
             "f7 f4-m f2-l"
@@ -1030,7 +1035,27 @@ viewBar status isSelected msg bar =
                                 , Svg.Attributes.textAnchor "middle"
                                 , Svg.Attributes.dominantBaseline "central"
                                 ]
-                                [ Svg.text "–" ]
+                                [ Svg.text
+                                    (let
+                                        dash =
+                                            "–"
+                                     in
+                                        case previousBar of
+                                            Nothing ->
+                                                dash
+
+                                            Just bar ->
+                                                case bar of
+                                                    Bar chords ->
+                                                        if List.length chords == 2 then
+                                                            "٪"
+                                                        else
+                                                            dash
+
+                                                    BarRepeat ->
+                                                        dash
+                                    )
+                                ]
                             ]
             ]
 
