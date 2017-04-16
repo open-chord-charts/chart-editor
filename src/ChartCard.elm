@@ -843,179 +843,196 @@ viewPart chart status partIndex part =
 
 viewBar : ChartStatus -> Bool -> Msg -> Bar -> Html Msg
 viewBar status isSelected msg bar =
-    div
-        ([ class
-            ("dtc ba b--mid-gray f5 f2-ns "
-                ++ (case status of
-                        ViewStatus ->
-                            "cursor-default"
+    let
+        defaultFontSizeClasses =
+            "f7 f4-m f2-l"
 
-                        EditStatus _ ->
-                            "pointer"
-                   )
-            )
-         , classList [ ( "bg-moon-gray", isSelected ) ]
-         ]
-            ++ (case status of
-                    EditStatus _ ->
-                        [ onClick msg ]
-
-                    ViewStatus ->
-                        []
-               )
-        )
-        [ let
-            barCellWithSvg children =
-                barCell
-                    [ svg [ Svg.Attributes.class "h-100 w-100 v-mid" ]
-                        children
-                    ]
-          in
+        fontSizeClasses =
             case bar of
                 Bar chords ->
-                    case chords of
-                        [ chord ] ->
-                            barCellWithSvg
-                                [ Svg.text_
-                                    [ Svg.Attributes.x "50%"
-                                    , Svg.Attributes.y "50%"
-                                    , Svg.Attributes.textAnchor "middle"
-                                    , Svg.Attributes.dominantBaseline "central"
-                                    ]
-                                    [ Svg.text (Music.Chord.toString chord) ]
-                                ]
-
-                        [ chord1, chord2 ] ->
-                            barCellWithSvg
-                                [ Svg.line
-                                    [ Svg.Attributes.x1 "0"
-                                    , Svg.Attributes.y1 "100%"
-                                    , Svg.Attributes.x2 "100%"
-                                    , Svg.Attributes.y2 "0"
-                                    , Svg.Attributes.class "stroke-mid-gray"
-                                    ]
-                                    []
-                                , Svg.text_
-                                    [ Svg.Attributes.x "25%"
-                                    , Svg.Attributes.y "25%"
-                                    , Svg.Attributes.dy "0.1em"
-                                    , Svg.Attributes.textAnchor "middle"
-                                    , Svg.Attributes.dominantBaseline "central"
-                                    ]
-                                    [ Svg.text (Music.Chord.toString chord1) ]
-                                , Svg.text_
-                                    [ Svg.Attributes.x "75%"
-                                    , Svg.Attributes.y "75%"
-                                    , Svg.Attributes.dy "-0.1em"
-                                    , Svg.Attributes.textAnchor "middle"
-                                    , Svg.Attributes.dominantBaseline "central"
-                                    ]
-                                    [ Svg.text (Music.Chord.toString chord2) ]
-                                ]
-
-                        [ chord1, chord2, chord3 ] ->
-                            barCellWithSvg
-                                [ Svg.line
-                                    [ Svg.Attributes.x1 "0"
-                                    , Svg.Attributes.y1 "50%"
-                                    , Svg.Attributes.x2 "100%"
-                                    , Svg.Attributes.y2 "50%"
-                                    , Svg.Attributes.class "stroke-mid-gray"
-                                    ]
-                                    []
-                                , Svg.line
-                                    [ Svg.Attributes.x1 "50%"
-                                    , Svg.Attributes.y1 "50%"
-                                    , Svg.Attributes.x2 "50%"
-                                    , Svg.Attributes.y2 "100%"
-                                    , Svg.Attributes.class "stroke-mid-gray"
-                                    ]
-                                    []
-                                , Svg.text_
-                                    [ Svg.Attributes.x "50%"
-                                    , Svg.Attributes.y "25%"
-                                    , Svg.Attributes.textAnchor "middle"
-                                    , Svg.Attributes.dominantBaseline "central"
-                                    ]
-                                    [ Svg.text (Music.Chord.toString chord1) ]
-                                , Svg.text_
-                                    [ Svg.Attributes.x "25%"
-                                    , Svg.Attributes.y "75%"
-                                    , Svg.Attributes.textAnchor "middle"
-                                    , Svg.Attributes.dominantBaseline "central"
-                                    ]
-                                    [ Svg.text (Music.Chord.toString chord2) ]
-                                , Svg.text_
-                                    [ Svg.Attributes.x "75%"
-                                    , Svg.Attributes.y "75%"
-                                    , Svg.Attributes.textAnchor "middle"
-                                    , Svg.Attributes.dominantBaseline "central"
-                                    ]
-                                    [ Svg.text (Music.Chord.toString chord3) ]
-                                ]
-
-                        [ chord1, chord2, chord3, chord4 ] ->
-                            barCellWithSvg
-                                [ Svg.line
-                                    [ Svg.Attributes.x1 "0"
-                                    , Svg.Attributes.y1 "50%"
-                                    , Svg.Attributes.x2 "100%"
-                                    , Svg.Attributes.y2 "50%"
-                                    , Svg.Attributes.class "stroke-mid-gray"
-                                    ]
-                                    []
-                                , Svg.line
-                                    [ Svg.Attributes.x1 "50%"
-                                    , Svg.Attributes.y1 "0"
-                                    , Svg.Attributes.x2 "50%"
-                                    , Svg.Attributes.y2 "100%"
-                                    , Svg.Attributes.class "stroke-mid-gray"
-                                    ]
-                                    []
-                                , Svg.text_
-                                    [ Svg.Attributes.x "25%"
-                                    , Svg.Attributes.y "25%"
-                                    , Svg.Attributes.textAnchor "middle"
-                                    , Svg.Attributes.dominantBaseline "central"
-                                    ]
-                                    [ Svg.text (Music.Chord.toString chord1) ]
-                                , Svg.text_
-                                    [ Svg.Attributes.x "75%"
-                                    , Svg.Attributes.y "25%"
-                                    , Svg.Attributes.textAnchor "middle"
-                                    , Svg.Attributes.dominantBaseline "central"
-                                    ]
-                                    [ Svg.text (Music.Chord.toString chord2) ]
-                                , Svg.text_
-                                    [ Svg.Attributes.x "25%"
-                                    , Svg.Attributes.y "75%"
-                                    , Svg.Attributes.textAnchor "middle"
-                                    , Svg.Attributes.dominantBaseline "central"
-                                    ]
-                                    [ Svg.text (Music.Chord.toString chord3) ]
-                                , Svg.text_
-                                    [ Svg.Attributes.x "75%"
-                                    , Svg.Attributes.y "75%"
-                                    , Svg.Attributes.textAnchor "middle"
-                                    , Svg.Attributes.dominantBaseline "central"
-                                    ]
-                                    [ Svg.text (Music.Chord.toString chord4) ]
-                                ]
-
-                        _ ->
-                            text "TODO"
+                    if List.length chords > 1 then
+                        "f7 f6-m f4-l"
+                    else
+                        defaultFontSizeClasses
 
                 BarRepeat ->
-                    barCellWithSvg
-                        [ Svg.text_
-                            [ Svg.Attributes.x "50%"
-                            , Svg.Attributes.y "50%"
-                            , Svg.Attributes.textAnchor "middle"
-                            , Svg.Attributes.dominantBaseline "central"
-                            ]
-                            [ Svg.text "–" ]
+                    defaultFontSizeClasses
+    in
+        div
+            ([ class
+                ("dtc ba b--mid-gray "
+                    ++ fontSizeClasses
+                    ++ " "
+                    ++ (case status of
+                            ViewStatus ->
+                                "cursor-default"
+
+                            EditStatus _ ->
+                                "pointer"
+                       )
+                )
+             , classList [ ( "bg-moon-gray", isSelected ) ]
+             ]
+                ++ (case status of
+                        EditStatus _ ->
+                            [ onClick msg ]
+
+                        ViewStatus ->
+                            []
+                   )
+            )
+            [ let
+                barCellWithSvg children =
+                    barCell
+                        [ svg [ Svg.Attributes.class "h-100 w-100 v-mid" ]
+                            children
                         ]
-        ]
+              in
+                case bar of
+                    Bar chords ->
+                        case chords of
+                            [ chord ] ->
+                                barCellWithSvg
+                                    [ Svg.text_
+                                        [ Svg.Attributes.x "50%"
+                                        , Svg.Attributes.y "50%"
+                                        , Svg.Attributes.textAnchor "middle"
+                                        , Svg.Attributes.dominantBaseline "central"
+                                        ]
+                                        [ Svg.text (Music.Chord.toString chord) ]
+                                    ]
+
+                            [ chord1, chord2 ] ->
+                                barCellWithSvg
+                                    [ Svg.line
+                                        [ Svg.Attributes.x1 "0"
+                                        , Svg.Attributes.y1 "100%"
+                                        , Svg.Attributes.x2 "100%"
+                                        , Svg.Attributes.y2 "0"
+                                        , Svg.Attributes.class "stroke-mid-gray"
+                                        ]
+                                        []
+                                    , Svg.text_
+                                        [ Svg.Attributes.x "25%"
+                                        , Svg.Attributes.y "25%"
+                                        , Svg.Attributes.dy "0.1em"
+                                        , Svg.Attributes.textAnchor "middle"
+                                        , Svg.Attributes.dominantBaseline "central"
+                                        ]
+                                        [ Svg.text (Music.Chord.toString chord1) ]
+                                    , Svg.text_
+                                        [ Svg.Attributes.x "75%"
+                                        , Svg.Attributes.y "75%"
+                                        , Svg.Attributes.dy "-0.1em"
+                                        , Svg.Attributes.textAnchor "middle"
+                                        , Svg.Attributes.dominantBaseline "central"
+                                        ]
+                                        [ Svg.text (Music.Chord.toString chord2) ]
+                                    ]
+
+                            [ chord1, chord2, chord3 ] ->
+                                barCellWithSvg
+                                    [ Svg.line
+                                        [ Svg.Attributes.x1 "0"
+                                        , Svg.Attributes.y1 "50%"
+                                        , Svg.Attributes.x2 "100%"
+                                        , Svg.Attributes.y2 "50%"
+                                        , Svg.Attributes.class "stroke-mid-gray"
+                                        ]
+                                        []
+                                    , Svg.line
+                                        [ Svg.Attributes.x1 "50%"
+                                        , Svg.Attributes.y1 "50%"
+                                        , Svg.Attributes.x2 "50%"
+                                        , Svg.Attributes.y2 "100%"
+                                        , Svg.Attributes.class "stroke-mid-gray"
+                                        ]
+                                        []
+                                    , Svg.text_
+                                        [ Svg.Attributes.x "50%"
+                                        , Svg.Attributes.y "25%"
+                                        , Svg.Attributes.textAnchor "middle"
+                                        , Svg.Attributes.dominantBaseline "central"
+                                        ]
+                                        [ Svg.text (Music.Chord.toString chord1) ]
+                                    , Svg.text_
+                                        [ Svg.Attributes.x "25%"
+                                        , Svg.Attributes.y "75%"
+                                        , Svg.Attributes.textAnchor "middle"
+                                        , Svg.Attributes.dominantBaseline "central"
+                                        ]
+                                        [ Svg.text (Music.Chord.toString chord2) ]
+                                    , Svg.text_
+                                        [ Svg.Attributes.x "75%"
+                                        , Svg.Attributes.y "75%"
+                                        , Svg.Attributes.textAnchor "middle"
+                                        , Svg.Attributes.dominantBaseline "central"
+                                        ]
+                                        [ Svg.text (Music.Chord.toString chord3) ]
+                                    ]
+
+                            [ chord1, chord2, chord3, chord4 ] ->
+                                barCellWithSvg
+                                    [ Svg.line
+                                        [ Svg.Attributes.x1 "0"
+                                        , Svg.Attributes.y1 "50%"
+                                        , Svg.Attributes.x2 "100%"
+                                        , Svg.Attributes.y2 "50%"
+                                        , Svg.Attributes.class "stroke-mid-gray"
+                                        ]
+                                        []
+                                    , Svg.line
+                                        [ Svg.Attributes.x1 "50%"
+                                        , Svg.Attributes.y1 "0"
+                                        , Svg.Attributes.x2 "50%"
+                                        , Svg.Attributes.y2 "100%"
+                                        , Svg.Attributes.class "stroke-mid-gray"
+                                        ]
+                                        []
+                                    , Svg.text_
+                                        [ Svg.Attributes.x "25%"
+                                        , Svg.Attributes.y "25%"
+                                        , Svg.Attributes.textAnchor "middle"
+                                        , Svg.Attributes.dominantBaseline "central"
+                                        ]
+                                        [ Svg.text (Music.Chord.toString chord1) ]
+                                    , Svg.text_
+                                        [ Svg.Attributes.x "75%"
+                                        , Svg.Attributes.y "25%"
+                                        , Svg.Attributes.textAnchor "middle"
+                                        , Svg.Attributes.dominantBaseline "central"
+                                        ]
+                                        [ Svg.text (Music.Chord.toString chord2) ]
+                                    , Svg.text_
+                                        [ Svg.Attributes.x "25%"
+                                        , Svg.Attributes.y "75%"
+                                        , Svg.Attributes.textAnchor "middle"
+                                        , Svg.Attributes.dominantBaseline "central"
+                                        ]
+                                        [ Svg.text (Music.Chord.toString chord3) ]
+                                    , Svg.text_
+                                        [ Svg.Attributes.x "75%"
+                                        , Svg.Attributes.y "75%"
+                                        , Svg.Attributes.textAnchor "middle"
+                                        , Svg.Attributes.dominantBaseline "central"
+                                        ]
+                                        [ Svg.text (Music.Chord.toString chord4) ]
+                                    ]
+
+                            _ ->
+                                text "TODO"
+
+                    BarRepeat ->
+                        barCellWithSvg
+                            [ Svg.text_
+                                [ Svg.Attributes.x "50%"
+                                , Svg.Attributes.y "50%"
+                                , Svg.Attributes.textAnchor "middle"
+                                , Svg.Attributes.dominantBaseline "central"
+                                ]
+                                [ Svg.text "–" ]
+                            ]
+            ]
 
 
 barCell : List (Html msg) -> Html msg
