@@ -718,7 +718,7 @@ viewQualitySelector preSelectedQuality qualityToMsg =
                                     "minor 7th"
 
                                 HalfDiminished ->
-                                    "semi-diminished"
+                                    "half-diminished"
                     in
                         button Secondary
                             (if quality == preSelectedQuality then
