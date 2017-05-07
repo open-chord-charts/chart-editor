@@ -13,15 +13,49 @@ type Chord
 type Quality
     = Major
     | Minor
-    | Sixth
+    | Augmented
+    | MajorSixth
+    | MinorSixth
     | Seventh
+    | MajorSeventh
+    | MinorMajorSeventh
     | MinorSeventh
+    | SeventhSus4
+    | Diminished
     | HalfDiminished
+    | Ninth
+    | MajorMinorNinth
+    | MinorNinth
+    | AugmentedNinth
+    | SixthPlusNinth
+    | AugmentedEleventh
+    | Thirteenth
+    | Altered
 
 
 qualities : List Quality
 qualities =
-    [ Major, Minor, Sixth, Seventh, MinorSeventh, HalfDiminished ]
+    [ Major
+    , Minor
+    , Augmented
+    , MajorSixth
+    , MinorSixth
+    , Seventh
+    , MajorSeventh
+    , MinorMajorSeventh
+    , MinorSeventh
+    , SeventhSus4
+    , Diminished
+    , HalfDiminished
+    , Ninth
+    , MajorMinorNinth
+    , MinorNinth
+    , AugmentedNinth
+    , SixthPlusNinth
+    , AugmentedEleventh
+    , Thirteenth
+    , Altered
+    ]
 
 
 
@@ -35,26 +69,68 @@ transpose interval (Chord note quality) =
 
 toString : Chord -> String
 toString (Chord note quality) =
-    let
-        qualityToString : Quality -> String
-        qualityToString quality =
-            case quality of
-                Major ->
-                    ""
+    Note.toString note ++ qualityToString quality
 
-                Minor ->
-                    "m"
 
-                Sixth ->
-                    "6"
+qualityToString : Quality -> String
+qualityToString quality =
+    case quality of
+        Major ->
+            ""
 
-                Seventh ->
-                    "7"
+        Minor ->
+            "m"
 
-                MinorSeventh ->
-                    "m7"
+        Augmented ->
+            "+"
 
-                HalfDiminished ->
-                    "ø"
-    in
-        Note.toString note ++ qualityToString quality
+        MajorSixth ->
+            "6"
+
+        MinorSixth ->
+            "m6"
+
+        Seventh ->
+            "7"
+
+        MajorSeventh ->
+            "Δ"
+
+        MinorMajorSeventh ->
+            "mΔ"
+
+        MinorSeventh ->
+            "m7"
+
+        SeventhSus4 ->
+            "7sus4"
+
+        Diminished ->
+            "o"
+
+        HalfDiminished ->
+            "ø"
+
+        Ninth ->
+            "9"
+
+        MajorMinorNinth ->
+            "9b"
+
+        MinorNinth ->
+            "m9"
+
+        AugmentedNinth ->
+            "9+"
+
+        SixthPlusNinth ->
+            "69"
+
+        AugmentedEleventh ->
+            "11+"
+
+        Thirteenth ->
+            "13"
+
+        Altered ->
+            "7alt"

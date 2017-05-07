@@ -699,37 +699,25 @@ viewQualitySelector preSelectedQuality qualityToMsg =
         (Music.Chord.qualities
             |> List.map
                 (\quality ->
-                    let
-                        qualityStr =
-                            case quality of
-                                Major ->
-                                    "Major"
+                    button Secondary
+                        (if quality == preSelectedQuality then
+                            Pressed
+                         else
+                            NotPressed
+                        )
+                        [ class "mr1 tc"
+                        , onClick (qualityToMsg quality)
+                        , title (Basics.toString quality)
+                        ]
+                        [ text
+                            (case qualityToString quality of
+                                "" ->
+                                    "M"
 
-                                Minor ->
-                                    "minor"
-
-                                Sixth ->
-                                    "6th"
-
-                                Seventh ->
-                                    "7th"
-
-                                MinorSeventh ->
-                                    "minor 7th"
-
-                                HalfDiminished ->
-                                    "half-diminished"
-                    in
-                        button Secondary
-                            (if quality == preSelectedQuality then
-                                Pressed
-                             else
-                                NotPressed
+                                s ->
+                                    s
                             )
-                            [ class "mr1 tc"
-                            , onClick (qualityToMsg quality)
-                            ]
-                            [ text qualityStr ]
+                        ]
                 )
         )
 

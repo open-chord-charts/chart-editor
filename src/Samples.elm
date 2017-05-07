@@ -16,7 +16,7 @@ grammar =
             , Bar [ Chord noteA MinorSeventh, Chord noteD Seventh ]
             , BarRepeat
             , Bar [ Chord noteG Minor, Chord noteEb Seventh, Chord noteD Seventh ]
-            , Bar [ Chord noteAb Major, Chord noteC Seventh, Chord noteF Minor, Chord noteEb Sixth ]
+            , Bar [ Chord noteAb Major, Chord noteC Seventh, Chord noteF Minor, Chord noteEb MajorSixth ]
             ]
         ]
     }
