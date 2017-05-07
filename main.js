@@ -4982,6 +4982,15 @@ var _elm_community$list_extra$List_Extra$findIndex = function (p) {
 			A2(_elm_community$list_extra$List_Extra$findIndices, p, _p60));
 	};
 };
+var _elm_community$list_extra$List_Extra$splitWhen = F2(
+	function (predicate, list) {
+		return A2(
+			_elm_lang$core$Maybe$map,
+			function (i) {
+				return A2(_elm_community$list_extra$List_Extra$splitAt, i, list);
+			},
+			A2(_elm_community$list_extra$List_Extra$findIndex, predicate, list));
+	});
 var _elm_community$list_extra$List_Extra$elemIndices = function (x) {
 	return _elm_community$list_extra$List_Extra$findIndices(
 		F2(
@@ -10077,29 +10086,57 @@ var _open_chords_charts$chart_editor$Music_Note$transpose = F2(
 			A2(_elm_lang$core$Basics_ops['%'], _p10._0 + interval, 12));
 	});
 
-var _open_chords_charts$chart_editor$Music_Chord$toString = function (_p0) {
-	var _p1 = _p0;
-	var qualityToString = function (quality) {
-		var _p2 = quality;
-		switch (_p2.ctor) {
-			case 'Major':
-				return '';
-			case 'Minor':
-				return 'm';
-			case 'Sixth':
-				return '6';
-			case 'Seventh':
-				return '7';
-			case 'MinorSeventh':
-				return 'm7';
-			default:
-				return 'ø';
-		}
-	};
+var _open_chords_charts$chart_editor$Music_Chord$qualityToString = function (quality) {
+	var _p0 = quality;
+	switch (_p0.ctor) {
+		case 'Major':
+			return '';
+		case 'Minor':
+			return 'm';
+		case 'Augmented':
+			return '+';
+		case 'MajorSixth':
+			return '6';
+		case 'MinorSixth':
+			return 'm6';
+		case 'Seventh':
+			return '7';
+		case 'MajorSeventh':
+			return 'Δ';
+		case 'MinorMajorSeventh':
+			return 'mΔ';
+		case 'MinorSeventh':
+			return 'm7';
+		case 'SeventhSus4':
+			return '7sus4';
+		case 'Diminished':
+			return 'o';
+		case 'HalfDiminished':
+			return 'ø';
+		case 'Ninth':
+			return '9';
+		case 'MajorMinorNinth':
+			return '9b';
+		case 'MinorNinth':
+			return 'm9';
+		case 'AugmentedNinth':
+			return '9+';
+		case 'SixthPlusNinth':
+			return '69';
+		case 'AugmentedEleventh':
+			return '11+';
+		case 'Thirteenth':
+			return '13';
+		default:
+			return '7alt';
+	}
+};
+var _open_chords_charts$chart_editor$Music_Chord$toString = function (_p1) {
+	var _p2 = _p1;
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		_open_chords_charts$chart_editor$Music_Note$toString(_p1._0),
-		qualityToString(_p1._1));
+		_open_chords_charts$chart_editor$Music_Note$toString(_p2._0),
+		_open_chords_charts$chart_editor$Music_Chord$qualityToString(_p2._1));
 };
 var _open_chords_charts$chart_editor$Music_Chord$Chord = F2(
 	function (a, b) {
@@ -10113,10 +10150,24 @@ var _open_chords_charts$chart_editor$Music_Chord$transpose = F2(
 			A2(_open_chords_charts$chart_editor$Music_Note$transpose, interval, _p4._0),
 			_p4._1);
 	});
+var _open_chords_charts$chart_editor$Music_Chord$Altered = {ctor: 'Altered'};
+var _open_chords_charts$chart_editor$Music_Chord$Thirteenth = {ctor: 'Thirteenth'};
+var _open_chords_charts$chart_editor$Music_Chord$AugmentedEleventh = {ctor: 'AugmentedEleventh'};
+var _open_chords_charts$chart_editor$Music_Chord$SixthPlusNinth = {ctor: 'SixthPlusNinth'};
+var _open_chords_charts$chart_editor$Music_Chord$AugmentedNinth = {ctor: 'AugmentedNinth'};
+var _open_chords_charts$chart_editor$Music_Chord$MinorNinth = {ctor: 'MinorNinth'};
+var _open_chords_charts$chart_editor$Music_Chord$MajorMinorNinth = {ctor: 'MajorMinorNinth'};
+var _open_chords_charts$chart_editor$Music_Chord$Ninth = {ctor: 'Ninth'};
 var _open_chords_charts$chart_editor$Music_Chord$HalfDiminished = {ctor: 'HalfDiminished'};
+var _open_chords_charts$chart_editor$Music_Chord$Diminished = {ctor: 'Diminished'};
+var _open_chords_charts$chart_editor$Music_Chord$SeventhSus4 = {ctor: 'SeventhSus4'};
 var _open_chords_charts$chart_editor$Music_Chord$MinorSeventh = {ctor: 'MinorSeventh'};
+var _open_chords_charts$chart_editor$Music_Chord$MinorMajorSeventh = {ctor: 'MinorMajorSeventh'};
+var _open_chords_charts$chart_editor$Music_Chord$MajorSeventh = {ctor: 'MajorSeventh'};
 var _open_chords_charts$chart_editor$Music_Chord$Seventh = {ctor: 'Seventh'};
-var _open_chords_charts$chart_editor$Music_Chord$Sixth = {ctor: 'Sixth'};
+var _open_chords_charts$chart_editor$Music_Chord$MinorSixth = {ctor: 'MinorSixth'};
+var _open_chords_charts$chart_editor$Music_Chord$MajorSixth = {ctor: 'MajorSixth'};
+var _open_chords_charts$chart_editor$Music_Chord$Augmented = {ctor: 'Augmented'};
 var _open_chords_charts$chart_editor$Music_Chord$Minor = {ctor: 'Minor'};
 var _open_chords_charts$chart_editor$Music_Chord$Major = {ctor: 'Major'};
 var _open_chords_charts$chart_editor$Music_Chord$qualities = {
@@ -10127,17 +10178,73 @@ var _open_chords_charts$chart_editor$Music_Chord$qualities = {
 		_0: _open_chords_charts$chart_editor$Music_Chord$Minor,
 		_1: {
 			ctor: '::',
-			_0: _open_chords_charts$chart_editor$Music_Chord$Sixth,
+			_0: _open_chords_charts$chart_editor$Music_Chord$Augmented,
 			_1: {
 				ctor: '::',
-				_0: _open_chords_charts$chart_editor$Music_Chord$Seventh,
+				_0: _open_chords_charts$chart_editor$Music_Chord$MajorSixth,
 				_1: {
 					ctor: '::',
-					_0: _open_chords_charts$chart_editor$Music_Chord$MinorSeventh,
+					_0: _open_chords_charts$chart_editor$Music_Chord$MinorSixth,
 					_1: {
 						ctor: '::',
-						_0: _open_chords_charts$chart_editor$Music_Chord$HalfDiminished,
-						_1: {ctor: '[]'}
+						_0: _open_chords_charts$chart_editor$Music_Chord$Seventh,
+						_1: {
+							ctor: '::',
+							_0: _open_chords_charts$chart_editor$Music_Chord$MajorSeventh,
+							_1: {
+								ctor: '::',
+								_0: _open_chords_charts$chart_editor$Music_Chord$MinorMajorSeventh,
+								_1: {
+									ctor: '::',
+									_0: _open_chords_charts$chart_editor$Music_Chord$MinorSeventh,
+									_1: {
+										ctor: '::',
+										_0: _open_chords_charts$chart_editor$Music_Chord$SeventhSus4,
+										_1: {
+											ctor: '::',
+											_0: _open_chords_charts$chart_editor$Music_Chord$Diminished,
+											_1: {
+												ctor: '::',
+												_0: _open_chords_charts$chart_editor$Music_Chord$HalfDiminished,
+												_1: {
+													ctor: '::',
+													_0: _open_chords_charts$chart_editor$Music_Chord$Ninth,
+													_1: {
+														ctor: '::',
+														_0: _open_chords_charts$chart_editor$Music_Chord$MajorMinorNinth,
+														_1: {
+															ctor: '::',
+															_0: _open_chords_charts$chart_editor$Music_Chord$MinorNinth,
+															_1: {
+																ctor: '::',
+																_0: _open_chords_charts$chart_editor$Music_Chord$AugmentedNinth,
+																_1: {
+																	ctor: '::',
+																	_0: _open_chords_charts$chart_editor$Music_Chord$SixthPlusNinth,
+																	_1: {
+																		ctor: '::',
+																		_0: _open_chords_charts$chart_editor$Music_Chord$AugmentedEleventh,
+																		_1: {
+																			ctor: '::',
+																			_0: _open_chords_charts$chart_editor$Music_Chord$Thirteenth,
+																			_1: {
+																				ctor: '::',
+																				_0: _open_chords_charts$chart_editor$Music_Chord$Altered,
+																				_1: {ctor: '[]'}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -11006,7 +11113,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 			});
 	});
 var _open_chords_charts$chart_editor$ChartCard$viewSelectNote = F2(
-	function (selectedNote, tagger) {
+	function (selectedNote, noteToMsg) {
 		return A2(
 			_elm_lang$html$Html$select,
 			{
@@ -11016,7 +11123,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewSelectNote = F2(
 					'change',
 					A2(
 						_elm_lang$core$Json_Decode$map,
-						tagger,
+						noteToMsg,
 						A2(_elm_lang$core$Json_Decode$andThen, _open_chords_charts$chart_editor$ChartCard$noteDecoder, _elm_lang$html$Html_Events$targetValue))),
 				_1: {ctor: '[]'}
 			},
@@ -11916,23 +12023,6 @@ var _open_chords_charts$chart_editor$ChartCard$viewQualitySelector = F2(
 			A2(
 				_elm_lang$core$List$map,
 				function (quality) {
-					var qualityStr = function () {
-						var _p39 = quality;
-						switch (_p39.ctor) {
-							case 'Major':
-								return 'Major';
-							case 'Minor':
-								return 'minor';
-							case 'Sixth':
-								return '6th';
-							case 'Seventh':
-								return '7th';
-							case 'MinorSeventh':
-								return 'minor 7th';
-							default:
-								return 'semi-diminished';
-						}
-					}();
 					return A4(
 						_open_chords_charts$chart_editor$ChartCard$button,
 						_open_chords_charts$chart_editor$ChartCard$Secondary,
@@ -11944,12 +12034,25 @@ var _open_chords_charts$chart_editor$ChartCard$viewQualitySelector = F2(
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onClick(
 									qualityToMsg(quality)),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$title(
+										_elm_lang$core$Basics$toString(quality)),
+									_1: {ctor: '[]'}
+								}
 							}
 						},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text(qualityStr),
+							_0: _elm_lang$html$Html$text(
+								function () {
+									var _p39 = _open_chords_charts$chart_editor$Music_Chord$qualityToString(quality);
+									if (_p39 === '') {
+										return 'M';
+									} else {
+										return _p39;
+									}
+								}()),
 							_1: {ctor: '[]'}
 						});
 				},
@@ -12598,7 +12701,7 @@ var _open_chords_charts$chart_editor$Samples$grammar = {
 													_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteF, _open_chords_charts$chart_editor$Music_Chord$Minor),
 													_1: {
 														ctor: '::',
-														_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteEb, _open_chords_charts$chart_editor$Music_Chord$Sixth),
+														_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteEb, _open_chords_charts$chart_editor$Music_Chord$MajorSixth),
 														_1: {ctor: '[]'}
 													}
 												}
