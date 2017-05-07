@@ -645,12 +645,12 @@ viewPartEditor chart partIndex part =
 
 
 viewSelectNote : Note -> (Note -> Msg) -> Html Msg
-viewSelectNote selectedNote tagger =
+viewSelectNote selectedNote noteToMsg =
     select
         [ on "change"
             (targetValue
                 |> Decode.andThen noteDecoder
-                |> Decode.map tagger
+                |> Decode.map noteToMsg
             )
         ]
         (Note.notes
