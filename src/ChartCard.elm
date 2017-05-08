@@ -469,6 +469,7 @@ view { chart, status, viewedKey } =
                         [ onClick Edit ]
                         [ text "Edit" ]
                     ]
+        , pre [] [ text (Music.Chart.toString chart) ]
         ]
 
 
@@ -1146,12 +1147,3 @@ qualityDecoder string =
 
         _ ->
             Decode.fail string
-
-
-
--- FORMATTERS
-
-
-keyToString : Key -> String
-keyToString (Key note) =
-    Note.toString note

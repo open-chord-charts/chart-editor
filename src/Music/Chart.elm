@@ -123,3 +123,71 @@ transposeBar : Int -> Bar -> Bar
 transposeBar nbSemitones bar =
     bar
         |> mapBarChords (List.map (Chord.transpose nbSemitones))
+
+
+
+-- TO STRING FUNCTIONS
+
+
+keyToString : Key -> String
+keyToString (Key note) =
+    Note.toString note
+
+
+barToString : Bar -> String
+barToString bar =
+    case bar of
+        Bar chords ->
+            chords
+                |> List.map Chord.toString
+                |> String.join "/"
+
+        BarRepeat ->
+            "-"
+
+
+partToString : Part -> String
+partToString part =
+    let
+        partNameToString partName =
+            "= " ++ partName
+
+        partAsString =
+            case part of
+                Part partName bars ->
+                    [ partNameToString partName
+                    , bars
+                        |> List.map barToString
+                        |> String.join " "
+                    ]
+                        |> String.join "\n"
+
+                PartRepeat partName ->
+                    partNameToString partName
+    in
+        partAsString ++ "\n"
+
+
+toString : Chart -> String
+toString chart =
+    let
+        dashes =
+            "---"
+
+        metadata =
+            [ "title: " ++ chart.title
+            , "key: " ++ keyToString chart.key
+            ]
+                |> String.join "\n"
+
+        header =
+            [ dashes, metadata, dashes ]
+                |> String.join "\n"
+    in
+        [ header
+        , ""
+        , chart.parts
+            |> List.map partToString
+            |> String.join "\n"
+        ]
+            |> String.join "\n"
