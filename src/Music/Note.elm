@@ -1,25 +1,7 @@
-module Music.Note
-    exposing
-        ( Interval
-        , Note
-        , noteAb
-        , noteA
-        , noteBb
-        , noteB
-        , noteC
-        , noteDb
-        , noteD
-        , noteEb
-        , noteE
-        , noteF
-        , noteGb
-        , noteG
-        , notes
-        , transpose
-        , interval
-        , toString
-        , fromString
-        )
+module Music.Note exposing (..)
+
+import List.Extra as List
+
 
 -- TYPES
 
@@ -36,9 +18,21 @@ type alias Interval =
 -- CONSTANTS
 
 
-notes : List Note
+notes : List ( Note, String )
 notes =
-    [ noteAb, noteA, noteBb, noteB, noteC, noteDb, noteD, noteEb, noteE, noteF, noteGb, noteG ]
+    [ ( noteAb, "Ab" )
+    , ( noteA, "A" )
+    , ( noteBb, "Bb" )
+    , ( noteB, "B" )
+    , ( noteC, "C" )
+    , ( noteDb, "Db" )
+    , ( noteD, "D" )
+    , ( noteEb, "Eb" )
+    , ( noteE, "E" )
+    , ( noteF, "F" )
+    , ( noteGb, "Gb" )
+    , ( noteG, "G" )
+    ]
 
 
 
@@ -117,85 +111,20 @@ interval (Note oldInt) (Note newInt) =
 
 toString : Note -> String
 toString (Note int) =
-    case int % 12 of
-        0 ->
-            "Ab"
+    let
+        noteNames =
+            notes |> List.map Tuple.second
+    in
+        case noteNames |> List.getAt (int % 12) of
+            Just noteName ->
+                noteName
 
-        1 ->
-            "A"
-
-        2 ->
-            "Bb"
-
-        3 ->
-            "B"
-
-        4 ->
-            "C"
-
-        5 ->
-            "Db"
-
-        6 ->
-            "D"
-
-        7 ->
-            "Eb"
-
-        8 ->
-            "E"
-
-        9 ->
-            "F"
-
-        10 ->
-            "Gb"
-
-        11 ->
-            "G"
-
-        _ ->
-            Debug.crash "Should not reach this point"
+            Nothing ->
+                Debug.crash ("Tried to get an element outside of List (int: " ++ Basics.toString int ++ ").")
 
 
 fromString : String -> Maybe Note
-fromString string =
-    case string of
-        "Ab" ->
-            Just noteAb
-
-        "A" ->
-            Just noteA
-
-        "Bb" ->
-            Just noteBb
-
-        "B" ->
-            Just noteB
-
-        "C" ->
-            Just noteC
-
-        "Db" ->
-            Just noteDb
-
-        "D" ->
-            Just noteD
-
-        "Eb" ->
-            Just noteEb
-
-        "E" ->
-            Just noteE
-
-        "F" ->
-            Just noteF
-
-        "Gb" ->
-            Just noteGb
-
-        "G" ->
-            Just noteG
-
-        _ ->
-            Nothing
+fromString s =
+    notes
+        |> List.find (\( _, noteName ) -> noteName == s)
+        |> Maybe.map Tuple.first

@@ -656,16 +656,12 @@ viewSelectNote selectedNote noteToMsg =
         ]
         (Note.notes
             |> List.map
-                (\note ->
-                    let
-                        noteStr =
-                            Note.toString note
-                    in
-                        option
-                            [ selected (note == selectedNote)
-                            , value noteStr
-                            ]
-                            [ text noteStr ]
+                (\( note, noteName ) ->
+                    option
+                        [ selected (note == selectedNote)
+                        , value noteName
+                        ]
+                        [ text noteName ]
                 )
         )
 
@@ -675,21 +671,17 @@ viewNoteSelector preSelectedNote noteToMsg =
     div []
         (Note.notes
             |> List.map
-                (\note ->
-                    let
-                        noteStr =
-                            Note.toString note
-                    in
-                        button Secondary
-                            (if note == preSelectedNote then
-                                Pressed
-                             else
-                                NotPressed
-                            )
-                            [ class "mr1 w3 tc"
-                            , onClick (noteToMsg note)
-                            ]
-                            [ text noteStr ]
+                (\( note, noteName ) ->
+                    button Secondary
+                        (if note == preSelectedNote then
+                            Pressed
+                         else
+                            NotPressed
+                        )
+                        [ class "mr1 w3 tc"
+                        , onClick (noteToMsg note)
+                        ]
+                        [ text noteName ]
                 )
         )
 
@@ -699,7 +691,7 @@ viewQualitySelector preSelectedQuality qualityToMsg =
     div []
         (Music.Chord.qualities
             |> List.map
-                (\quality ->
+                (\( quality, qualityName ) ->
                     button Secondary
                         (if quality == preSelectedQuality then
                             Pressed
@@ -711,7 +703,7 @@ viewQualitySelector preSelectedQuality qualityToMsg =
                         , title (Basics.toString quality)
                         ]
                         [ text
-                            (case qualityToString quality of
+                            (case qualityName of
                                 "" ->
                                     "M"
 

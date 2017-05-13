@@ -1,5 +1,6 @@
 module Music.Chord exposing (..)
 
+import List.Extra as List
 import Music.Note as Note exposing (Note, Interval)
 
 
@@ -33,28 +34,28 @@ type Quality
     | Altered
 
 
-qualities : List Quality
+qualities : List ( Quality, String )
 qualities =
-    [ Major
-    , Minor
-    , Augmented
-    , MajorSixth
-    , MinorSixth
-    , Seventh
-    , MajorSeventh
-    , MinorMajorSeventh
-    , MinorSeventh
-    , SeventhSus4
-    , Diminished
-    , HalfDiminished
-    , Ninth
-    , MajorMinorNinth
-    , MinorNinth
-    , AugmentedNinth
-    , SixthPlusNinth
-    , AugmentedEleventh
-    , Thirteenth
-    , Altered
+    [ ( Major, "" )
+    , ( Minor, "m" )
+    , ( Augmented, "+" )
+    , ( MajorSixth, "6" )
+    , ( MinorSixth, "m6" )
+    , ( Seventh, "7" )
+    , ( MajorSeventh, "Δ" )
+    , ( MinorMajorSeventh, "mΔ" )
+    , ( MinorSeventh, "m7" )
+    , ( SeventhSus4, "7sus4" )
+    , ( Diminished, "o" )
+    , ( HalfDiminished, "ø" )
+    , ( Ninth, "9" )
+    , ( MajorMinorNinth, "9b" )
+    , ( MinorNinth, "m9" )
+    , ( AugmentedNinth, "9+" )
+    , ( SixthPlusNinth, "69" )
+    , ( AugmentedEleventh, "11+" )
+    , ( Thirteenth, "13" )
+    , ( Altered, "7alt" )
     ]
 
 
@@ -74,63 +75,16 @@ toString (Chord note quality) =
 
 qualityToString : Quality -> String
 qualityToString quality =
-    case quality of
-        Major ->
-            ""
+    case qualities |> List.find (\( q, _ ) -> q == quality) of
+        Just ( _, s ) ->
+            s
 
-        Minor ->
-            "m"
+        Nothing ->
+            Debug.crash ("Tried to get quality: " ++ Basics.toString quality ++ " not in `qualities` list.")
 
-        Augmented ->
-            "+"
 
-        MajorSixth ->
-            "6"
-
-        MinorSixth ->
-            "m6"
-
-        Seventh ->
-            "7"
-
-        MajorSeventh ->
-            "Δ"
-
-        MinorMajorSeventh ->
-            "mΔ"
-
-        MinorSeventh ->
-            "m7"
-
-        SeventhSus4 ->
-            "7sus4"
-
-        Diminished ->
-            "o"
-
-        HalfDiminished ->
-            "ø"
-
-        Ninth ->
-            "9"
-
-        MajorMinorNinth ->
-            "9b"
-
-        MinorNinth ->
-            "m9"
-
-        AugmentedNinth ->
-            "9+"
-
-        SixthPlusNinth ->
-            "69"
-
-        AugmentedEleventh ->
-            "11+"
-
-        Thirteenth ->
-            "13"
-
-        Altered ->
-            "7alt"
+qualityFromString : String -> Maybe Quality
+qualityFromString s =
+    qualities
+        |> List.find (\( _, qualityName ) -> qualityName == s)
+        |> Maybe.map Tuple.first
