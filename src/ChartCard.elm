@@ -1131,19 +1131,3 @@ noteDecoder string =
 
         Nothing ->
             Decode.fail string
-
-
-qualityDecoder : String -> Decoder Quality
-qualityDecoder string =
-    case string of
-        "Major" ->
-            Decode.succeed Major
-
-        "minor" ->
-            Decode.succeed Minor
-
-        "7th" ->
-            Decode.succeed Seventh
-
-        _ ->
-            Decode.fail string
