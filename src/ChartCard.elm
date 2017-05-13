@@ -8,6 +8,9 @@ import List.Extra as List
 import Music.Chart exposing (..)
 import Music.Chord exposing (..)
 import Music.Note as Note exposing (..)
+import Parser
+import Parsers
+import String
 import Svg exposing (svg)
 import Svg.Attributes
 
@@ -133,6 +136,7 @@ type ChartStatus
 
 type alias Model =
     { chart : Chart
+    , chartStr : String
     , status : ChartStatus
     , viewedKey : Key
     }
@@ -141,6 +145,7 @@ type alias Model =
 init : Chart -> Model
 init chart =
     { chart = chart
+    , chartStr = Music.Chart.toString chart
     , status = ViewStatus
     , viewedKey = chart.key
     }
@@ -168,6 +173,8 @@ type Msg
     | SetPartRepeat PartIndex Bool
     | SetChord BarReference ChordIndex Chord
     | SetViewKey Key
+    | TextAreaInput String
+    | TextAreaSave
 
 
 
@@ -194,10 +201,21 @@ update msg model =
                 newStatus =
                     EditStatus (PartSelection partIndex)
             in
-                { model
-                    | chart = newChart
-                    , status = newStatus
-                }
+                { model | status = newStatus }
+                    |> updateChartAndChartStr newChart
+
+        parse : String -> Model
+        parse chartStr =
+            case Parser.run Parsers.chart chartStr of
+                Ok chart ->
+                    { model | chart = chart }
+
+                Err err ->
+                    let
+                        _ =
+                            Debug.log "Error parsing chart" err
+                    in
+                        model
 
         removePart : PartIndex -> Model -> Model
         removePart partIndex model =
@@ -219,10 +237,15 @@ update msg model =
                             )
                         )
             in
-                { model
-                    | chart = newChart
-                    , status = newStatus
-                }
+                { model | status = newStatus }
+                    |> updateChartAndChartStr newChart
+
+        updateChartAndChartStr : Chart -> Model -> Model
+        updateChartAndChartStr chart model =
+            { model
+                | chart = chart
+                , chartStr = Music.Chart.toString chart
+            }
     in
         case msg of
             AddBar barReference ->
@@ -239,10 +262,8 @@ update msg model =
                     newStatus =
                         EditStatus (BarSelection barReference)
                 in
-                    { model
-                        | chart = newChart
-                        , status = newStatus
-                    }
+                    { model | status = newStatus }
+                        |> updateChartAndChartStr newChart
 
             AddChord barReference ->
                 let
@@ -250,7 +271,7 @@ update msg model =
                         model.chart
                             |> updateBarAt barReference (mapBarChords (\chords -> chords ++ [ defaultChord ]))
                 in
-                    { model | chart = newChart }
+                    model |> updateChartAndChartStr newChart
 
             AddPart partIndex ->
                 addPart partIndex defaultPart model
@@ -301,10 +322,8 @@ update msg model =
                         EditStatus
                             (BarSelection { barReference | barIndex = newBarIndex })
                 in
-                    { model
-                        | chart = newChart
-                        , status = newStatus
-                    }
+                    { model | status = newStatus }
+                        |> updateChartAndChartStr newChart
 
             RemoveChord barReference chordIndex ->
                 let
@@ -312,13 +331,14 @@ update msg model =
                         model.chart
                             |> updateBarAt barReference (mapBarChords (List.removeAt chordIndex))
                 in
-                    { model | chart = newChart }
+                    model |> updateChartAndChartStr newChart
 
             RemovePart partIndex ->
                 removePart partIndex model
 
             Save ->
-                { model | status = ViewStatus }
+                parse model.chartStr
+                    |> (\model -> { model | status = ViewStatus })
 
             SelectBar barReference ->
                 let
@@ -346,7 +366,7 @@ update msg model =
                                         defaultBar
                                 )
                 in
-                    { model | chart = newChart }
+                    model |> updateChartAndChartStr newChart
 
             SetPartName partIndex partName ->
                 let
@@ -362,7 +382,7 @@ update msg model =
                                             PartRepeat partName
                                 )
                 in
-                    { model | chart = newChart }
+                    model |> updateChartAndChartStr newChart
 
             SetPartRepeat partIndex checked ->
                 let
@@ -380,7 +400,7 @@ update msg model =
                                             Part partName [ defaultBar ]
                                 )
                 in
-                    { model | chart = newChart }
+                    model |> updateChartAndChartStr newChart
 
             SetChord barReference chordIndex chord ->
                 let
@@ -398,10 +418,16 @@ update msg model =
                                     )
                                 )
                 in
-                    { model | chart = newChart }
+                    model |> updateChartAndChartStr newChart
 
             SetViewKey key ->
                 { model | viewedKey = key }
+
+            TextAreaInput str ->
+                { model | chartStr = str }
+
+            TextAreaSave ->
+                parse model.chartStr
 
 
 
@@ -409,7 +435,7 @@ update msg model =
 
 
 view : Model -> Html Msg
-view { chart, status, viewedKey } =
+view { chart, chartStr, status, viewedKey } =
     card chart.title
         (keyToString chart.key)
         [ div [ class "dt dt--fixed collapse mv3 athelas" ]
@@ -432,8 +458,14 @@ view { chart, status, viewedKey } =
                 div []
                     [ button Primary
                         NotPressed
-                        [ onClick Save ]
+                        [ class "mr1"
+                        , onClick Save
+                        ]
                         [ text "Save" ]
+                    , button Secondary
+                        NotPressed
+                        [ onClick TextAreaSave ]
+                        [ text "Parse" ]
                     , case selection of
                         BarSelection barReference ->
                             case getBarAtReference barReference chart of
@@ -450,6 +482,14 @@ view { chart, status, viewedKey } =
 
                                 Just part ->
                                     viewPartEditor chart partIndex part
+                    , textarea
+                        [ cols 80
+                        , rows ((chartStr |> String.lines |> List.length) + 5)
+                        , onInput TextAreaInput
+                        , spellcheck False
+                        , value chartStr
+                        ]
+                        []
                     ]
 
             ViewStatus ->
@@ -469,7 +509,6 @@ view { chart, status, viewedKey } =
                         [ onClick Edit ]
                         [ text "Edit" ]
                     ]
-        , pre [] [ text (Music.Chart.toString chart) ]
         ]
 
 
