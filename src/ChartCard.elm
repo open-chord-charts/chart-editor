@@ -38,6 +38,11 @@ nbBarsByRow =
     8
 
 
+nbMaxChordsInBar : Int
+nbMaxChordsInBar =
+    4
+
+
 youFoundABugMessage : String
 youFoundABugMessage =
     "Should never happen – you found a bug :-)"
@@ -544,7 +549,9 @@ viewBarEditor chart barReference bar =
                                                 )
                                             , button Secondary
                                                 NotPressed
-                                                [ onClick (RemoveChord barReference chordIndex) ]
+                                                [ disabled (List.length chords == 1)
+                                                , onClick (RemoveChord barReference chordIndex)
+                                                ]
                                                 [ text "Remove chord" ]
                                             ]
                                     )
@@ -552,7 +559,9 @@ viewBarEditor chart barReference bar =
                         ++ [ toolbar
                                 [ button Secondary
                                     NotPressed
-                                    [ onClick (AddChord barReference) ]
+                                    [ disabled (List.length chords == nbMaxChordsInBar)
+                                    , onClick (AddChord barReference)
+                                    ]
                                     [ text "Add chord in bar" ]
                                 ]
                            ]
@@ -576,13 +585,13 @@ viewBarEditor chart barReference bar =
                             ]
                             [ text "Add bar after" ]
                         , let
-                            removeDisabled =
+                            isLastBarInPart =
                                 (getBarsOfPartByIndex barReference.partIndex chart |> List.length) == 1
                           in
                             button Secondary
                                 NotPressed
                                 [ class "mr1"
-                                , disabled removeDisabled
+                                , disabled isLastBarInPart
                                 , onClick (RemoveBar barReference)
                                 ]
                                 [ text "Remove bar" ]
@@ -916,6 +925,9 @@ viewBar status isSelected msg bar previousBar =
                 case bar of
                     Bar chords ->
                         case chords of
+                            [] ->
+                                text ""
+
                             [ chord ] ->
                                 barCellWithSvg
                                     [ Svg.text_
@@ -1045,7 +1057,7 @@ viewBar status isSelected msg bar previousBar =
                                     ]
 
                             _ ->
-                                text "TODO"
+                                text "Error"
 
                     BarRepeat ->
                         barCellWithSvg
