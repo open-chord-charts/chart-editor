@@ -11506,7 +11506,10 @@ var _open_chords_charts$chart_editor$Parsers$chart = function () {
 															_elm_tools$parser$Parser_ops['|.'],
 															A2(
 																_elm_tools$parser$Parser_ops['|.'],
-																_elm_tools$parser$Parser$succeed(_open_chords_charts$chart_editor$Music_Chart$Chart),
+																A2(
+																	_elm_tools$parser$Parser_ops['|.'],
+																	_elm_tools$parser$Parser$succeed(_open_chords_charts$chart_editor$Music_Chart$Chart),
+																	_open_chords_charts$chart_editor$Parsers$spacesAndNewlines),
 																_elm_tools$parser$Parser$symbol(dashes)),
 															_open_chords_charts$chart_editor$Parsers$newLine),
 														_elm_tools$parser$Parser$symbol('title:')),
@@ -13679,289 +13682,14 @@ var _open_chords_charts$chart_editor$ChartCard$view = function (_p54) {
 		});
 };
 
-var _open_chords_charts$chart_editor$Samples$allOfMe = function () {
-	var partC = A2(
-		_open_chords_charts$chart_editor$Music_Chart$Part,
-		'C',
-		{
-			ctor: '::',
-			_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-				{
-					ctor: '::',
-					_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteF, _open_chords_charts$chart_editor$Music_Chord$Major),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-					{
-						ctor: '::',
-						_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteF, _open_chords_charts$chart_editor$Music_Chord$Minor),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-						{
-							ctor: '::',
-							_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteC, _open_chords_charts$chart_editor$Music_Chord$Major),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-							{
-								ctor: '::',
-								_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteA, _open_chords_charts$chart_editor$Music_Chord$Major),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-								{
-									ctor: '::',
-									_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteD, _open_chords_charts$chart_editor$Music_Chord$HalfDiminished),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
-								ctor: '::',
-								_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-									{
-										ctor: '::',
-										_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteG, _open_chords_charts$chart_editor$Music_Chord$Major),
-										_1: {ctor: '[]'}
-									}),
-								_1: {
-									ctor: '::',
-									_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-										{
-											ctor: '::',
-											_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteC, _open_chords_charts$chart_editor$Music_Chord$Major),
-											_1: {ctor: '[]'}
-										}),
-									_1: {
-										ctor: '::',
-										_0: _open_chords_charts$chart_editor$Music_Chart$BarRepeat,
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		});
-	var partB = A2(
-		_open_chords_charts$chart_editor$Music_Chart$Part,
-		'B',
-		{
-			ctor: '::',
-			_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-				{
-					ctor: '::',
-					_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteE, _open_chords_charts$chart_editor$Music_Chord$Major),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: _open_chords_charts$chart_editor$Music_Chart$BarRepeat,
-				_1: {
-					ctor: '::',
-					_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-						{
-							ctor: '::',
-							_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteA, _open_chords_charts$chart_editor$Music_Chord$Minor),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: _open_chords_charts$chart_editor$Music_Chart$BarRepeat,
-						_1: {
-							ctor: '::',
-							_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-								{
-									ctor: '::',
-									_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteD, _open_chords_charts$chart_editor$Music_Chord$Major),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
-								ctor: '::',
-								_0: _open_chords_charts$chart_editor$Music_Chart$BarRepeat,
-								_1: {
-									ctor: '::',
-									_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-										{
-											ctor: '::',
-											_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteG, _open_chords_charts$chart_editor$Music_Chord$Major),
-											_1: {ctor: '[]'}
-										}),
-									_1: {
-										ctor: '::',
-										_0: _open_chords_charts$chart_editor$Music_Chart$BarRepeat,
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		});
-	var partA = A2(
-		_open_chords_charts$chart_editor$Music_Chart$Part,
-		'A',
-		{
-			ctor: '::',
-			_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-				{
-					ctor: '::',
-					_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteC, _open_chords_charts$chart_editor$Music_Chord$Major),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: _open_chords_charts$chart_editor$Music_Chart$BarRepeat,
-				_1: {
-					ctor: '::',
-					_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-						{
-							ctor: '::',
-							_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteE, _open_chords_charts$chart_editor$Music_Chord$Major),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: _open_chords_charts$chart_editor$Music_Chart$BarRepeat,
-						_1: {
-							ctor: '::',
-							_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-								{
-									ctor: '::',
-									_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteA, _open_chords_charts$chart_editor$Music_Chord$Major),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
-								ctor: '::',
-								_0: _open_chords_charts$chart_editor$Music_Chart$BarRepeat,
-								_1: {
-									ctor: '::',
-									_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-										{
-											ctor: '::',
-											_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteD, _open_chords_charts$chart_editor$Music_Chord$Minor),
-											_1: {ctor: '[]'}
-										}),
-									_1: {
-										ctor: '::',
-										_0: _open_chords_charts$chart_editor$Music_Chart$BarRepeat,
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		});
-	return {
-		title: 'All of me',
-		key: _open_chords_charts$chart_editor$Music_Chart$Key(_open_chords_charts$chart_editor$Music_Note$noteC),
-		parts: {
-			ctor: '::',
-			_0: partA,
-			_1: {
-				ctor: '::',
-				_0: partB,
-				_1: {
-					ctor: '::',
-					_0: _open_chords_charts$chart_editor$Music_Chart$PartRepeat('A'),
-					_1: {
-						ctor: '::',
-						_0: partC,
-						_1: {ctor: '[]'}
-					}
-				}
-			}
-		}
-	};
-}();
-var _open_chords_charts$chart_editor$Samples$grammar = {
-	title: 'Chords chart grammar',
-	key: _open_chords_charts$chart_editor$Music_Chart$Key(_open_chords_charts$chart_editor$Music_Note$noteC),
-	parts: {
+var _open_chords_charts$chart_editor$Samples$allOfMe = '\n---\ntitle: All of me\nkey: C\n---\n\n= A\nC - E7 - A7 - Dm -\n\n= B\nE7 - Am - D7 - G7 -\n\n= A\n\n= C\nF Fm C A7 Dø G7 C -\n';
+var _open_chords_charts$chart_editor$Samples$test = '\n---\ntitle: Chords chart grammar\nkey: C\n---\n\n= A\nC - A7/D7 - Gm/Eb7/D7 Ab/C7/Fm/Eb6\n';
+var _open_chords_charts$chart_editor$Samples$samples = {
+	ctor: '::',
+	_0: _open_chords_charts$chart_editor$Samples$test,
+	_1: {
 		ctor: '::',
-		_0: A2(
-			_open_chords_charts$chart_editor$Music_Chart$Part,
-			'A',
-			{
-				ctor: '::',
-				_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-					{
-						ctor: '::',
-						_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteC, _open_chords_charts$chart_editor$Music_Chord$Major),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: _open_chords_charts$chart_editor$Music_Chart$BarRepeat,
-					_1: {
-						ctor: '::',
-						_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-							{
-								ctor: '::',
-								_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteA, _open_chords_charts$chart_editor$Music_Chord$MinorSeventh),
-								_1: {
-									ctor: '::',
-									_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteD, _open_chords_charts$chart_editor$Music_Chord$Seventh),
-									_1: {ctor: '[]'}
-								}
-							}),
-						_1: {
-							ctor: '::',
-							_0: _open_chords_charts$chart_editor$Music_Chart$BarRepeat,
-							_1: {
-								ctor: '::',
-								_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-									{
-										ctor: '::',
-										_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteG, _open_chords_charts$chart_editor$Music_Chord$Minor),
-										_1: {
-											ctor: '::',
-											_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteEb, _open_chords_charts$chart_editor$Music_Chord$Seventh),
-											_1: {
-												ctor: '::',
-												_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteD, _open_chords_charts$chart_editor$Music_Chord$Seventh),
-												_1: {ctor: '[]'}
-											}
-										}
-									}),
-								_1: {
-									ctor: '::',
-									_0: _open_chords_charts$chart_editor$Music_Chart$Bar(
-										{
-											ctor: '::',
-											_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteAb, _open_chords_charts$chart_editor$Music_Chord$Major),
-											_1: {
-												ctor: '::',
-												_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteC, _open_chords_charts$chart_editor$Music_Chord$Seventh),
-												_1: {
-													ctor: '::',
-													_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteF, _open_chords_charts$chart_editor$Music_Chord$Minor),
-													_1: {
-														ctor: '::',
-														_0: A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteEb, _open_chords_charts$chart_editor$Music_Chord$MajorSixth),
-														_1: {ctor: '[]'}
-													}
-												}
-											}
-										}),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				}
-			}),
+		_0: _open_chords_charts$chart_editor$Samples$allOfMe,
 		_1: {ctor: '[]'}
 	}
 };
@@ -13972,20 +13700,23 @@ var _open_chords_charts$chart_editor$Main$update = F2(
 		return A2(
 			_elm_lang$core$List$indexedMap,
 			F2(
-				function (index, item) {
-					return _elm_lang$core$Native_Utils.eq(index, _p0._0) ? A2(_open_chords_charts$chart_editor$ChartCard$update, _p0._1, item) : item;
+				function (index, result) {
+					return _elm_lang$core$Native_Utils.eq(index, _p0._0) ? A2(
+						_elm_lang$core$Result$map,
+						_open_chords_charts$chart_editor$ChartCard$update(_p0._1),
+						result) : result;
 				}),
 			model);
 	});
-var _open_chords_charts$chart_editor$Main$model = {
-	ctor: '::',
-	_0: _open_chords_charts$chart_editor$ChartCard$init(_open_chords_charts$chart_editor$Samples$grammar),
-	_1: {
-		ctor: '::',
-		_0: _open_chords_charts$chart_editor$ChartCard$init(_open_chords_charts$chart_editor$Samples$allOfMe),
-		_1: {ctor: '[]'}
-	}
-};
+var _open_chords_charts$chart_editor$Main$model = A2(
+	_elm_lang$core$List$map,
+	function (_p1) {
+		return A2(
+			_elm_lang$core$Result$map,
+			_open_chords_charts$chart_editor$ChartCard$init,
+			A2(_elm_tools$parser$Parser$run, _open_chords_charts$chart_editor$Parsers$chart, _p1));
+	},
+	_open_chords_charts$chart_editor$Samples$samples);
 var _open_chords_charts$chart_editor$Main$ChartCardMsg = F2(
 	function (a, b) {
 		return {ctor: 'ChartCardMsg', _0: a, _1: b};
@@ -14054,11 +13785,49 @@ var _open_chords_charts$chart_editor$Main$view = function (model) {
 						A2(
 							_elm_lang$core$List$indexedMap,
 							F2(
-								function (index, chartModel) {
-									return A2(
-										_elm_lang$html$Html$map,
-										_open_chords_charts$chart_editor$Main$ChartCardMsg(index),
-										_open_chords_charts$chart_editor$ChartCard$view(chartModel));
+								function (index, result) {
+									var _p2 = result;
+									if (_p2.ctor === 'Ok') {
+										return A2(
+											_elm_lang$html$Html$map,
+											_open_chords_charts$chart_editor$Main$ChartCardMsg(index),
+											_open_chords_charts$chart_editor$ChartCard$view(_p2._0));
+									} else {
+										var _p3 = A2(_elm_lang$core$Debug$log, 'Parse error', _p2._0);
+										return A2(
+											_elm_lang$html$Html$div,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$p,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('Chart text could not be parsed.'),
+														_1: {ctor: '[]'}
+													}),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$p,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$small,
+																{ctor: '[]'},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text('Look at your browser developer console to see the technical error message.'),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												}
+											});
+									}
 								}),
 							model))),
 				_1: {
