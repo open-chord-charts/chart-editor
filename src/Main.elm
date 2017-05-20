@@ -3,6 +3,8 @@ module Main exposing (main)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import ChartCard
+import Parser
+import Parsers
 import Samples
 
 
@@ -20,14 +22,13 @@ main =
 
 
 type alias Model =
-    List ChartCard.Model
+    List (Result Parser.Error ChartCard.Model)
 
 
 model : Model
 model =
-    [ ChartCard.init Samples.grammar
-    , ChartCard.init Samples.allOfMe
-    ]
+    Samples.samples
+        |> List.map (Parser.run Parsers.chart >> Result.map ChartCard.init)
 
 
 
@@ -46,14 +47,14 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         ChartCardMsg msgIndex nestedMsg ->
-            List.indexedMap
-                (\index item ->
-                    if index == msgIndex then
-                        ChartCard.update nestedMsg item
-                    else
-                        item
-                )
-                model
+            model
+                |> List.indexedMap
+                    (\index result ->
+                        if index == msgIndex then
+                            result |> Result.map (ChartCard.update nestedMsg)
+                        else
+                            result
+                    )
 
 
 
@@ -82,9 +83,24 @@ view model =
                 (debugBreakpoints
                     ++ (model
                             |> List.indexedMap
-                                (\index chartModel ->
-                                    ChartCard.view chartModel
-                                        |> Html.map (ChartCardMsg index)
+                                (\index result ->
+                                    case result of
+                                        Ok chartCardModel ->
+                                            ChartCard.view chartCardModel
+                                                |> Html.map (ChartCardMsg index)
+
+                                        Err err ->
+                                            let
+                                                _ =
+                                                    Debug.log "Parse error" err
+                                            in
+                                                div []
+                                                    [ p [] [ text "Chart text could not be parsed." ]
+                                                    , p []
+                                                        [ small []
+                                                            [ text "Look at your browser developer console to see the technical error message." ]
+                                                        ]
+                                                    ]
                                 )
                        )
                 )

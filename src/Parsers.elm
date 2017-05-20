@@ -34,6 +34,7 @@ chart =
     in
         inContext "chart" <|
             succeed Chart
+                |. spacesAndNewlines
                 |. symbol dashes
                 |. newLine
                 |. symbol "title:"
