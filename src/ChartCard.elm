@@ -715,7 +715,9 @@ viewPart chart status partIndex part =
             div
                 ((case status of
                     EditStatus _ ->
-                        [ onClick (SelectPart partIndex) ]
+                        [ class "pointer"
+                        , onClick (SelectPart partIndex)
+                        ]
 
                     ViewStatus ->
                         []
@@ -829,13 +831,12 @@ viewBar status isSelected msg bar previousBar =
                 ("dtc ba b--mid-gray "
                     ++ fontSizeClasses
                     ++ " "
-                    ++ (case status of
-                            ViewStatus ->
-                                "cursor-default"
+                    ++ case status of
+                        ViewStatus ->
+                            "cursor-default"
 
-                            EditStatus _ ->
-                                "pointer"
-                       )
+                        EditStatus _ ->
+                            "pointer"
                 )
              , classList [ ( "bg-moon-gray", isSelected ) ]
              ]
