@@ -55,7 +55,8 @@ part : Parser Part
 part =
     inContext "part" <|
         succeed (\partName toPart -> toPart partName)
-            |. symbol "= "
+            |. symbol "="
+            |. spaces
             |= keepUntilEndOfLine
             |. spacesAndNewlines
             |= oneOf
