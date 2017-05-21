@@ -10838,64 +10838,192 @@ var _elm_tools$parser$Parser$AtLeast = function (a) {
 var _elm_tools$parser$Parser$zeroOrMore = _elm_tools$parser$Parser$AtLeast(0);
 var _elm_tools$parser$Parser$oneOrMore = _elm_tools$parser$Parser$AtLeast(1);
 
-var _open_chords_charts$chart_editor$Music_Note$interval = F2(
-	function (_p1, _p0) {
-		var _p2 = _p1;
-		var _p3 = _p0;
-		return A2(_elm_lang$core$Basics_ops['%'], _p3._0 - _p2._0, 12);
+var _open_chords_charts$chart_editor$Music_Note$getAtUnsafe = F2(
+	function (index, list) {
+		var cyclingIndex = A2(
+			_elm_lang$core$Basics_ops['%'],
+			index,
+			_elm_lang$core$List$length(list));
+		var _p0 = A2(_elm_community$list_extra$List_Extra$getAt, cyclingIndex, list);
+		if (_p0.ctor === 'Just') {
+			return _p0._0;
+		} else {
+			return _elm_lang$core$Native_Utils.crashCase(
+				'Music.Note',
+				{
+					start: {line: 186, column: 9},
+					end: {line: 191, column: 129}
+				},
+				_p0)(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'attempt to reach index ',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(cyclingIndex),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							' of list ',
+							_elm_lang$core$Basics$toString(list)))));
+		}
 	});
-var _open_chords_charts$chart_editor$Music_Note$Note = function (a) {
-	return {ctor: 'Note', _0: a};
+var _open_chords_charts$chart_editor$Music_Note$toString = function (note) {
+	var noteStr = _elm_lang$core$Basics$toString(note);
+	return A2(_elm_lang$core$String$endsWith, 'f', noteStr) ? A2(
+		_elm_lang$core$Basics_ops['++'],
+		A2(_elm_lang$core$String$dropRight, 1, noteStr),
+		'b') : (A2(_elm_lang$core$String$endsWith, 's', noteStr) ? A2(
+		_elm_lang$core$Basics_ops['++'],
+		A2(_elm_lang$core$String$dropRight, 1, noteStr),
+		'#') : noteStr);
 };
-var _open_chords_charts$chart_editor$Music_Note$noteAb = _open_chords_charts$chart_editor$Music_Note$Note(0);
-var _open_chords_charts$chart_editor$Music_Note$noteA = _open_chords_charts$chart_editor$Music_Note$Note(1);
-var _open_chords_charts$chart_editor$Music_Note$noteBb = _open_chords_charts$chart_editor$Music_Note$Note(2);
-var _open_chords_charts$chart_editor$Music_Note$noteB = _open_chords_charts$chart_editor$Music_Note$Note(3);
-var _open_chords_charts$chart_editor$Music_Note$noteC = _open_chords_charts$chart_editor$Music_Note$Note(4);
-var _open_chords_charts$chart_editor$Music_Note$noteDb = _open_chords_charts$chart_editor$Music_Note$Note(5);
-var _open_chords_charts$chart_editor$Music_Note$noteD = _open_chords_charts$chart_editor$Music_Note$Note(6);
-var _open_chords_charts$chart_editor$Music_Note$noteEb = _open_chords_charts$chart_editor$Music_Note$Note(7);
-var _open_chords_charts$chart_editor$Music_Note$noteE = _open_chords_charts$chart_editor$Music_Note$Note(8);
-var _open_chords_charts$chart_editor$Music_Note$noteF = _open_chords_charts$chart_editor$Music_Note$Note(9);
-var _open_chords_charts$chart_editor$Music_Note$noteGb = _open_chords_charts$chart_editor$Music_Note$Note(10);
-var _open_chords_charts$chart_editor$Music_Note$noteG = _open_chords_charts$chart_editor$Music_Note$Note(11);
+var _open_chords_charts$chart_editor$Music_Note$toOctaveIndex = function (note) {
+	var _p2 = note;
+	switch (_p2.ctor) {
+		case 'Af':
+			return 0;
+		case 'A':
+			return 1;
+		case 'As':
+			return 2;
+		case 'Bf':
+			return 2;
+		case 'B':
+			return 3;
+		case 'Bs':
+			return 4;
+		case 'Cf':
+			return 3;
+		case 'C':
+			return 4;
+		case 'Cs':
+			return 5;
+		case 'Df':
+			return 5;
+		case 'D':
+			return 6;
+		case 'Ds':
+			return 7;
+		case 'Ef':
+			return 7;
+		case 'E':
+			return 8;
+		case 'Es':
+			return 9;
+		case 'Ff':
+			return 8;
+		case 'F':
+			return 9;
+		case 'Fs':
+			return 10;
+		case 'Gf':
+			return 10;
+		case 'G':
+			return 11;
+		default:
+			return 0;
+	}
+};
+var _open_chords_charts$chart_editor$Music_Note$interval = F2(
+	function (low, high) {
+		var highOctaveIndex = _open_chords_charts$chart_editor$Music_Note$toOctaveIndex(high);
+		var lowOctaveIndex = _open_chords_charts$chart_editor$Music_Note$toOctaveIndex(low);
+		return A2(_elm_lang$core$Basics_ops['%'], highOctaveIndex - lowOctaveIndex, 12);
+	});
+var _open_chords_charts$chart_editor$Music_Note$Gs = {ctor: 'Gs'};
+var _open_chords_charts$chart_editor$Music_Note$G = {ctor: 'G'};
+var _open_chords_charts$chart_editor$Music_Note$Gf = {ctor: 'Gf'};
+var _open_chords_charts$chart_editor$Music_Note$Fs = {ctor: 'Fs'};
+var _open_chords_charts$chart_editor$Music_Note$F = {ctor: 'F'};
+var _open_chords_charts$chart_editor$Music_Note$Ff = {ctor: 'Ff'};
+var _open_chords_charts$chart_editor$Music_Note$Es = {ctor: 'Es'};
+var _open_chords_charts$chart_editor$Music_Note$E = {ctor: 'E'};
+var _open_chords_charts$chart_editor$Music_Note$Ef = {ctor: 'Ef'};
+var _open_chords_charts$chart_editor$Music_Note$Ds = {ctor: 'Ds'};
+var _open_chords_charts$chart_editor$Music_Note$D = {ctor: 'D'};
+var _open_chords_charts$chart_editor$Music_Note$Df = {ctor: 'Df'};
+var _open_chords_charts$chart_editor$Music_Note$Cs = {ctor: 'Cs'};
+var _open_chords_charts$chart_editor$Music_Note$C = {ctor: 'C'};
+var _open_chords_charts$chart_editor$Music_Note$Cf = {ctor: 'Cf'};
+var _open_chords_charts$chart_editor$Music_Note$Bs = {ctor: 'Bs'};
+var _open_chords_charts$chart_editor$Music_Note$B = {ctor: 'B'};
+var _open_chords_charts$chart_editor$Music_Note$Bf = {ctor: 'Bf'};
+var _open_chords_charts$chart_editor$Music_Note$As = {ctor: 'As'};
+var _open_chords_charts$chart_editor$Music_Note$A = {ctor: 'A'};
+var _open_chords_charts$chart_editor$Music_Note$Af = {ctor: 'Af'};
 var _open_chords_charts$chart_editor$Music_Note$notes = {
 	ctor: '::',
-	_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Note$noteAb, _1: 'Ab'},
+	_0: _open_chords_charts$chart_editor$Music_Note$Af,
 	_1: {
 		ctor: '::',
-		_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Note$noteA, _1: 'A'},
+		_0: _open_chords_charts$chart_editor$Music_Note$A,
 		_1: {
 			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Note$noteBb, _1: 'Bb'},
+			_0: _open_chords_charts$chart_editor$Music_Note$As,
 			_1: {
 				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Note$noteB, _1: 'B'},
+				_0: _open_chords_charts$chart_editor$Music_Note$Bf,
 				_1: {
 					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Note$noteC, _1: 'C'},
+					_0: _open_chords_charts$chart_editor$Music_Note$B,
 					_1: {
 						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Note$noteDb, _1: 'Db'},
+						_0: _open_chords_charts$chart_editor$Music_Note$Bs,
 						_1: {
 							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Note$noteD, _1: 'D'},
+							_0: _open_chords_charts$chart_editor$Music_Note$Cf,
 							_1: {
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Note$noteEb, _1: 'Eb'},
+								_0: _open_chords_charts$chart_editor$Music_Note$C,
 								_1: {
 									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Note$noteE, _1: 'E'},
+									_0: _open_chords_charts$chart_editor$Music_Note$Cs,
 									_1: {
 										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Note$noteF, _1: 'F'},
+										_0: _open_chords_charts$chart_editor$Music_Note$Df,
 										_1: {
 											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Note$noteGb, _1: 'Gb'},
+											_0: _open_chords_charts$chart_editor$Music_Note$D,
 											_1: {
 												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Note$noteG, _1: 'G'},
-												_1: {ctor: '[]'}
+												_0: _open_chords_charts$chart_editor$Music_Note$Ds,
+												_1: {
+													ctor: '::',
+													_0: _open_chords_charts$chart_editor$Music_Note$Ef,
+													_1: {
+														ctor: '::',
+														_0: _open_chords_charts$chart_editor$Music_Note$E,
+														_1: {
+															ctor: '::',
+															_0: _open_chords_charts$chart_editor$Music_Note$Es,
+															_1: {
+																ctor: '::',
+																_0: _open_chords_charts$chart_editor$Music_Note$Ff,
+																_1: {
+																	ctor: '::',
+																	_0: _open_chords_charts$chart_editor$Music_Note$F,
+																	_1: {
+																		ctor: '::',
+																		_0: _open_chords_charts$chart_editor$Music_Note$Fs,
+																		_1: {
+																			ctor: '::',
+																			_0: _open_chords_charts$chart_editor$Music_Note$Gf,
+																			_1: {
+																				ctor: '::',
+																				_0: _open_chords_charts$chart_editor$Music_Note$G,
+																				_1: {
+																					ctor: '::',
+																					_0: _open_chords_charts$chart_editor$Music_Note$Gs,
+																					_1: {ctor: '[]'}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
 											}
 										}
 									}
@@ -10908,63 +11036,157 @@ var _open_chords_charts$chart_editor$Music_Note$notes = {
 		}
 	}
 };
-var _open_chords_charts$chart_editor$Music_Note$toString = function (_p4) {
-	var _p5 = _p4;
-	var _p8 = _p5._0;
-	var noteNames = A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$second, _open_chords_charts$chart_editor$Music_Note$notes);
-	var _p6 = A2(
-		_elm_community$list_extra$List_Extra$getAt,
-		A2(_elm_lang$core$Basics_ops['%'], _p8, 12),
-		noteNames);
-	if (_p6.ctor === 'Just') {
-		return _p6._0;
-	} else {
-		return _elm_lang$core$Native_Utils.crashCase(
-			'Music.Note',
-			{
-				start: {line: 118, column: 9},
-				end: {line: 123, column: 110}
-			},
-			_p6)(
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				'Tried to get an element outside of List (int: ',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(_p8),
-					').')));
-	}
-};
+var _open_chords_charts$chart_editor$Music_Note$notesAndStrings = A2(
+	_elm_lang$core$List$map,
+	function (note) {
+		return {
+			ctor: '_Tuple2',
+			_0: note,
+			_1: _open_chords_charts$chart_editor$Music_Note$toString(note)
+		};
+	},
+	_open_chords_charts$chart_editor$Music_Note$notes);
 var _open_chords_charts$chart_editor$Music_Note$fromString = function (s) {
 	return A2(
 		_elm_lang$core$Maybe$map,
 		_elm_lang$core$Tuple$first,
 		A2(
 			_elm_community$list_extra$List_Extra$find,
-			function (_p9) {
-				var _p10 = _p9;
-				return _elm_lang$core$Native_Utils.eq(_p10._1, s);
+			function (_p3) {
+				var _p4 = _p3;
+				return _elm_lang$core$Native_Utils.eq(_p4._1, s);
 			},
-			_open_chords_charts$chart_editor$Music_Note$notes));
+			_open_chords_charts$chart_editor$Music_Note$notesAndStrings));
+};
+var _open_chords_charts$chart_editor$Music_Note$fromOctaveIndex = function (octaveIndex) {
+	var selectedNotes = {
+		ctor: '::',
+		_0: _open_chords_charts$chart_editor$Music_Note$Af,
+		_1: {
+			ctor: '::',
+			_0: _open_chords_charts$chart_editor$Music_Note$A,
+			_1: {
+				ctor: '::',
+				_0: _open_chords_charts$chart_editor$Music_Note$Bf,
+				_1: {
+					ctor: '::',
+					_0: _open_chords_charts$chart_editor$Music_Note$B,
+					_1: {
+						ctor: '::',
+						_0: _open_chords_charts$chart_editor$Music_Note$C,
+						_1: {
+							ctor: '::',
+							_0: _open_chords_charts$chart_editor$Music_Note$Df,
+							_1: {
+								ctor: '::',
+								_0: _open_chords_charts$chart_editor$Music_Note$D,
+								_1: {
+									ctor: '::',
+									_0: _open_chords_charts$chart_editor$Music_Note$Ef,
+									_1: {
+										ctor: '::',
+										_0: _open_chords_charts$chart_editor$Music_Note$E,
+										_1: {
+											ctor: '::',
+											_0: _open_chords_charts$chart_editor$Music_Note$F,
+											_1: {
+												ctor: '::',
+												_0: _open_chords_charts$chart_editor$Music_Note$Gf,
+												_1: {
+													ctor: '::',
+													_0: _open_chords_charts$chart_editor$Music_Note$G,
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	};
+	return A2(_open_chords_charts$chart_editor$Music_Note$getAtUnsafe, octaveIndex, selectedNotes);
 };
 var _open_chords_charts$chart_editor$Music_Note$transpose = F2(
-	function (interval, _p11) {
-		var _p12 = _p11;
-		return _open_chords_charts$chart_editor$Music_Note$Note(
-			A2(_elm_lang$core$Basics_ops['%'], _p12._0 + interval, 12));
+	function (interval, note) {
+		var octaveIndex = _open_chords_charts$chart_editor$Music_Note$toOctaveIndex(note);
+		return _open_chords_charts$chart_editor$Music_Note$fromOctaveIndex(octaveIndex + interval);
 	});
 
+var _open_chords_charts$chart_editor$Music_Chord$qualityToString = function (quality) {
+	var _p0 = quality;
+	switch (_p0.ctor) {
+		case 'Major':
+			return 'M';
+		case 'Minor':
+			return 'm';
+		case 'Augmented':
+			return '+';
+		case 'MajorSixth':
+			return '6';
+		case 'MinorSixth':
+			return 'm6';
+		case 'Seventh':
+			return '7';
+		case 'MajorSeventh':
+			return 'Δ';
+		case 'MinorMajorSeventh':
+			return 'mΔ';
+		case 'MinorSeventh':
+			return 'm7';
+		case 'SeventhSus4':
+			return '7sus4';
+		case 'Diminished':
+			return 'o';
+		case 'HalfDiminished':
+			return 'ø';
+		case 'Ninth':
+			return '9';
+		case 'MajorMinorNinth':
+			return '9b';
+		case 'MinorNinth':
+			return 'm9';
+		case 'AugmentedNinth':
+			return '9+';
+		case 'SixthPlusNinth':
+			return '69';
+		case 'AugmentedEleventh':
+			return '11+';
+		case 'Thirteenth':
+			return '13';
+		default:
+			return '7alt';
+	}
+};
+var _open_chords_charts$chart_editor$Music_Chord$qualityToStringHidingMajor = function (quality) {
+	var _p1 = quality;
+	if (_p1.ctor === 'Major') {
+		return '';
+	} else {
+		return _open_chords_charts$chart_editor$Music_Chord$qualityToString(quality);
+	}
+};
+var _open_chords_charts$chart_editor$Music_Chord$toString = function (_p2) {
+	var _p3 = _p2;
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_open_chords_charts$chart_editor$Music_Note$toString(_p3._0),
+		_open_chords_charts$chart_editor$Music_Chord$qualityToStringHidingMajor(_p3._1));
+};
 var _open_chords_charts$chart_editor$Music_Chord$Chord = F2(
 	function (a, b) {
 		return {ctor: 'Chord', _0: a, _1: b};
 	});
 var _open_chords_charts$chart_editor$Music_Chord$transpose = F2(
-	function (interval, _p0) {
-		var _p1 = _p0;
+	function (interval, _p4) {
+		var _p5 = _p4;
 		return A2(
 			_open_chords_charts$chart_editor$Music_Chord$Chord,
-			A2(_open_chords_charts$chart_editor$Music_Note$transpose, interval, _p1._0),
-			_p1._1);
+			A2(_open_chords_charts$chart_editor$Music_Note$transpose, interval, _p5._0),
+			_p5._1);
 	});
 var _open_chords_charts$chart_editor$Music_Chord$Altered = {ctor: 'Altered'};
 var _open_chords_charts$chart_editor$Music_Chord$Thirteenth = {ctor: 'Thirteenth'};
@@ -10988,64 +11210,64 @@ var _open_chords_charts$chart_editor$Music_Chord$Minor = {ctor: 'Minor'};
 var _open_chords_charts$chart_editor$Music_Chord$Major = {ctor: 'Major'};
 var _open_chords_charts$chart_editor$Music_Chord$qualities = {
 	ctor: '::',
-	_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$Major, _1: ''},
+	_0: _open_chords_charts$chart_editor$Music_Chord$Major,
 	_1: {
 		ctor: '::',
-		_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$Minor, _1: 'm'},
+		_0: _open_chords_charts$chart_editor$Music_Chord$Minor,
 		_1: {
 			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$Augmented, _1: '+'},
+			_0: _open_chords_charts$chart_editor$Music_Chord$Augmented,
 			_1: {
 				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$MajorSixth, _1: '6'},
+				_0: _open_chords_charts$chart_editor$Music_Chord$MajorSixth,
 				_1: {
 					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$MinorSixth, _1: 'm6'},
+					_0: _open_chords_charts$chart_editor$Music_Chord$MinorSixth,
 					_1: {
 						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$Seventh, _1: '7'},
+						_0: _open_chords_charts$chart_editor$Music_Chord$Seventh,
 						_1: {
 							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$MajorSeventh, _1: 'Δ'},
+							_0: _open_chords_charts$chart_editor$Music_Chord$MajorSeventh,
 							_1: {
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$MinorMajorSeventh, _1: 'mΔ'},
+								_0: _open_chords_charts$chart_editor$Music_Chord$MinorMajorSeventh,
 								_1: {
 									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$MinorSeventh, _1: 'm7'},
+									_0: _open_chords_charts$chart_editor$Music_Chord$MinorSeventh,
 									_1: {
 										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$SeventhSus4, _1: '7sus4'},
+										_0: _open_chords_charts$chart_editor$Music_Chord$SeventhSus4,
 										_1: {
 											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$Diminished, _1: 'o'},
+											_0: _open_chords_charts$chart_editor$Music_Chord$Diminished,
 											_1: {
 												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$HalfDiminished, _1: 'ø'},
+												_0: _open_chords_charts$chart_editor$Music_Chord$HalfDiminished,
 												_1: {
 													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$Ninth, _1: '9'},
+													_0: _open_chords_charts$chart_editor$Music_Chord$Ninth,
 													_1: {
 														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$MajorMinorNinth, _1: '9b'},
+														_0: _open_chords_charts$chart_editor$Music_Chord$MajorMinorNinth,
 														_1: {
 															ctor: '::',
-															_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$MinorNinth, _1: 'm9'},
+															_0: _open_chords_charts$chart_editor$Music_Chord$MinorNinth,
 															_1: {
 																ctor: '::',
-																_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$AugmentedNinth, _1: '9+'},
+																_0: _open_chords_charts$chart_editor$Music_Chord$AugmentedNinth,
 																_1: {
 																	ctor: '::',
-																	_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$SixthPlusNinth, _1: '69'},
+																	_0: _open_chords_charts$chart_editor$Music_Chord$SixthPlusNinth,
 																	_1: {
 																		ctor: '::',
-																		_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$AugmentedEleventh, _1: '11+'},
+																		_0: _open_chords_charts$chart_editor$Music_Chord$AugmentedEleventh,
 																		_1: {
 																			ctor: '::',
-																			_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$Thirteenth, _1: '13'},
+																			_0: _open_chords_charts$chart_editor$Music_Chord$Thirteenth,
 																			_1: {
 																				ctor: '::',
-																				_0: {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Chord$Altered, _1: '7alt'},
+																				_0: _open_chords_charts$chart_editor$Music_Chord$Altered,
 																				_1: {ctor: '[]'}
 																			}
 																		}
@@ -11067,51 +11289,27 @@ var _open_chords_charts$chart_editor$Music_Chord$qualities = {
 		}
 	}
 };
-var _open_chords_charts$chart_editor$Music_Chord$qualityToString = function (quality) {
-	var _p4 = A2(
-		_elm_community$list_extra$List_Extra$find,
-		function (_p2) {
-			var _p3 = _p2;
-			return _elm_lang$core$Native_Utils.eq(_p3._0, quality);
-		},
-		_open_chords_charts$chart_editor$Music_Chord$qualities);
-	if (_p4.ctor === 'Just') {
-		return _p4._0._1;
-	} else {
-		return _elm_lang$core$Native_Utils.crashCase(
-			'Music.Chord',
-			{
-				start: {line: 78, column: 5},
-				end: {line: 83, column: 109}
-			},
-			_p4)(
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				'Tried to get quality: ',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(quality),
-					' not in `qualities` list.')));
-	}
-};
-var _open_chords_charts$chart_editor$Music_Chord$toString = function (_p6) {
-	var _p7 = _p6;
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		_open_chords_charts$chart_editor$Music_Note$toString(_p7._0),
-		_open_chords_charts$chart_editor$Music_Chord$qualityToString(_p7._1));
-};
+var _open_chords_charts$chart_editor$Music_Chord$qualitiesAndStrings = A2(
+	_elm_lang$core$List$map,
+	function (quality) {
+		return {
+			ctor: '_Tuple2',
+			_0: quality,
+			_1: _open_chords_charts$chart_editor$Music_Chord$qualityToStringHidingMajor(quality)
+		};
+	},
+	_open_chords_charts$chart_editor$Music_Chord$qualities);
 var _open_chords_charts$chart_editor$Music_Chord$qualityFromString = function (s) {
 	return A2(
 		_elm_lang$core$Maybe$map,
 		_elm_lang$core$Tuple$first,
 		A2(
 			_elm_community$list_extra$List_Extra$find,
-			function (_p8) {
-				var _p9 = _p8;
-				return _elm_lang$core$Native_Utils.eq(_p9._1, s);
+			function (_p6) {
+				var _p7 = _p6;
+				return _elm_lang$core$Native_Utils.eq(_p7._1, s);
 			},
-			_open_chords_charts$chart_editor$Music_Chord$qualities));
+			_open_chords_charts$chart_editor$Music_Chord$qualitiesAndStrings));
 };
 
 var _open_chords_charts$chart_editor$Music_Chart$barToString = function (bar) {
@@ -11278,83 +11476,70 @@ var _open_chords_charts$chart_editor$Music_Chart$mapBarChords = F2(
 		}
 	});
 var _open_chords_charts$chart_editor$Music_Chart$transposeBar = F2(
-	function (nbSemitones, bar) {
+	function (interval, bar) {
 		return A2(
 			_open_chords_charts$chart_editor$Music_Chart$mapBarChords,
 			_elm_lang$core$List$map(
-				_open_chords_charts$chart_editor$Music_Chord$transpose(nbSemitones)),
+				_open_chords_charts$chart_editor$Music_Chord$transpose(interval)),
 			bar);
 	});
 var _open_chords_charts$chart_editor$Music_Chart$transposePart = F2(
-	function (nbSemitones, part) {
-		var _p10 = part;
-		if (_p10.ctor === 'Part') {
-			return A2(
-				_open_chords_charts$chart_editor$Music_Chart$Part,
-				_p10._0,
-				A2(
-					_elm_lang$core$List$map,
-					_open_chords_charts$chart_editor$Music_Chart$transposeBar(nbSemitones),
-					_p10._1));
-		} else {
-			return part;
-		}
+	function (interval, part) {
+		return A2(
+			_open_chords_charts$chart_editor$Music_Chart$mapPartBars,
+			_elm_lang$core$List$map(
+				_open_chords_charts$chart_editor$Music_Chart$transposeBar(interval)),
+			part);
 	});
 var _open_chords_charts$chart_editor$Music_Chart$transpose = F2(
-	function (newKey, _p11) {
-		var _p12 = _p11;
-		var interval = F2(
-			function (_p14, _p13) {
-				var _p15 = _p14;
-				var _p16 = _p13;
-				return A2(_open_chords_charts$chart_editor$Music_Note$interval, _p15._0, _p16._0);
-			});
+	function (_p10, chart) {
+		var _p11 = _p10;
+		var _p12 = chart.key;
+		var keyNote = _p12._0;
+		var newParts = A2(
+			_elm_lang$core$List$map,
+			_open_chords_charts$chart_editor$Music_Chart$transposePart(
+				A2(_open_chords_charts$chart_editor$Music_Note$interval, keyNote, _p11._0)),
+			chart.parts);
 		return _elm_lang$core$Native_Utils.update(
-			_p12,
-			{
-				key: newKey,
-				parts: A2(
-					_elm_lang$core$List$map,
-					_open_chords_charts$chart_editor$Music_Chart$transposePart(
-						A2(interval, _p12.key, newKey)),
-					_p12.parts)
-			});
+			chart,
+			{key: _p11, parts: newParts});
 	});
 var _open_chords_charts$chart_editor$Music_Chart$Key = function (a) {
 	return {ctor: 'Key', _0: a};
 };
 
 var _open_chords_charts$chart_editor$Parsers$oneOfTuples = function (tuples) {
+	var sortTuples = function (_p0) {
+		return _elm_lang$core$List$reverse(
+			A2(
+				_elm_lang$core$List$sortBy,
+				function (_p1) {
+					return _elm_lang$core$String$length(
+						_elm_lang$core$Tuple$second(_p1));
+				},
+				_p0));
+	};
 	return _elm_tools$parser$Parser$oneOf(
 		A2(
 			_elm_lang$core$List$map,
-			function (_p0) {
-				var _p1 = _p0;
+			function (_p2) {
+				var _p3 = _p2;
 				return A2(
 					_elm_tools$parser$Parser_ops['|.'],
-					_elm_tools$parser$Parser$succeed(_p1._0),
-					_elm_tools$parser$Parser$symbol(_p1._1));
+					_elm_tools$parser$Parser$succeed(_p3._0),
+					_elm_tools$parser$Parser$symbol(_p3._1));
 			},
-			tuples));
+			sortTuples(tuples)));
 };
 var _open_chords_charts$chart_editor$Parsers$note = A2(
 	_elm_tools$parser$Parser$inContext,
 	'note',
-	_open_chords_charts$chart_editor$Parsers$oneOfTuples(_open_chords_charts$chart_editor$Music_Note$notes));
-var _open_chords_charts$chart_editor$Parsers$quality = function () {
-	var sortedQualities = _elm_lang$core$List$reverse(
-		A2(
-			_elm_lang$core$List$sortBy,
-			function (_p2) {
-				return _elm_lang$core$String$length(
-					_elm_lang$core$Tuple$second(_p2));
-			},
-			_open_chords_charts$chart_editor$Music_Chord$qualities));
-	return A2(
-		_elm_tools$parser$Parser$inContext,
-		'quality',
-		_open_chords_charts$chart_editor$Parsers$oneOfTuples(sortedQualities));
-}();
+	_open_chords_charts$chart_editor$Parsers$oneOfTuples(_open_chords_charts$chart_editor$Music_Note$notesAndStrings));
+var _open_chords_charts$chart_editor$Parsers$quality = A2(
+	_elm_tools$parser$Parser$inContext,
+	'quality',
+	_open_chords_charts$chart_editor$Parsers$oneOfTuples(_open_chords_charts$chart_editor$Music_Chord$qualitiesAndStrings));
 var _open_chords_charts$chart_editor$Parsers$chord = A2(
 	_elm_tools$parser$Parser$inContext,
 	'chord',
@@ -11529,12 +11714,20 @@ var _open_chords_charts$chart_editor$Parsers$chart = function () {
 			_elm_tools$parser$Parser$end));
 }();
 
-var _open_chords_charts$chart_editor$ChartCard$noteDecoder = function (string) {
-	var _p0 = _open_chords_charts$chart_editor$Music_Note$fromString(string);
+var _open_chords_charts$chart_editor$ChartCard$qualityDecoder = function (string) {
+	var _p0 = _open_chords_charts$chart_editor$Music_Chord$qualityFromString(string);
 	if (_p0.ctor === 'Just') {
 		return _elm_lang$core$Json_Decode$succeed(_p0._0);
 	} else {
-		return _elm_lang$core$Json_Decode$fail(string);
+		return _elm_lang$core$Json_Decode$fail('Invalid quality');
+	}
+};
+var _open_chords_charts$chart_editor$ChartCard$noteDecoder = function (string) {
+	var _p1 = _open_chords_charts$chart_editor$Music_Note$fromString(string);
+	if (_p1.ctor === 'Just') {
+		return _elm_lang$core$Json_Decode$succeed(_p1._0);
+	} else {
+		return _elm_lang$core$Json_Decode$fail('Invalid note');
 	}
 };
 var _open_chords_charts$chart_editor$ChartCard$toolbar = _elm_lang$html$Html$div(
@@ -11633,16 +11826,16 @@ var _open_chords_charts$chart_editor$ChartCard$button = F3(
 							_elm_lang$core$Basics_ops['++'],
 							'pointer f5 fw4 lh-title ba br2 ph3 pv2 mb2 dib ',
 							function () {
-								var _p1 = purpose;
-								if (_p1.ctor === 'Primary') {
+								var _p2 = purpose;
+								if (_p2.ctor === 'Primary') {
 									return 'b--transparent bg-blue hover-bg-dark-blue white';
 								} else {
 									return A2(
 										_elm_lang$core$Basics_ops['++'],
 										'b--mid-gray hover-bg-moon-gray ',
 										function () {
-											var _p2 = state;
-											if (_p2.ctor === 'Pressed') {
+											var _p3 = state;
+											if (_p3.ctor === 'Pressed') {
 												return 'bg-light-silver';
 											} else {
 												return 'bg-transparent';
@@ -11678,10 +11871,10 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 	function (status, isSelected, msg, bar, previousBar) {
 		var defaultFontSizeClasses = 'f7 f4-m f2-l';
 		var fontSizeClasses = function () {
-			var _p3 = bar;
-			if (_p3.ctor === 'Bar') {
+			var _p4 = bar;
+			if (_p4.ctor === 'Bar') {
 				return (_elm_lang$core$Native_Utils.cmp(
-					_elm_lang$core$List$length(_p3._0),
+					_elm_lang$core$List$length(_p4._0),
 					1) > 0) ? 'f7 f6-m f4-l' : defaultFontSizeClasses;
 			} else {
 				return defaultFontSizeClasses;
@@ -11704,8 +11897,8 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 									_elm_lang$core$Basics_ops['++'],
 									' ',
 									function () {
-										var _p4 = status;
-										if (_p4.ctor === 'ViewStatus') {
+										var _p5 = status;
+										if (_p5.ctor === 'ViewStatus') {
 											return 'cursor-default';
 										} else {
 											return 'pointer';
@@ -11723,8 +11916,8 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 					}
 				},
 				function () {
-					var _p5 = status;
-					if (_p5.ctor === 'EditStatus') {
+					var _p6 = status;
+					if (_p6.ctor === 'EditStatus') {
 						return {
 							ctor: '::',
 							_0: _elm_lang$html$Html_Events$onClick(msg),
@@ -11752,13 +11945,13 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 								_1: {ctor: '[]'}
 							});
 					};
-					var _p6 = bar;
-					if (_p6.ctor === 'Bar') {
-						var _p7 = _p6._0;
-						if (_p7.ctor === '[]') {
+					var _p7 = bar;
+					if (_p7.ctor === 'Bar') {
+						var _p8 = _p7._0;
+						if (_p8.ctor === '[]') {
 							return _elm_lang$html$Html$text('');
 						} else {
-							if (_p7._1.ctor === '[]') {
+							if (_p8._1.ctor === '[]') {
 								return barCellWithSvg(
 									{
 										ctor: '::',
@@ -11784,13 +11977,13 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 											{
 												ctor: '::',
 												_0: _elm_lang$svg$Svg$text(
-													_open_chords_charts$chart_editor$Music_Chord$toString(_p7._0)),
+													_open_chords_charts$chart_editor$Music_Chord$toString(_p8._0)),
 												_1: {ctor: '[]'}
 											}),
 										_1: {ctor: '[]'}
 									});
 							} else {
-								if (_p7._1._1.ctor === '[]') {
+								if (_p8._1._1.ctor === '[]') {
 									return barCellWithSvg(
 										{
 											ctor: '::',
@@ -11846,7 +12039,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 													{
 														ctor: '::',
 														_0: _elm_lang$svg$Svg$text(
-															_open_chords_charts$chart_editor$Music_Chord$toString(_p7._0)),
+															_open_chords_charts$chart_editor$Music_Chord$toString(_p8._0)),
 														_1: {ctor: '[]'}
 													}),
 												_1: {
@@ -11877,7 +12070,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 														{
 															ctor: '::',
 															_0: _elm_lang$svg$Svg$text(
-																_open_chords_charts$chart_editor$Music_Chord$toString(_p7._1._0)),
+																_open_chords_charts$chart_editor$Music_Chord$toString(_p8._1._0)),
 															_1: {ctor: '[]'}
 														}),
 													_1: {ctor: '[]'}
@@ -11885,7 +12078,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 											}
 										});
 								} else {
-									if (_p7._1._1._1.ctor === '[]') {
+									if (_p8._1._1._1.ctor === '[]') {
 										return barCellWithSvg(
 											{
 												ctor: '::',
@@ -11963,7 +12156,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 															{
 																ctor: '::',
 																_0: _elm_lang$svg$Svg$text(
-																	_open_chords_charts$chart_editor$Music_Chord$toString(_p7._0)),
+																	_open_chords_charts$chart_editor$Music_Chord$toString(_p8._0)),
 																_1: {ctor: '[]'}
 															}),
 														_1: {
@@ -11990,7 +12183,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 																{
 																	ctor: '::',
 																	_0: _elm_lang$svg$Svg$text(
-																		_open_chords_charts$chart_editor$Music_Chord$toString(_p7._1._0)),
+																		_open_chords_charts$chart_editor$Music_Chord$toString(_p8._1._0)),
 																	_1: {ctor: '[]'}
 																}),
 															_1: {
@@ -12017,7 +12210,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 																	{
 																		ctor: '::',
 																		_0: _elm_lang$svg$Svg$text(
-																			_open_chords_charts$chart_editor$Music_Chord$toString(_p7._1._1._0)),
+																			_open_chords_charts$chart_editor$Music_Chord$toString(_p8._1._1._0)),
 																		_1: {ctor: '[]'}
 																	}),
 																_1: {ctor: '[]'}
@@ -12027,7 +12220,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 												}
 											});
 									} else {
-										if (_p7._1._1._1._1.ctor === '[]') {
+										if (_p8._1._1._1._1.ctor === '[]') {
 											return barCellWithSvg(
 												{
 													ctor: '::',
@@ -12105,7 +12298,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 																{
 																	ctor: '::',
 																	_0: _elm_lang$svg$Svg$text(
-																		_open_chords_charts$chart_editor$Music_Chord$toString(_p7._0)),
+																		_open_chords_charts$chart_editor$Music_Chord$toString(_p8._0)),
 																	_1: {ctor: '[]'}
 																}),
 															_1: {
@@ -12132,7 +12325,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 																	{
 																		ctor: '::',
 																		_0: _elm_lang$svg$Svg$text(
-																			_open_chords_charts$chart_editor$Music_Chord$toString(_p7._1._0)),
+																			_open_chords_charts$chart_editor$Music_Chord$toString(_p8._1._0)),
 																		_1: {ctor: '[]'}
 																	}),
 																_1: {
@@ -12159,7 +12352,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 																		{
 																			ctor: '::',
 																			_0: _elm_lang$svg$Svg$text(
-																				_open_chords_charts$chart_editor$Music_Chord$toString(_p7._1._1._0)),
+																				_open_chords_charts$chart_editor$Music_Chord$toString(_p8._1._1._0)),
 																			_1: {ctor: '[]'}
 																		}),
 																	_1: {
@@ -12186,7 +12379,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 																			{
 																				ctor: '::',
 																				_0: _elm_lang$svg$Svg$text(
-																					_open_chords_charts$chart_editor$Music_Chord$toString(_p7._1._1._1._0)),
+																					_open_chords_charts$chart_editor$Music_Chord$toString(_p8._1._1._1._0)),
 																				_1: {ctor: '[]'}
 																			}),
 																		_1: {ctor: '[]'}
@@ -12231,14 +12424,14 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 										_0: _elm_lang$svg$Svg$text(
 											function () {
 												var dash = '–';
-												var _p8 = previousBar;
-												if (_p8.ctor === 'Nothing') {
+												var _p9 = previousBar;
+												if (_p9.ctor === 'Nothing') {
 													return dash;
 												} else {
-													var _p9 = _p8._0;
-													if (_p9.ctor === 'Bar') {
+													var _p10 = _p9._0;
+													if (_p10.ctor === 'Bar') {
 														return _elm_lang$core$Native_Utils.eq(
-															_elm_lang$core$List$length(_p9._0),
+															_elm_lang$core$List$length(_p10._0),
 															2) ? '٪' : dash;
 													} else {
 														return dash;
@@ -12254,8 +12447,47 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 				_1: {ctor: '[]'}
 			});
 	});
-var _open_chords_charts$chart_editor$ChartCard$viewSelectNote = F2(
-	function (selectedNote, noteToMsg) {
+var _open_chords_charts$chart_editor$ChartCard$qualitySelect = F2(
+	function (selectedQuality, qualityToMsg) {
+		return A2(
+			_elm_lang$html$Html$select,
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html_Events$on,
+					'change',
+					A2(
+						_elm_lang$core$Json_Decode$map,
+						qualityToMsg,
+						A2(_elm_lang$core$Json_Decode$andThen, _open_chords_charts$chart_editor$ChartCard$qualityDecoder, _elm_lang$html$Html_Events$targetValue))),
+				_1: {ctor: '[]'}
+			},
+			A2(
+				_elm_lang$core$List$map,
+				function (quality) {
+					var qualityStr = _open_chords_charts$chart_editor$Music_Chord$qualityToString(quality);
+					return A2(
+						_elm_lang$html$Html$option,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$selected(
+								_elm_lang$core$Native_Utils.eq(quality, selectedQuality)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$value(qualityStr),
+								_1: {ctor: '[]'}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(qualityStr),
+							_1: {ctor: '[]'}
+						});
+				},
+				_open_chords_charts$chart_editor$Music_Chord$qualities));
+	});
+var _open_chords_charts$chart_editor$ChartCard$noteSelect = F3(
+	function (notes, selectedNote, noteToMsg) {
 		return A2(
 			_elm_lang$html$Html$select,
 			{
@@ -12271,36 +12503,35 @@ var _open_chords_charts$chart_editor$ChartCard$viewSelectNote = F2(
 			},
 			A2(
 				_elm_lang$core$List$map,
-				function (_p10) {
-					var _p11 = _p10;
-					var _p12 = _p11._1;
+				function (note) {
+					var noteStr = _open_chords_charts$chart_editor$Music_Note$toString(note);
 					return A2(
 						_elm_lang$html$Html$option,
 						{
 							ctor: '::',
 							_0: _elm_lang$html$Html_Attributes$selected(
-								_elm_lang$core$Native_Utils.eq(_p11._0, selectedNote)),
+								_elm_lang$core$Native_Utils.eq(note, selectedNote)),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$value(_p12),
+								_0: _elm_lang$html$Html_Attributes$value(noteStr),
 								_1: {ctor: '[]'}
 							}
 						},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text(_p12),
+							_0: _elm_lang$html$Html$text(noteStr),
 							_1: {ctor: '[]'}
 						});
 				},
-				_open_chords_charts$chart_editor$Music_Note$notes));
+				notes));
 	});
 var _open_chords_charts$chart_editor$ChartCard$removePartAtIndex = F2(
 	function (partIndex, chart) {
 		var newParts = A2(
 			_elm_lang$core$List$filterMap,
-			function (_p13) {
-				var _p14 = _p13;
-				return _elm_lang$core$Native_Utils.eq(partIndex, _p14._0) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(_p14._1);
+			function (_p11) {
+				var _p12 = _p11;
+				return _elm_lang$core$Native_Utils.eq(partIndex, _p12._0) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(_p12._1);
 			},
 			A2(
 				_elm_lang$core$List$indexedMap,
@@ -12349,7 +12580,7 @@ var _open_chords_charts$chart_editor$ChartCard$getBarAtReference = F2(
 var _open_chords_charts$chart_editor$ChartCard$youFoundABugMessage = 'Should never happen – you found a bug :-)';
 var _open_chords_charts$chart_editor$ChartCard$nbMaxChordsInBar = 4;
 var _open_chords_charts$chart_editor$ChartCard$nbBarsByRow = 8;
-var _open_chords_charts$chart_editor$ChartCard$defaultChord = A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$noteC, _open_chords_charts$chart_editor$Music_Chord$Major);
+var _open_chords_charts$chart_editor$ChartCard$defaultChord = A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$C, _open_chords_charts$chart_editor$Music_Chord$Major);
 var _open_chords_charts$chart_editor$ChartCard$defaultBar = _open_chords_charts$chart_editor$Music_Chart$Bar(
 	{
 		ctor: '::',
@@ -12416,13 +12647,13 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 						{status: newStatus}));
 			});
 		var parse = function (chartStr) {
-			var _p15 = A2(_elm_tools$parser$Parser$run, _open_chords_charts$chart_editor$Parsers$chart, chartStr);
-			if (_p15.ctor === 'Ok') {
+			var _p13 = A2(_elm_tools$parser$Parser$run, _open_chords_charts$chart_editor$Parsers$chart, chartStr);
+			if (_p13.ctor === 'Ok') {
 				return _elm_lang$core$Native_Utils.update(
 					model,
-					{chart: _p15._0});
+					{chart: _p13._0});
 			} else {
-				var _p16 = A2(_elm_lang$core$Debug$log, 'Error parsing chart', _p15._0);
+				var _p14 = A2(_elm_lang$core$Debug$log, 'Error parsing chart', _p13._0);
 				return model;
 			}
 		};
@@ -12431,11 +12662,11 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 				var newStatus = _open_chords_charts$chart_editor$ChartCard$EditStatus(
 					_open_chords_charts$chart_editor$ChartCard$PartSelection(partIndex));
 				var chart = model.chart;
-				var newParts = function (_p17) {
-					var _p18 = _p17;
+				var newParts = function (_p15) {
+					var _p16 = _p15;
 					return A2(
 						_elm_lang$core$Basics_ops['++'],
-						_p18._0,
+						_p16._0,
 						A2(
 							_elm_lang$core$Basics_ops['++'],
 							{
@@ -12443,7 +12674,7 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 								_0: part,
 								_1: {ctor: '[]'}
 							},
-							_p18._1));
+							_p16._1));
 				}(
 					A2(_elm_community$list_extra$List_Extra$splitAt, partIndex, model.chart.parts));
 				var newChart = _elm_lang$core$Native_Utils.update(
@@ -12456,22 +12687,22 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 						model,
 						{status: newStatus}));
 			});
-		var _p19 = msg;
-		switch (_p19.ctor) {
+		var _p17 = msg;
+		switch (_p17.ctor) {
 			case 'AddBar':
-				var _p23 = _p19._0;
+				var _p21 = _p17._0;
 				var newStatus = _open_chords_charts$chart_editor$ChartCard$EditStatus(
-					_open_chords_charts$chart_editor$ChartCard$BarSelection(_p23));
+					_open_chords_charts$chart_editor$ChartCard$BarSelection(_p21));
 				var newChart = A3(
 					_open_chords_charts$chart_editor$ChartCard$updatePartAtIndex,
-					_p23.partIndex,
+					_p21.partIndex,
 					_open_chords_charts$chart_editor$Music_Chart$mapPartBars(
-						function (_p20) {
-							return function (_p21) {
-								var _p22 = _p21;
+						function (_p18) {
+							return function (_p19) {
+								var _p20 = _p19;
 								return A2(
 									_elm_lang$core$Basics_ops['++'],
-									_p22._0,
+									_p20._0,
 									A2(
 										_elm_lang$core$Basics_ops['++'],
 										{
@@ -12479,9 +12710,9 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 											_0: _open_chords_charts$chart_editor$ChartCard$defaultBar,
 											_1: {ctor: '[]'}
 										},
-										_p22._1));
+										_p20._1));
 							}(
-								A2(_elm_community$list_extra$List_Extra$splitAt, _p23.barIndex, _p20));
+								A2(_elm_community$list_extra$List_Extra$splitAt, _p21.barIndex, _p18));
 						}),
 					model.chart);
 				return A2(
@@ -12493,7 +12724,7 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 			case 'AddChord':
 				var newChart = A3(
 					_open_chords_charts$chart_editor$ChartCard$updateBarAt,
-					_p19._0,
+					_p17._0,
 					_open_chords_charts$chart_editor$Music_Chart$mapBarChords(
 						function (chords) {
 							return A2(
@@ -12508,14 +12739,14 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 					model.chart);
 				return A2(updateChartAndChartStr, newChart, model);
 			case 'AddPart':
-				return A3(addPart, _p19._0, _open_chords_charts$chart_editor$ChartCard$defaultPart, model);
+				return A3(addPart, _p17._0, _open_chords_charts$chart_editor$ChartCard$defaultPart, model);
 			case 'DuplicatePart':
-				var _p25 = _p19._0;
-				var _p24 = A2(_elm_community$list_extra$List_Extra$getAt, _p25, model.chart.parts);
-				if (_p24.ctor === 'Nothing') {
+				var _p23 = _p17._0;
+				var _p22 = A2(_elm_community$list_extra$List_Extra$getAt, _p23, model.chart.parts);
+				if (_p22.ctor === 'Nothing') {
 					return model;
 				} else {
-					return A3(addPart, _p25 + 1, _p24._0, model);
+					return A3(addPart, _p23 + 1, _p22._0, model);
 				}
 			case 'Edit':
 				var newStatus = _open_chords_charts$chart_editor$ChartCard$EditStatus(
@@ -12525,32 +12756,32 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 					model,
 					{status: newStatus});
 			case 'MovePart':
-				var _p27 = _p19._0;
-				var _p26 = A2(_elm_community$list_extra$List_Extra$getAt, _p27, model.chart.parts);
-				if (_p26.ctor === 'Nothing') {
+				var _p25 = _p17._0;
+				var _p24 = A2(_elm_community$list_extra$List_Extra$getAt, _p25, model.chart.parts);
+				if (_p24.ctor === 'Nothing') {
 					return model;
 				} else {
 					return A3(
 						addPart,
-						_p19._1,
-						_p26._0,
-						A2(removePart, _p27, model));
+						_p17._1,
+						_p24._0,
+						A2(removePart, _p25, model));
 				}
 			case 'RemoveBar':
-				var _p28 = _p19._0;
+				var _p26 = _p17._0;
 				var newChart = A3(
 					_open_chords_charts$chart_editor$ChartCard$updatePartAtIndex,
-					_p28.partIndex,
+					_p26.partIndex,
 					_open_chords_charts$chart_editor$Music_Chart$mapPartBars(
-						_elm_community$list_extra$List_Extra$removeAt(_p28.barIndex)),
+						_elm_community$list_extra$List_Extra$removeAt(_p26.barIndex)),
 					model.chart);
 				var nbBars = _elm_lang$core$List$length(
-					A2(_open_chords_charts$chart_editor$Music_Chart$getBarsOfPartByIndex, _p28.partIndex, newChart));
-				var newBarIndex = (_elm_lang$core$Native_Utils.cmp(_p28.barIndex, nbBars - 1) > 0) ? A2(_elm_lang$core$Basics$max, 0, nbBars - 1) : _p28.barIndex;
+					A2(_open_chords_charts$chart_editor$Music_Chart$getBarsOfPartByIndex, _p26.partIndex, newChart));
+				var newBarIndex = (_elm_lang$core$Native_Utils.cmp(_p26.barIndex, nbBars - 1) > 0) ? A2(_elm_lang$core$Basics$max, 0, nbBars - 1) : _p26.barIndex;
 				var newStatus = _open_chords_charts$chart_editor$ChartCard$EditStatus(
 					_open_chords_charts$chart_editor$ChartCard$BarSelection(
 						_elm_lang$core$Native_Utils.update(
-							_p28,
+							_p26,
 							{barIndex: newBarIndex})));
 				return A2(
 					updateChartAndChartStr,
@@ -12561,13 +12792,13 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 			case 'RemoveChord':
 				var newChart = A3(
 					_open_chords_charts$chart_editor$ChartCard$updateBarAt,
-					_p19._0,
+					_p17._0,
 					_open_chords_charts$chart_editor$Music_Chart$mapBarChords(
-						_elm_community$list_extra$List_Extra$removeAt(_p19._1)),
+						_elm_community$list_extra$List_Extra$removeAt(_p17._1)),
 					model.chart);
 				return A2(updateChartAndChartStr, newChart, model);
 			case 'RemovePart':
-				return A2(removePart, _p19._0, model);
+				return A2(removePart, _p17._0, model);
 			case 'Save':
 				return function (model) {
 					return _elm_lang$core$Native_Utils.update(
@@ -12577,36 +12808,36 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 					parse(model.chartStr));
 			case 'SelectBar':
 				var newStatus = _open_chords_charts$chart_editor$ChartCard$EditStatus(
-					_open_chords_charts$chart_editor$ChartCard$BarSelection(_p19._0));
+					_open_chords_charts$chart_editor$ChartCard$BarSelection(_p17._0));
 				return _elm_lang$core$Native_Utils.update(
 					model,
 					{status: newStatus});
 			case 'SelectPart':
 				var newStatus = _open_chords_charts$chart_editor$ChartCard$EditStatus(
-					_open_chords_charts$chart_editor$ChartCard$PartSelection(_p19._0));
+					_open_chords_charts$chart_editor$ChartCard$PartSelection(_p17._0));
 				return _elm_lang$core$Native_Utils.update(
 					model,
 					{status: newStatus});
 			case 'SetBarRepeat':
 				var newChart = A3(
 					_open_chords_charts$chart_editor$ChartCard$updateBarAt,
-					_p19._0,
-					function (_p29) {
-						return _p19._1 ? _open_chords_charts$chart_editor$Music_Chart$BarRepeat : _open_chords_charts$chart_editor$ChartCard$defaultBar;
+					_p17._0,
+					function (_p27) {
+						return _p17._1 ? _open_chords_charts$chart_editor$Music_Chart$BarRepeat : _open_chords_charts$chart_editor$ChartCard$defaultBar;
 					},
 					model.chart);
 				return A2(updateChartAndChartStr, newChart, model);
 			case 'SetPartName':
-				var _p31 = _p19._1;
+				var _p29 = _p17._1;
 				var newChart = A3(
 					_open_chords_charts$chart_editor$ChartCard$updatePartAtIndex,
-					_p19._0,
+					_p17._0,
 					function (part) {
-						var _p30 = part;
-						if (_p30.ctor === 'Part') {
-							return A2(_open_chords_charts$chart_editor$Music_Chart$Part, _p31, _p30._1);
+						var _p28 = part;
+						if (_p28.ctor === 'Part') {
+							return A2(_open_chords_charts$chart_editor$Music_Chart$Part, _p29, _p28._1);
 						} else {
-							return _open_chords_charts$chart_editor$Music_Chart$PartRepeat(_p31);
+							return _open_chords_charts$chart_editor$Music_Chart$PartRepeat(_p29);
 						}
 					},
 					model.chart);
@@ -12614,10 +12845,10 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 			case 'SetPartRepeat':
 				var newChart = A3(
 					_open_chords_charts$chart_editor$ChartCard$updatePartAtIndex,
-					_p19._0,
+					_p17._0,
 					function (part) {
 						var partName = _open_chords_charts$chart_editor$Music_Chart$getPartName(part);
-						return _p19._1 ? _open_chords_charts$chart_editor$Music_Chart$PartRepeat(partName) : A2(
+						return _p17._1 ? _open_chords_charts$chart_editor$Music_Chart$PartRepeat(partName) : A2(
 							_open_chords_charts$chart_editor$Music_Chart$Part,
 							partName,
 							{
@@ -12631,23 +12862,23 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 			case 'SetChord':
 				var newChart = A3(
 					_open_chords_charts$chart_editor$ChartCard$updateBarAt,
-					_p19._0,
+					_p17._0,
 					_open_chords_charts$chart_editor$Music_Chart$mapBarChords(
 						_elm_lang$core$List$indexedMap(
 							F2(
 								function (chordIndex1, chord1) {
-									return _elm_lang$core$Native_Utils.eq(_p19._1, chordIndex1) ? _p19._2 : chord1;
+									return _elm_lang$core$Native_Utils.eq(_p17._1, chordIndex1) ? _p17._2 : chord1;
 								}))),
 					model.chart);
 				return A2(updateChartAndChartStr, newChart, model);
 			case 'SetViewKey':
 				return _elm_lang$core$Native_Utils.update(
 					model,
-					{viewedKey: _p19._0});
+					{viewedKey: _p17._0});
 			case 'TextAreaInput':
 				return _elm_lang$core$Native_Utils.update(
 					model,
-					{chartStr: _p19._0});
+					{chartStr: _p17._0});
 			default:
 				return parse(model.chartStr);
 		}
@@ -12684,27 +12915,27 @@ var _open_chords_charts$chart_editor$ChartCard$SelectBar = function (a) {
 var _open_chords_charts$chart_editor$ChartCard$viewPart = F4(
 	function (chart, status, partIndex, part) {
 		var isBarSelected = function (barIndex) {
-			var _p32 = status;
-			if (_p32.ctor === 'EditStatus') {
-				var _p33 = _p32._0;
-				if (_p33.ctor === 'BarSelection') {
-					var _p34 = _p33._0;
-					return _elm_lang$core$Native_Utils.eq(partIndex, _p34.partIndex) && _elm_lang$core$Native_Utils.eq(barIndex, _p34.barIndex);
+			var _p30 = status;
+			if (_p30.ctor === 'EditStatus') {
+				var _p31 = _p30._0;
+				if (_p31.ctor === 'BarSelection') {
+					var _p32 = _p31._0;
+					return _elm_lang$core$Native_Utils.eq(partIndex, _p32.partIndex) && _elm_lang$core$Native_Utils.eq(barIndex, _p32.barIndex);
 				} else {
-					return _elm_lang$core$Native_Utils.eq(partIndex, _p33._0);
+					return _elm_lang$core$Native_Utils.eq(partIndex, _p31._0);
 				}
 			} else {
 				return false;
 			}
 		};
 		var isPartSelected = function () {
-			var _p35 = status;
-			if (_p35.ctor === 'EditStatus') {
-				var _p36 = _p35._0;
-				if (_p36.ctor === 'BarSelection') {
+			var _p33 = status;
+			if (_p33.ctor === 'EditStatus') {
+				var _p34 = _p33._0;
+				if (_p34.ctor === 'BarSelection') {
 					return false;
 				} else {
-					return _elm_lang$core$Native_Utils.eq(partIndex, _p36._0);
+					return _elm_lang$core$Native_Utils.eq(partIndex, _p34._0);
 				}
 			} else {
 				return false;
@@ -12716,8 +12947,8 @@ var _open_chords_charts$chart_editor$ChartCard$viewPart = F4(
 				A2(
 					_elm_lang$core$Basics_ops['++'],
 					function () {
-						var _p37 = status;
-						if (_p37.ctor === 'EditStatus') {
+						var _p35 = status;
+						if (_p35.ctor === 'EditStatus') {
 							return {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onClick(
@@ -12748,8 +12979,8 @@ var _open_chords_charts$chart_editor$ChartCard$viewPart = F4(
 					_1: {ctor: '[]'}
 				});
 		};
-		var _p38 = part;
-		if (_p38.ctor === 'Part') {
+		var _p36 = part;
+		if (_p36.ctor === 'Part') {
 			return A2(
 				_elm_lang$core$List$indexedMap,
 				F2(
@@ -12764,7 +12995,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewPart = F4(
 							{
 								ctor: '::',
 								_0: partCell(
-									_elm_lang$core$Native_Utils.eq(rowIndex, 0) ? _p38._0 : ''),
+									_elm_lang$core$Native_Utils.eq(rowIndex, 0) ? _p36._0 : ''),
 								_1: function () {
 									var emptyBar = A2(
 										_elm_lang$html$Html$div,
@@ -12797,8 +13028,8 @@ var _open_chords_charts$chart_editor$ChartCard$viewPart = F4(
 										rowBars);
 									var nbPaddingBars = _open_chords_charts$chart_editor$ChartCard$nbBarsByRow - _elm_lang$core$List$length(nonEmptyBars);
 									var paddingBars = A2(_elm_lang$core$List$repeat, nbPaddingBars, emptyBar);
-									var _p39 = status;
-									if (_p39.ctor === 'EditStatus') {
+									var _p37 = status;
+									if (_p37.ctor === 'EditStatus') {
 										return A2(_elm_lang$core$Basics_ops['++'], nonEmptyBars, paddingBars);
 									} else {
 										return A2(_elm_lang$core$Basics_ops['++'], paddingBars, nonEmptyBars);
@@ -12806,7 +13037,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewPart = F4(
 								}()
 							});
 					}),
-				A2(_elm_community$list_extra$List_Extra$greedyGroupsOf, _open_chords_charts$chart_editor$ChartCard$nbBarsByRow, _p38._1));
+				A2(_elm_community$list_extra$List_Extra$greedyGroupsOf, _open_chords_charts$chart_editor$ChartCard$nbBarsByRow, _p36._1));
 		} else {
 			return {
 				ctor: '::',
@@ -12819,7 +13050,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewPart = F4(
 					},
 					{
 						ctor: '::',
-						_0: partCell(_p38._0),
+						_0: partCell(_p36._0),
 						_1: A2(
 							_elm_lang$core$List$indexedMap,
 							F2(
@@ -12869,6 +13100,258 @@ var _open_chords_charts$chart_editor$ChartCard$AddBar = function (a) {
 var _open_chords_charts$chart_editor$ChartCard$Secondary = {ctor: 'Secondary'};
 var _open_chords_charts$chart_editor$ChartCard$Primary = {ctor: 'Primary'};
 var _open_chords_charts$chart_editor$ChartCard$NotPressed = {ctor: 'NotPressed'};
+var _open_chords_charts$chart_editor$ChartCard$viewBarEditor = F3(
+	function (chart, barReference, bar) {
+		var barRepeatCheckbox = function (isChecked) {
+			return A2(
+				_elm_lang$html$Html$label,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$checked(isChecked),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onCheck(
+									_open_chords_charts$chart_editor$ChartCard$SetBarRepeat(barReference)),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(' repeated bar'),
+						_1: {ctor: '[]'}
+					}
+				});
+		};
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				function () {
+					var _p38 = bar;
+					if (_p38.ctor === 'Bar') {
+						var _p43 = _p38._0;
+						return A2(
+							_elm_lang$core$Basics_ops['++'],
+							{
+								ctor: '::',
+								_0: _open_chords_charts$chart_editor$ChartCard$toolbar(
+									{
+										ctor: '::',
+										_0: barRepeatCheckbox(false),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							},
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								A2(
+									_elm_lang$core$List$indexedMap,
+									F2(
+										function (chordIndex, _p39) {
+											var _p40 = _p39;
+											var _p42 = _p40._1;
+											var _p41 = _p40._0;
+											return _open_chords_charts$chart_editor$ChartCard$toolbar(
+												{
+													ctor: '::',
+													_0: A3(
+														_open_chords_charts$chart_editor$ChartCard$noteSelect,
+														_open_chords_charts$chart_editor$Music_Note$notes,
+														_p41,
+														function (selectedNote) {
+															return A3(
+																_open_chords_charts$chart_editor$ChartCard$SetChord,
+																barReference,
+																chordIndex,
+																A2(_open_chords_charts$chart_editor$Music_Chord$Chord, selectedNote, _p42));
+														}),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_open_chords_charts$chart_editor$ChartCard$qualitySelect,
+															_p42,
+															function (selectedQuality) {
+																return A3(
+																	_open_chords_charts$chart_editor$ChartCard$SetChord,
+																	barReference,
+																	chordIndex,
+																	A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _p41, selectedQuality));
+															}),
+														_1: {
+															ctor: '::',
+															_0: A4(
+																_open_chords_charts$chart_editor$ChartCard$button,
+																_open_chords_charts$chart_editor$ChartCard$Secondary,
+																_open_chords_charts$chart_editor$ChartCard$NotPressed,
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$disabled(
+																		_elm_lang$core$Native_Utils.eq(
+																			_elm_lang$core$List$length(_p43),
+																			1)),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Events$onClick(
+																			A2(_open_chords_charts$chart_editor$ChartCard$RemoveChord, barReference, chordIndex)),
+																		_1: {
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Attributes$class('ml1'),
+																			_1: {ctor: '[]'}
+																		}
+																	}
+																},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text('Remove chord'),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														}
+													}
+												});
+										}),
+									_p43),
+								{
+									ctor: '::',
+									_0: _open_chords_charts$chart_editor$ChartCard$toolbar(
+										{
+											ctor: '::',
+											_0: A4(
+												_open_chords_charts$chart_editor$ChartCard$button,
+												_open_chords_charts$chart_editor$ChartCard$Secondary,
+												_open_chords_charts$chart_editor$ChartCard$NotPressed,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$disabled(
+														_elm_lang$core$Native_Utils.eq(
+															_elm_lang$core$List$length(_p43),
+															_open_chords_charts$chart_editor$ChartCard$nbMaxChordsInBar)),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onClick(
+															_open_chords_charts$chart_editor$ChartCard$AddChord(barReference)),
+														_1: {ctor: '[]'}
+													}
+												},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('Add chord in bar'),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}));
+					} else {
+						return {
+							ctor: '::',
+							_0: _open_chords_charts$chart_editor$ChartCard$toolbar(
+								{
+									ctor: '::',
+									_0: barRepeatCheckbox(true),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						};
+					}
+				}(),
+				{
+					ctor: '::',
+					_0: _open_chords_charts$chart_editor$ChartCard$toolbar(
+						{
+							ctor: '::',
+							_0: A4(
+								_open_chords_charts$chart_editor$ChartCard$button,
+								_open_chords_charts$chart_editor$ChartCard$Secondary,
+								_open_chords_charts$chart_editor$ChartCard$NotPressed,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('mr1'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(
+											_open_chords_charts$chart_editor$ChartCard$AddBar(barReference)),
+										_1: {ctor: '[]'}
+									}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Add bar before'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A4(
+									_open_chords_charts$chart_editor$ChartCard$button,
+									_open_chords_charts$chart_editor$ChartCard$Secondary,
+									_open_chords_charts$chart_editor$ChartCard$NotPressed,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('mr1'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onClick(
+												_open_chords_charts$chart_editor$ChartCard$AddBar(
+													_elm_lang$core$Native_Utils.update(
+														barReference,
+														{barIndex: barReference.barIndex + 1}))),
+											_1: {ctor: '[]'}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Add bar after'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: function () {
+										var isLastBarInPart = _elm_lang$core$Native_Utils.eq(
+											_elm_lang$core$List$length(
+												A2(_open_chords_charts$chart_editor$Music_Chart$getBarsOfPartByIndex, barReference.partIndex, chart)),
+											1);
+										return A4(
+											_open_chords_charts$chart_editor$ChartCard$button,
+											_open_chords_charts$chart_editor$ChartCard$Secondary,
+											_open_chords_charts$chart_editor$ChartCard$NotPressed,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('mr1'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$disabled(isLastBarInPart),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onClick(
+															_open_chords_charts$chart_editor$ChartCard$RemoveBar(barReference)),
+														_1: {ctor: '[]'}
+													}
+												}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Remove bar'),
+												_1: {ctor: '[]'}
+											});
+									}(),
+									_1: {ctor: '[]'}
+								}
+							}
+						}),
+					_1: {ctor: '[]'}
+				}));
+	});
 var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 	function (chart, partIndex, part) {
 		var partRepeatCheckbox = function (isChecked) {
@@ -12946,8 +13429,8 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 				A2(
 					_elm_lang$core$Basics_ops['++'],
 					function () {
-						var _p40 = part;
-						if (_p40.ctor === 'PartRepeat') {
+						var _p44 = part;
+						if (_p44.ctor === 'PartRepeat') {
 							return {ctor: '[]'};
 						} else {
 							return {
@@ -12991,7 +13474,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 																A2(
 																	_open_chords_charts$chart_editor$ChartCard$BarReference,
 																	partIndex,
-																	_elm_lang$core$List$length(_p40._1)))),
+																	_elm_lang$core$List$length(_p44._1)))),
 														_1: {ctor: '[]'}
 													}
 												},
@@ -13165,341 +13648,16 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 						_1: {ctor: '[]'}
 					})));
 	});
-var _open_chords_charts$chart_editor$ChartCard$Pressed = {ctor: 'Pressed'};
-var _open_chords_charts$chart_editor$ChartCard$viewNoteSelector = F2(
-	function (preSelectedNote, noteToMsg) {
-		return A2(
-			_elm_lang$html$Html$div,
-			{ctor: '[]'},
-			A2(
-				_elm_lang$core$List$map,
-				function (_p41) {
-					var _p42 = _p41;
-					var _p43 = _p42._0;
-					return A4(
-						_open_chords_charts$chart_editor$ChartCard$button,
-						_open_chords_charts$chart_editor$ChartCard$Secondary,
-						_elm_lang$core$Native_Utils.eq(_p43, preSelectedNote) ? _open_chords_charts$chart_editor$ChartCard$Pressed : _open_chords_charts$chart_editor$ChartCard$NotPressed,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('mr1 w3 tc'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onClick(
-									noteToMsg(_p43)),
-								_1: {ctor: '[]'}
-							}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text(_p42._1),
-							_1: {ctor: '[]'}
-						});
-				},
-				_open_chords_charts$chart_editor$Music_Note$notes));
-	});
-var _open_chords_charts$chart_editor$ChartCard$viewQualitySelector = F2(
-	function (preSelectedQuality, qualityToMsg) {
-		return A2(
-			_elm_lang$html$Html$div,
-			{ctor: '[]'},
-			A2(
-				_elm_lang$core$List$map,
-				function (_p44) {
-					var _p45 = _p44;
-					var _p47 = _p45._0;
-					return A4(
-						_open_chords_charts$chart_editor$ChartCard$button,
-						_open_chords_charts$chart_editor$ChartCard$Secondary,
-						_elm_lang$core$Native_Utils.eq(_p47, preSelectedQuality) ? _open_chords_charts$chart_editor$ChartCard$Pressed : _open_chords_charts$chart_editor$ChartCard$NotPressed,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('mr1 tc'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onClick(
-									qualityToMsg(_p47)),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$title(
-										_elm_lang$core$Basics$toString(_p47)),
-									_1: {ctor: '[]'}
-								}
-							}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text(
-								function () {
-									var _p46 = _p45._1;
-									if (_p46 === '') {
-										return 'M';
-									} else {
-										return _p46;
-									}
-								}()),
-							_1: {ctor: '[]'}
-						});
-				},
-				_open_chords_charts$chart_editor$Music_Chord$qualities));
-	});
-var _open_chords_charts$chart_editor$ChartCard$viewBarEditor = F3(
-	function (chart, barReference, bar) {
-		var barRepeatCheckbox = function (isChecked) {
-			return A2(
-				_elm_lang$html$Html$label,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$input,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$checked(isChecked),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onCheck(
-									_open_chords_charts$chart_editor$ChartCard$SetBarRepeat(barReference)),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-									_1: {ctor: '[]'}
-								}
-							}
-						},
-						{ctor: '[]'}),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(' repeated bar'),
-						_1: {ctor: '[]'}
-					}
-				});
-		};
-		return A2(
-			_elm_lang$html$Html$div,
-			{ctor: '[]'},
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				function () {
-					var _p48 = bar;
-					if (_p48.ctor === 'Bar') {
-						var _p53 = _p48._0;
-						return A2(
-							_elm_lang$core$Basics_ops['++'],
-							{
-								ctor: '::',
-								_0: _open_chords_charts$chart_editor$ChartCard$toolbar(
-									{
-										ctor: '::',
-										_0: barRepeatCheckbox(false),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							},
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								A2(
-									_elm_lang$core$List$indexedMap,
-									F2(
-										function (chordIndex, _p49) {
-											var _p50 = _p49;
-											var _p52 = _p50._1;
-											var _p51 = _p50._0;
-											return _open_chords_charts$chart_editor$ChartCard$toolbar(
-												{
-													ctor: '::',
-													_0: A2(
-														_open_chords_charts$chart_editor$ChartCard$viewNoteSelector,
-														_p51,
-														function (selectedNote) {
-															return A3(
-																_open_chords_charts$chart_editor$ChartCard$SetChord,
-																barReference,
-																chordIndex,
-																A2(_open_chords_charts$chart_editor$Music_Chord$Chord, selectedNote, _p52));
-														}),
-													_1: {
-														ctor: '::',
-														_0: A2(
-															_open_chords_charts$chart_editor$ChartCard$viewQualitySelector,
-															_p52,
-															function (selectedQuality) {
-																return A3(
-																	_open_chords_charts$chart_editor$ChartCard$SetChord,
-																	barReference,
-																	chordIndex,
-																	A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _p51, selectedQuality));
-															}),
-														_1: {
-															ctor: '::',
-															_0: A4(
-																_open_chords_charts$chart_editor$ChartCard$button,
-																_open_chords_charts$chart_editor$ChartCard$Secondary,
-																_open_chords_charts$chart_editor$ChartCard$NotPressed,
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$disabled(
-																		_elm_lang$core$Native_Utils.eq(
-																			_elm_lang$core$List$length(_p53),
-																			1)),
-																	_1: {
-																		ctor: '::',
-																		_0: _elm_lang$html$Html_Events$onClick(
-																			A2(_open_chords_charts$chart_editor$ChartCard$RemoveChord, barReference, chordIndex)),
-																		_1: {ctor: '[]'}
-																	}
-																},
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html$text('Remove chord'),
-																	_1: {ctor: '[]'}
-																}),
-															_1: {ctor: '[]'}
-														}
-													}
-												});
-										}),
-									_p53),
-								{
-									ctor: '::',
-									_0: _open_chords_charts$chart_editor$ChartCard$toolbar(
-										{
-											ctor: '::',
-											_0: A4(
-												_open_chords_charts$chart_editor$ChartCard$button,
-												_open_chords_charts$chart_editor$ChartCard$Secondary,
-												_open_chords_charts$chart_editor$ChartCard$NotPressed,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$disabled(
-														_elm_lang$core$Native_Utils.eq(
-															_elm_lang$core$List$length(_p53),
-															_open_chords_charts$chart_editor$ChartCard$nbMaxChordsInBar)),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(
-															_open_chords_charts$chart_editor$ChartCard$AddChord(barReference)),
-														_1: {ctor: '[]'}
-													}
-												},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('Add chord in bar'),
-													_1: {ctor: '[]'}
-												}),
-											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
-								}));
-					} else {
-						return {
-							ctor: '::',
-							_0: _open_chords_charts$chart_editor$ChartCard$toolbar(
-								{
-									ctor: '::',
-									_0: barRepeatCheckbox(true),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						};
-					}
-				}(),
-				{
-					ctor: '::',
-					_0: _open_chords_charts$chart_editor$ChartCard$toolbar(
-						{
-							ctor: '::',
-							_0: A4(
-								_open_chords_charts$chart_editor$ChartCard$button,
-								_open_chords_charts$chart_editor$ChartCard$Secondary,
-								_open_chords_charts$chart_editor$ChartCard$NotPressed,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('mr1'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(
-											_open_chords_charts$chart_editor$ChartCard$AddBar(barReference)),
-										_1: {ctor: '[]'}
-									}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Add bar before'),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
-								ctor: '::',
-								_0: A4(
-									_open_chords_charts$chart_editor$ChartCard$button,
-									_open_chords_charts$chart_editor$ChartCard$Secondary,
-									_open_chords_charts$chart_editor$ChartCard$NotPressed,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('mr1'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(
-												_open_chords_charts$chart_editor$ChartCard$AddBar(
-													_elm_lang$core$Native_Utils.update(
-														barReference,
-														{barIndex: barReference.barIndex + 1}))),
-											_1: {ctor: '[]'}
-										}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Add bar after'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {
-									ctor: '::',
-									_0: function () {
-										var isLastBarInPart = _elm_lang$core$Native_Utils.eq(
-											_elm_lang$core$List$length(
-												A2(_open_chords_charts$chart_editor$Music_Chart$getBarsOfPartByIndex, barReference.partIndex, chart)),
-											1);
-										return A4(
-											_open_chords_charts$chart_editor$ChartCard$button,
-											_open_chords_charts$chart_editor$ChartCard$Secondary,
-											_open_chords_charts$chart_editor$ChartCard$NotPressed,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('mr1'),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$disabled(isLastBarInPart),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(
-															_open_chords_charts$chart_editor$ChartCard$RemoveBar(barReference)),
-														_1: {ctor: '[]'}
-													}
-												}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('Remove bar'),
-												_1: {ctor: '[]'}
-											});
-									}(),
-									_1: {ctor: '[]'}
-								}
-							}
-						}),
-					_1: {ctor: '[]'}
-				}));
-	});
-var _open_chords_charts$chart_editor$ChartCard$view = function (_p54) {
-	var _p55 = _p54;
-	var _p68 = _p55.viewedKey;
-	var _p67 = _p55.status;
-	var _p66 = _p55.chartStr;
-	var _p65 = _p55.chart;
+var _open_chords_charts$chart_editor$ChartCard$view = function (_p45) {
+	var _p46 = _p45;
+	var _p59 = _p46.viewedKey;
+	var _p58 = _p46.status;
+	var _p57 = _p46.chartStr;
+	var _p56 = _p46.chart;
 	return A3(
 		_open_chords_charts$chart_editor$ChartCard$card,
-		_p65.title,
-		_open_chords_charts$chart_editor$Music_Chart$keyToString(_p65.key),
+		_p56.title,
+		_open_chords_charts$chart_editor$Music_Chart$keyToString(_p56.key),
 		{
 			ctor: '::',
 			_0: A2(
@@ -13511,24 +13669,24 @@ var _open_chords_charts$chart_editor$ChartCard$view = function (_p54) {
 				},
 				function () {
 					var viewedChart = function () {
-						var _p56 = _p67;
-						if (_p56.ctor === 'EditStatus') {
-							return _p65;
+						var _p47 = _p58;
+						if (_p47.ctor === 'EditStatus') {
+							return _p56;
 						} else {
-							return A2(_open_chords_charts$chart_editor$Music_Chart$transpose, _p68, _p65);
+							return A2(_open_chords_charts$chart_editor$Music_Chart$transpose, _p59, _p56);
 						}
 					}();
 					return _elm_lang$core$List$concat(
 						A2(
 							_elm_lang$core$List$indexedMap,
-							A2(_open_chords_charts$chart_editor$ChartCard$viewPart, _p65, _p67),
+							A2(_open_chords_charts$chart_editor$ChartCard$viewPart, _p56, _p58),
 							viewedChart.parts));
 				}()),
 			_1: {
 				ctor: '::',
 				_0: function () {
-					var _p57 = _p67;
-					if (_p57.ctor === 'EditStatus') {
+					var _p48 = _p58;
+					if (_p48.ctor === 'EditStatus') {
 						return A2(
 							_elm_lang$html$Html$div,
 							{ctor: '[]'},
@@ -13571,22 +13729,22 @@ var _open_chords_charts$chart_editor$ChartCard$view = function (_p54) {
 									_1: {
 										ctor: '::',
 										_0: function () {
-											var _p58 = _p57._0;
-											if (_p58.ctor === 'BarSelection') {
-												var _p60 = _p58._0;
-												var _p59 = A2(_open_chords_charts$chart_editor$ChartCard$getBarAtReference, _p60, _p65);
-												if (_p59.ctor === 'Nothing') {
+											var _p49 = _p48._0;
+											if (_p49.ctor === 'BarSelection') {
+												var _p51 = _p49._0;
+												var _p50 = A2(_open_chords_charts$chart_editor$ChartCard$getBarAtReference, _p51, _p56);
+												if (_p50.ctor === 'Nothing') {
 													return _elm_lang$html$Html$text(_open_chords_charts$chart_editor$ChartCard$youFoundABugMessage);
 												} else {
-													return A3(_open_chords_charts$chart_editor$ChartCard$viewBarEditor, _p65, _p60, _p59._0);
+													return A3(_open_chords_charts$chart_editor$ChartCard$viewBarEditor, _p56, _p51, _p50._0);
 												}
 											} else {
-												var _p62 = _p58._0;
-												var _p61 = A2(_elm_community$list_extra$List_Extra$getAt, _p62, _p65.parts);
-												if (_p61.ctor === 'Nothing') {
+												var _p53 = _p49._0;
+												var _p52 = A2(_elm_community$list_extra$List_Extra$getAt, _p53, _p56.parts);
+												if (_p52.ctor === 'Nothing') {
 													return _elm_lang$html$Html$text(_open_chords_charts$chart_editor$ChartCard$youFoundABugMessage);
 												} else {
-													return A3(_open_chords_charts$chart_editor$ChartCard$viewPartEditor, _p65, _p62, _p61._0);
+													return A3(_open_chords_charts$chart_editor$ChartCard$viewPartEditor, _p56, _p53, _p52._0);
 												}
 											}
 										}(),
@@ -13601,7 +13759,7 @@ var _open_chords_charts$chart_editor$ChartCard$view = function (_p54) {
 														ctor: '::',
 														_0: _elm_lang$html$Html_Attributes$rows(
 															_elm_lang$core$List$length(
-																_elm_lang$core$String$lines(_p66)) + 5),
+																_elm_lang$core$String$lines(_p57)) + 5),
 														_1: {
 															ctor: '::',
 															_0: _elm_lang$html$Html_Events$onInput(_open_chords_charts$chart_editor$ChartCard$TextAreaInput),
@@ -13610,7 +13768,7 @@ var _open_chords_charts$chart_editor$ChartCard$view = function (_p54) {
 																_0: _elm_lang$html$Html_Attributes$spellcheck(false),
 																_1: {
 																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$value(_p66),
+																	_0: _elm_lang$html$Html_Attributes$value(_p57),
 																	_1: {ctor: '[]'}
 																}
 															}
@@ -13641,14 +13799,15 @@ var _open_chords_charts$chart_editor$ChartCard$view = function (_p54) {
 												_1: {
 													ctor: '::',
 													_0: function () {
-														var _p63 = _p68;
-														var viewedNote = _p63._0;
-														return A2(
-															_open_chords_charts$chart_editor$ChartCard$viewSelectNote,
+														var _p54 = _p59;
+														var viewedNote = _p54._0;
+														return A3(
+															_open_chords_charts$chart_editor$ChartCard$noteSelect,
+															_open_chords_charts$chart_editor$Music_Note$notes,
 															viewedNote,
-															function (_p64) {
+															function (_p55) {
 																return _open_chords_charts$chart_editor$ChartCard$SetViewKey(
-																	_open_chords_charts$chart_editor$Music_Chart$Key(_p64));
+																	_open_chords_charts$chart_editor$Music_Chart$Key(_p55));
 															});
 													}(),
 													_1: {ctor: '[]'}
@@ -13681,6 +13840,7 @@ var _open_chords_charts$chart_editor$ChartCard$view = function (_p54) {
 			}
 		});
 };
+var _open_chords_charts$chart_editor$ChartCard$Pressed = {ctor: 'Pressed'};
 
 var _open_chords_charts$chart_editor$Samples$allOfMe = '\n---\ntitle: All of me\nkey: C\n---\n\n= A\nC - E7 - A7 - Dm -\n\n= B\nE7 - Am - D7 - G7 -\n\n= A\n\n= C\nF Fm C A7 Dø G7 C -\n';
 var _open_chords_charts$chart_editor$Samples$test = '\n---\ntitle: Chords chart grammar\nkey: C\n---\n\n= A\nC - A7/D7 - Gm/Eb7/D7 Ab/C7/Fm/Eb6\n';
