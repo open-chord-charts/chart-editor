@@ -97,13 +97,13 @@ type Key
 
 
 transpose : Key -> Chart -> Chart
-transpose ((Key newKeyNote) as newKey) ({ key, parts } as chart) =
+transpose ((Key newKeyNote) as newKey) chart =
     let
         (Key keyNote) =
-            key
+            chart.key
 
         newParts =
-            parts
+            chart.parts
                 |> List.map (transposePart (Note.interval keyNote newKeyNote))
     in
         { chart | key = newKey, parts = newParts }
@@ -111,18 +111,12 @@ transpose ((Key newKeyNote) as newKey) ({ key, parts } as chart) =
 
 transposePart : Interval -> Part -> Part
 transposePart interval part =
-    case part of
-        Part name bars ->
-            Part name (List.map (transposeBar interval) bars)
-
-        _ ->
-            part
+    part |> mapPartBars (List.map (transposeBar interval))
 
 
 transposeBar : Interval -> Bar -> Bar
 transposeBar interval bar =
-    bar
-        |> mapBarChords (List.map (Chord.transpose interval))
+    bar |> mapBarChords (List.map (Chord.transpose interval))
 
 
 
