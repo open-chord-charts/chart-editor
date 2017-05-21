@@ -41,9 +41,18 @@ type alias Interval =
     Int
 
 
+{-| All notes, including unfrequently used B sharp, C flat, E sharp and F flat.
+-}
+allNotes : List Note
+allNotes =
+    [ Af, A, As, Bf, B, Bs, Cf, C, Cs, Df, D, Ds, Ef, E, Es, Ff, F, Fs, Gf, G, Gs ]
+
+
+{-| Commonly used notes, excluding B sharp, C flat, E sharp and F flat.
+-}
 notes : List Note
 notes =
-    [ Af, A, As, Bf, B, Bs, Cf, C, Cs, Df, D, Ds, Ef, E, Es, Ff, F, Fs, Gf, G, Gs ]
+    [ Af, A, As, Bf, B, C, Cs, Df, D, Ds, Ef, E, F, Fs, Gf, G, Gs ]
 
 
 notesAndStrings : List ( Note, String )
