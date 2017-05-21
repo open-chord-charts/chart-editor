@@ -7,7 +7,7 @@ import Json.Decode as Decode exposing (Decoder)
 import List.Extra as List
 import Music.Chart exposing (..)
 import Music.Chord exposing (..)
-import Music.Note as Note exposing (..)
+import Music.Note exposing (..)
 import Parser
 import Parsers
 import String
@@ -20,7 +20,7 @@ import Svg.Attributes
 
 defaultChord : Chord
 defaultChord =
-    Chord noteC Major
+    Chord C Major
 
 
 defaultBar : Bar
@@ -506,7 +506,7 @@ view { chart, chartStr, status, viewedKey } =
                                 (Key viewedNote) =
                                     viewedKey
                               in
-                                viewSelectNote viewedNote (Key >> SetViewKey)
+                                noteSelect Music.Note.notes viewedNote (Key >> SetViewKey)
                             ]
                         ]
                     , button Primary
@@ -539,11 +539,12 @@ viewBarEditor chart barReference bar =
                                 |> List.indexedMap
                                     (\chordIndex (Chord note quality) ->
                                         toolbar
-                                            [ viewNoteSelector note
+                                            [ noteSelect Music.Note.notes
+                                                note
                                                 (\selectedNote ->
                                                     SetChord barReference chordIndex (Chord selectedNote quality)
                                                 )
-                                            , viewQualitySelector quality
+                                            , qualitySelect quality
                                                 (\selectedQuality ->
                                                     SetChord barReference chordIndex (Chord note selectedQuality)
                                                 )
@@ -551,6 +552,7 @@ viewBarEditor chart barReference bar =
                                                 NotPressed
                                                 [ disabled (List.length chords == 1)
                                                 , onClick (RemoveChord barReference chordIndex)
+                                                , class "ml1"
                                                 ]
                                                 [ text "Remove chord" ]
                                             ]
@@ -693,8 +695,8 @@ viewPartEditor chart partIndex part =
             )
 
 
-viewSelectNote : Note -> (Note -> Msg) -> Html Msg
-viewSelectNote selectedNote noteToMsg =
+noteSelect : List Note -> Note -> (Note -> Msg) -> Html Msg
+noteSelect notes selectedNote noteToMsg =
     select
         [ on "change"
             (targetValue
@@ -702,63 +704,43 @@ viewSelectNote selectedNote noteToMsg =
                 |> Decode.map noteToMsg
             )
         ]
-        (Note.notes
+        (notes
             |> List.map
-                (\( note, noteName ) ->
-                    option
-                        [ selected (note == selectedNote)
-                        , value noteName
-                        ]
-                        [ text noteName ]
+                (\note ->
+                    let
+                        noteStr =
+                            Music.Note.toString note
+                    in
+                        option
+                            [ selected (note == selectedNote)
+                            , value noteStr
+                            ]
+                            [ text noteStr ]
                 )
         )
 
 
-viewNoteSelector : Note -> (Note -> Msg) -> Html Msg
-viewNoteSelector preSelectedNote noteToMsg =
-    div []
-        (Note.notes
-            |> List.map
-                (\( note, noteName ) ->
-                    button Secondary
-                        (if note == preSelectedNote then
-                            Pressed
-                         else
-                            NotPressed
-                        )
-                        [ class "mr1 w3 tc"
-                        , onClick (noteToMsg note)
-                        ]
-                        [ text noteName ]
-                )
-        )
-
-
-viewQualitySelector : Quality -> (Quality -> Msg) -> Html Msg
-viewQualitySelector preSelectedQuality qualityToMsg =
-    div []
+qualitySelect : Quality -> (Quality -> Msg) -> Html Msg
+qualitySelect selectedQuality qualityToMsg =
+    select
+        [ on "change"
+            (targetValue
+                |> Decode.andThen qualityDecoder
+                |> Decode.map qualityToMsg
+            )
+        ]
         (Music.Chord.qualities
             |> List.map
-                (\( quality, qualityName ) ->
-                    button Secondary
-                        (if quality == preSelectedQuality then
-                            Pressed
-                         else
-                            NotPressed
-                        )
-                        [ class "mr1 tc"
-                        , onClick (qualityToMsg quality)
-                        , title (Basics.toString quality)
-                        ]
-                        [ text
-                            (case qualityName of
-                                "" ->
-                                    "M"
-
-                                s ->
-                                    s
-                            )
-                        ]
+                (\quality ->
+                    let
+                        qualityStr =
+                            Music.Chord.qualityToString quality
+                    in
+                        option
+                            [ selected (quality == selectedQuality)
+                            , value qualityStr
+                            ]
+                            [ text qualityStr ]
                 )
         )
 
@@ -1168,9 +1150,19 @@ toolbar =
 
 noteDecoder : String -> Decoder Note
 noteDecoder string =
-    case Note.fromString string of
+    case Music.Note.fromString string of
         Just note ->
             Decode.succeed note
 
         Nothing ->
-            Decode.fail string
+            Decode.fail "Invalid note"
+
+
+qualityDecoder : String -> Decoder Quality
+qualityDecoder string =
+    case Music.Chord.qualityFromString string of
+        Just quality ->
+            Decode.succeed quality
+
+        Nothing ->
+            Decode.fail "Invalid quality"

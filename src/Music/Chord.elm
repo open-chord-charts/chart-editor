@@ -34,29 +34,35 @@ type Quality
     | Altered
 
 
-qualities : List ( Quality, String )
+qualities : List Quality
 qualities =
-    [ ( Major, "" )
-    , ( Minor, "m" )
-    , ( Augmented, "+" )
-    , ( MajorSixth, "6" )
-    , ( MinorSixth, "m6" )
-    , ( Seventh, "7" )
-    , ( MajorSeventh, "Δ" )
-    , ( MinorMajorSeventh, "mΔ" )
-    , ( MinorSeventh, "m7" )
-    , ( SeventhSus4, "7sus4" )
-    , ( Diminished, "o" )
-    , ( HalfDiminished, "ø" )
-    , ( Ninth, "9" )
-    , ( MajorMinorNinth, "9b" )
-    , ( MinorNinth, "m9" )
-    , ( AugmentedNinth, "9+" )
-    , ( SixthPlusNinth, "69" )
-    , ( AugmentedEleventh, "11+" )
-    , ( Thirteenth, "13" )
-    , ( Altered, "7alt" )
+    [ Major
+    , Minor
+    , Augmented
+    , MajorSixth
+    , MinorSixth
+    , Seventh
+    , MajorSeventh
+    , MinorMajorSeventh
+    , MinorSeventh
+    , SeventhSus4
+    , Diminished
+    , HalfDiminished
+    , Ninth
+    , MajorMinorNinth
+    , MinorNinth
+    , AugmentedNinth
+    , SixthPlusNinth
+    , AugmentedEleventh
+    , Thirteenth
+    , Altered
     ]
+
+
+qualitiesAndStrings : List ( Quality, String )
+qualitiesAndStrings =
+    qualities
+        |> List.map (\quality -> ( quality, qualityToStringHidingMajor quality ))
 
 
 
@@ -70,21 +76,85 @@ transpose interval (Chord note quality) =
 
 toString : Chord -> String
 toString (Chord note quality) =
-    Note.toString note ++ qualityToString quality
+    Note.toString note ++ (qualityToStringHidingMajor quality)
 
 
 qualityToString : Quality -> String
 qualityToString quality =
-    case qualities |> List.find (\( q, _ ) -> q == quality) of
-        Just ( _, s ) ->
-            s
+    case quality of
+        Major ->
+            "M"
 
-        Nothing ->
-            Debug.crash ("Tried to get quality: " ++ Basics.toString quality ++ " not in `qualities` list.")
+        Minor ->
+            "m"
+
+        Augmented ->
+            "+"
+
+        MajorSixth ->
+            "6"
+
+        MinorSixth ->
+            "m6"
+
+        Seventh ->
+            "7"
+
+        MajorSeventh ->
+            "Δ"
+
+        MinorMajorSeventh ->
+            "mΔ"
+
+        MinorSeventh ->
+            "m7"
+
+        SeventhSus4 ->
+            "7sus4"
+
+        Diminished ->
+            "o"
+
+        HalfDiminished ->
+            "ø"
+
+        Ninth ->
+            "9"
+
+        MajorMinorNinth ->
+            "9b"
+
+        MinorNinth ->
+            "m9"
+
+        AugmentedNinth ->
+            "9+"
+
+        SixthPlusNinth ->
+            "69"
+
+        AugmentedEleventh ->
+            "11+"
+
+        Thirteenth ->
+            "13"
+
+        Altered ->
+            "7alt"
+
+
+qualityToStringHidingMajor : Quality -> String
+qualityToStringHidingMajor quality =
+    case quality of
+        Major ->
+            ""
+
+        _ ->
+            qualityToString quality
 
 
 qualityFromString : String -> Maybe Quality
 qualityFromString s =
-    qualities
-        |> List.find (\( _, qualityName ) -> qualityName == s)
+    qualitiesAndStrings
+        |> List.find (\( _, qualityStr ) -> qualityStr == s)
         |> Maybe.map Tuple.first

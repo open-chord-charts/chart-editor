@@ -1,130 +1,191 @@
 module Music.Note exposing (..)
 
 import List.Extra as List
+import String
 
 
 -- TYPES
 
 
+{-| Af is A flat, As is A sharp
+-}
 type Note
-    = Note Int
+    = Af
+    | A
+    | As
+    | Bf
+    | B
+    | Bs
+    | Cf
+    | C
+    | Cs
+    | Df
+    | D
+    | Ds
+    | Ef
+    | E
+    | Es
+    | Ff
+    | F
+    | Fs
+    | Gf
+    | G
+    | Gs
+
+
+type alias OctaveIndex =
+    Int
 
 
 type alias Interval =
     Int
 
 
-
--- CONSTANTS
-
-
-notes : List ( Note, String )
+notes : List Note
 notes =
-    [ ( noteAb, "Ab" )
-    , ( noteA, "A" )
-    , ( noteBb, "Bb" )
-    , ( noteB, "B" )
-    , ( noteC, "C" )
-    , ( noteDb, "Db" )
-    , ( noteD, "D" )
-    , ( noteEb, "Eb" )
-    , ( noteE, "E" )
-    , ( noteF, "F" )
-    , ( noteGb, "Gb" )
-    , ( noteG, "G" )
-    ]
+    [ Af, A, As, Bf, B, Bs, Cf, C, Cs, Df, D, Ds, Ef, E, Es, Ff, F, Fs, Gf, G, Gs ]
+
+
+notesAndStrings : List ( Note, String )
+notesAndStrings =
+    notes |> List.map (\note -> ( note, toString note ))
 
 
 
 -- FUNCTIONS
 
 
-noteAb : Note
-noteAb =
-    Note 0
+toOctaveIndex : Note -> OctaveIndex
+toOctaveIndex note =
+    case note of
+        Af ->
+            0
+
+        A ->
+            1
+
+        As ->
+            2
+
+        Bf ->
+            2
+
+        B ->
+            3
+
+        Bs ->
+            4
+
+        Cf ->
+            3
+
+        C ->
+            4
+
+        Cs ->
+            5
+
+        Df ->
+            5
+
+        D ->
+            6
+
+        Ds ->
+            7
+
+        Ef ->
+            7
+
+        E ->
+            8
+
+        Es ->
+            9
+
+        Ff ->
+            8
+
+        F ->
+            9
+
+        Fs ->
+            10
+
+        Gf ->
+            10
+
+        G ->
+            11
+
+        Gs ->
+            0
 
 
-noteA : Note
-noteA =
-    Note 1
-
-
-noteBb : Note
-noteBb =
-    Note 2
-
-
-noteB : Note
-noteB =
-    Note 3
-
-
-noteC : Note
-noteC =
-    Note 4
-
-
-noteDb : Note
-noteDb =
-    Note 5
-
-
-noteD : Note
-noteD =
-    Note 6
-
-
-noteEb : Note
-noteEb =
-    Note 7
-
-
-noteE : Note
-noteE =
-    Note 8
-
-
-noteF : Note
-noteF =
-    Note 9
-
-
-noteGb : Note
-noteGb =
-    Note 10
-
-
-noteG : Note
-noteG =
-    Note 11
-
-
-transpose : Interval -> Note -> Note
-transpose interval (Note int) =
-    Note ((int + interval) % 12)
+fromOctaveIndex : OctaveIndex -> Note
+fromOctaveIndex octaveIndex =
+    let
+        selectedNotes =
+            [ Af, A, Bf, B, C, Df, D, Ef, E, F, Gf, G ]
+    in
+        selectedNotes |> getAtUnsafe octaveIndex
 
 
 interval : Note -> Note -> Interval
-interval (Note oldInt) (Note newInt) =
-    (newInt - oldInt) % 12
+interval low high =
+    let
+        lowOctaveIndex =
+            toOctaveIndex low
+
+        highOctaveIndex =
+            toOctaveIndex high
+    in
+        (highOctaveIndex - lowOctaveIndex) % 12
+
+
+transpose : Interval -> Note -> Note
+transpose interval note =
+    let
+        octaveIndex =
+            toOctaveIndex note
+    in
+        fromOctaveIndex (octaveIndex + interval)
 
 
 toString : Note -> String
-toString (Note int) =
+toString note =
     let
-        noteNames =
-            notes |> List.map Tuple.second
+        noteStr =
+            Basics.toString note
     in
-        case noteNames |> List.getAt (int % 12) of
-            Just noteName ->
-                noteName
-
-            Nothing ->
-                Debug.crash ("Tried to get an element outside of List (int: " ++ Basics.toString int ++ ").")
+        if noteStr |> String.endsWith "f" then
+            (noteStr |> String.dropRight 1) ++ "b"
+        else if noteStr |> String.endsWith "s" then
+            (noteStr |> String.dropRight 1) ++ "#"
+        else
+            noteStr
 
 
 fromString : String -> Maybe Note
 fromString s =
-    notes
-        |> List.find (\( _, noteName ) -> noteName == s)
+    notesAndStrings
+        |> List.find (\( _, noteStr ) -> noteStr == s)
         |> Maybe.map Tuple.first
+
+
+
+-- UNSAFE LIST FUNCTIONS
+
+
+getAtUnsafe : Int -> List a -> a
+getAtUnsafe index list =
+    let
+        cyclingIndex =
+            index % List.length list
+    in
+        case list |> List.getAt cyclingIndex of
+            Just item ->
+                item
+
+            Nothing ->
+                Debug.crash ("attempt to reach index " ++ Basics.toString cyclingIndex ++ " of list " ++ (Basics.toString list))

@@ -98,30 +98,30 @@ chord =
 
 quality : Parser Quality
 quality =
-    let
-        -- Sort qualities list to avoid having (Major, "") first, which would match in every cases.
-        sortedQualities =
-            Chord.qualities
-                |> List.sortBy (Tuple.second >> String.length)
-                |> List.reverse
-    in
-        inContext "quality" <|
-            oneOfTuples sortedQualities
+    inContext "quality" <|
+        oneOfTuples Chord.qualitiesAndStrings
 
 
 note : Parser Note
 note =
     inContext "note" <|
-        oneOfTuples Note.notes
+        oneOfTuples Note.notesAndStrings
 
 
 oneOfTuples : List ( a, String ) -> Parser a
 oneOfTuples tuples =
-    oneOf
-        (tuples
-            |> List.map
-                (\( x, name ) ->
-                    succeed x
-                        |. symbol name
-                )
-        )
+    let
+        -- Sort tuples to avoid having empty strings first, which would match in every cases.
+        sortTuples =
+            List.sortBy (Tuple.second >> String.length)
+                >> List.reverse
+    in
+        oneOf
+            (tuples
+                |> sortTuples
+                |> List.map
+                    (\( x, name ) ->
+                        succeed x
+                            |. symbol name
+                    )
+            )

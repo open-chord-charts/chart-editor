@@ -2,7 +2,7 @@ module Music.Chart exposing (..)
 
 import List.Extra as List
 import Music.Chord as Chord exposing (Chord)
-import Music.Note as Note exposing (Note, Interval)
+import Music.Note as Note exposing (Note(..), Interval)
 
 
 -- TYPES
@@ -97,32 +97,32 @@ type Key
 
 
 transpose : Key -> Chart -> Chart
-transpose newKey ({ key, parts } as chart) =
+transpose ((Key newKeyNote) as newKey) ({ key, parts } as chart) =
     let
-        interval : Key -> Key -> Interval
-        interval (Key oldNote) (Key newNote) =
-            Note.interval oldNote newNote
+        (Key keyNote) =
+            key
+
+        newParts =
+            parts
+                |> List.map (transposePart (Note.interval keyNote newKeyNote))
     in
-        { chart
-            | key = newKey
-            , parts = List.map (transposePart (interval key newKey)) parts
-        }
+        { chart | key = newKey, parts = newParts }
 
 
-transposePart : Int -> Part -> Part
-transposePart nbSemitones part =
+transposePart : Interval -> Part -> Part
+transposePart interval part =
     case part of
         Part name bars ->
-            Part name (List.map (transposeBar nbSemitones) bars)
+            Part name (List.map (transposeBar interval) bars)
 
         _ ->
             part
 
 
-transposeBar : Int -> Bar -> Bar
-transposeBar nbSemitones bar =
+transposeBar : Interval -> Bar -> Bar
+transposeBar interval bar =
     bar
-        |> mapBarChords (List.map (Chord.transpose nbSemitones))
+        |> mapBarChords (List.map (Chord.transpose interval))
 
 
 
