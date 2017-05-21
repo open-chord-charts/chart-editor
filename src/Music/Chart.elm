@@ -63,6 +63,20 @@ getBarsOfPartByIndex partIndex chart =
                     []
 
 
+getPartByName : PartName -> Chart -> Maybe Part
+getPartByName partName chart =
+    chart.parts
+        |> List.find
+            (\part ->
+                case part of
+                    Part partName1 _ ->
+                        partName == partName1
+
+                    PartRepeat _ ->
+                        False
+            )
+
+
 getPartName : Part -> PartName
 getPartName part =
     case part of

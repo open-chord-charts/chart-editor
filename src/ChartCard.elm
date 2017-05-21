@@ -741,6 +741,21 @@ viewPart chart status partIndex part =
 
                 ViewStatus ->
                     False
+
+        addPaddingBars : List (Html msg) -> List (Html msg)
+        addPaddingBars bars =
+            let
+                nbPaddingBars =
+                    nbBarsByRow - List.length bars
+
+                emptyBar =
+                    div [ class "dtc" ]
+                        [ barCell [] ]
+
+                paddingBars =
+                    List.repeat nbPaddingBars emptyBar
+            in
+                paddingBars ++ bars
     in
         case part of
             Part partName bars ->
@@ -755,43 +770,25 @@ viewPart chart status partIndex part =
                                      else
                                         ""
                                     )
-                                    :: (let
-                                            nonEmptyBars =
-                                                rowBars
-                                                    |> List.indexedMap
-                                                        (\barIndexInRow bar ->
-                                                            let
-                                                                barIndex =
-                                                                    rowIndex * nbBarsByRow + barIndexInRow
+                                    :: (rowBars
+                                            |> List.indexedMap
+                                                (\barIndexInRow bar ->
+                                                    let
+                                                        barIndex =
+                                                            rowIndex * nbBarsByRow + barIndexInRow
 
-                                                                previousBar =
-                                                                    rowBars
-                                                                        |> List.getAt (barIndexInRow - 1)
-                                                            in
-                                                                viewBar
-                                                                    status
-                                                                    (isBarSelected barIndex)
-                                                                    (SelectBar (BarReference partIndex barIndex))
-                                                                    bar
-                                                                    previousBar
-                                                        )
-
-                                            nbPaddingBars =
-                                                nbBarsByRow - List.length nonEmptyBars
-
-                                            emptyBar =
-                                                div [ class "dtc" ]
-                                                    [ barCell [] ]
-
-                                            paddingBars =
-                                                List.repeat nbPaddingBars emptyBar
-                                        in
-                                            case status of
-                                                EditStatus _ ->
-                                                    nonEmptyBars ++ paddingBars
-
-                                                ViewStatus ->
-                                                    paddingBars ++ nonEmptyBars
+                                                        previousBar =
+                                                            rowBars
+                                                                |> List.getAt (barIndexInRow - 1)
+                                                    in
+                                                        viewBar
+                                                            status
+                                                            (isBarSelected barIndex)
+                                                            (SelectBar (BarReference partIndex barIndex))
+                                                            bar
+                                                            previousBar
+                                                )
+                                            |> addPaddingBars
                                        )
                                 )
                         )
@@ -799,11 +796,17 @@ viewPart chart status partIndex part =
             PartRepeat partName ->
                 [ div [ class "dt-row h2" ]
                     (partCell partName
-                        :: (List.repeat nbBarsByRow BarRepeat
-                                |> List.indexedMap
-                                    (\barIndex bar ->
-                                        viewBar status (isBarSelected barIndex) (SelectPart partIndex) bar Nothing
-                                    )
+                        :: (case Music.Chart.getPartByName partName chart of
+                                Just (Part _ bars) ->
+                                    List.repeat (List.length bars) BarRepeat
+                                        |> List.indexedMap
+                                            (\barIndex bar ->
+                                                viewBar status (isBarSelected barIndex) (SelectPart partIndex) bar Nothing
+                                            )
+                                        |> addPaddingBars
+
+                                _ ->
+                                    []
                            )
                     )
                 ]
