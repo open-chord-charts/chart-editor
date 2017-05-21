@@ -695,56 +695,6 @@ viewPartEditor chart partIndex part =
             )
 
 
-noteSelect : List Note -> Note -> (Note -> Msg) -> Html Msg
-noteSelect notes selectedNote noteToMsg =
-    select
-        [ on "change"
-            (targetValue
-                |> Decode.andThen noteDecoder
-                |> Decode.map noteToMsg
-            )
-        ]
-        (notes
-            |> List.map
-                (\note ->
-                    let
-                        noteStr =
-                            Music.Note.toString note
-                    in
-                        option
-                            [ selected (note == selectedNote)
-                            , value noteStr
-                            ]
-                            [ text noteStr ]
-                )
-        )
-
-
-qualitySelect : Quality -> (Quality -> Msg) -> Html Msg
-qualitySelect selectedQuality qualityToMsg =
-    select
-        [ on "change"
-            (targetValue
-                |> Decode.andThen qualityDecoder
-                |> Decode.map qualityToMsg
-            )
-        ]
-        (Music.Chord.qualities
-            |> List.map
-                (\quality ->
-                    let
-                        qualityStr =
-                            Music.Chord.qualityToString quality
-                    in
-                        option
-                            [ selected (quality == selectedQuality)
-                            , value qualityStr
-                            ]
-                            [ text qualityStr ]
-                )
-        )
-
-
 viewPart : Chart -> ChartStatus -> PartIndex -> Part -> List (Html Msg)
 viewPart chart status partIndex part =
     let
@@ -1136,6 +1086,56 @@ card titleLeft titleRight children =
             ]
          ]
             ++ children
+        )
+
+
+noteSelect : List Note -> Note -> (Note -> Msg) -> Html Msg
+noteSelect notes selectedNote noteToMsg =
+    select
+        [ on "change"
+            (targetValue
+                |> Decode.andThen noteDecoder
+                |> Decode.map noteToMsg
+            )
+        ]
+        (notes
+            |> List.map
+                (\note ->
+                    let
+                        noteStr =
+                            Music.Note.toString note
+                    in
+                        option
+                            [ selected (note == selectedNote)
+                            , value noteStr
+                            ]
+                            [ text noteStr ]
+                )
+        )
+
+
+qualitySelect : Quality -> (Quality -> Msg) -> Html Msg
+qualitySelect selectedQuality qualityToMsg =
+    select
+        [ on "change"
+            (targetValue
+                |> Decode.andThen qualityDecoder
+                |> Decode.map qualityToMsg
+            )
+        ]
+        (Music.Chord.qualities
+            |> List.map
+                (\quality ->
+                    let
+                        qualityStr =
+                            Music.Chord.qualityToString quality
+                    in
+                        option
+                            [ selected (quality == selectedQuality)
+                            , value qualityStr
+                            ]
+                            [ text qualityStr ]
+                )
         )
 
 
