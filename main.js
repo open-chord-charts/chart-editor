@@ -6446,6 +6446,418 @@ var _elm_lang$core$Array$repeat = F2(
 	});
 var _elm_lang$core$Array$Array = {ctor: 'Array'};
 
+var _elm_lang$core$Task$onError = _elm_lang$core$Native_Scheduler.onError;
+var _elm_lang$core$Task$andThen = _elm_lang$core$Native_Scheduler.andThen;
+var _elm_lang$core$Task$spawnCmd = F2(
+	function (router, _p0) {
+		var _p1 = _p0;
+		return _elm_lang$core$Native_Scheduler.spawn(
+			A2(
+				_elm_lang$core$Task$andThen,
+				_elm_lang$core$Platform$sendToApp(router),
+				_p1._0));
+	});
+var _elm_lang$core$Task$fail = _elm_lang$core$Native_Scheduler.fail;
+var _elm_lang$core$Task$mapError = F2(
+	function (convert, task) {
+		return A2(
+			_elm_lang$core$Task$onError,
+			function (_p2) {
+				return _elm_lang$core$Task$fail(
+					convert(_p2));
+			},
+			task);
+	});
+var _elm_lang$core$Task$succeed = _elm_lang$core$Native_Scheduler.succeed;
+var _elm_lang$core$Task$map = F2(
+	function (func, taskA) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return _elm_lang$core$Task$succeed(
+					func(a));
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map2 = F3(
+	function (func, taskA, taskB) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return _elm_lang$core$Task$succeed(
+							A2(func, a, b));
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map3 = F4(
+	function (func, taskA, taskB, taskC) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (c) {
+								return _elm_lang$core$Task$succeed(
+									A3(func, a, b, c));
+							},
+							taskC);
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map4 = F5(
+	function (func, taskA, taskB, taskC, taskD) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (c) {
+								return A2(
+									_elm_lang$core$Task$andThen,
+									function (d) {
+										return _elm_lang$core$Task$succeed(
+											A4(func, a, b, c, d));
+									},
+									taskD);
+							},
+							taskC);
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map5 = F6(
+	function (func, taskA, taskB, taskC, taskD, taskE) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (c) {
+								return A2(
+									_elm_lang$core$Task$andThen,
+									function (d) {
+										return A2(
+											_elm_lang$core$Task$andThen,
+											function (e) {
+												return _elm_lang$core$Task$succeed(
+													A5(func, a, b, c, d, e));
+											},
+											taskE);
+									},
+									taskD);
+							},
+							taskC);
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$sequence = function (tasks) {
+	var _p3 = tasks;
+	if (_p3.ctor === '[]') {
+		return _elm_lang$core$Task$succeed(
+			{ctor: '[]'});
+	} else {
+		return A3(
+			_elm_lang$core$Task$map2,
+			F2(
+				function (x, y) {
+					return {ctor: '::', _0: x, _1: y};
+				}),
+			_p3._0,
+			_elm_lang$core$Task$sequence(_p3._1));
+	}
+};
+var _elm_lang$core$Task$onEffects = F3(
+	function (router, commands, state) {
+		return A2(
+			_elm_lang$core$Task$map,
+			function (_p4) {
+				return {ctor: '_Tuple0'};
+			},
+			_elm_lang$core$Task$sequence(
+				A2(
+					_elm_lang$core$List$map,
+					_elm_lang$core$Task$spawnCmd(router),
+					commands)));
+	});
+var _elm_lang$core$Task$init = _elm_lang$core$Task$succeed(
+	{ctor: '_Tuple0'});
+var _elm_lang$core$Task$onSelfMsg = F3(
+	function (_p7, _p6, _p5) {
+		return _elm_lang$core$Task$succeed(
+			{ctor: '_Tuple0'});
+	});
+var _elm_lang$core$Task$command = _elm_lang$core$Native_Platform.leaf('Task');
+var _elm_lang$core$Task$Perform = function (a) {
+	return {ctor: 'Perform', _0: a};
+};
+var _elm_lang$core$Task$perform = F2(
+	function (toMessage, task) {
+		return _elm_lang$core$Task$command(
+			_elm_lang$core$Task$Perform(
+				A2(_elm_lang$core$Task$map, toMessage, task)));
+	});
+var _elm_lang$core$Task$attempt = F2(
+	function (resultToMessage, task) {
+		return _elm_lang$core$Task$command(
+			_elm_lang$core$Task$Perform(
+				A2(
+					_elm_lang$core$Task$onError,
+					function (_p8) {
+						return _elm_lang$core$Task$succeed(
+							resultToMessage(
+								_elm_lang$core$Result$Err(_p8)));
+					},
+					A2(
+						_elm_lang$core$Task$andThen,
+						function (_p9) {
+							return _elm_lang$core$Task$succeed(
+								resultToMessage(
+									_elm_lang$core$Result$Ok(_p9)));
+						},
+						task))));
+	});
+var _elm_lang$core$Task$cmdMap = F2(
+	function (tagger, _p10) {
+		var _p11 = _p10;
+		return _elm_lang$core$Task$Perform(
+			A2(_elm_lang$core$Task$map, tagger, _p11._0));
+	});
+_elm_lang$core$Native_Platform.effectManagers['Task'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Task$init, onEffects: _elm_lang$core$Task$onEffects, onSelfMsg: _elm_lang$core$Task$onSelfMsg, tag: 'cmd', cmdMap: _elm_lang$core$Task$cmdMap};
+
+//import Native.Scheduler //
+
+var _elm_lang$core$Native_Time = function() {
+
+var now = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+{
+	callback(_elm_lang$core$Native_Scheduler.succeed(Date.now()));
+});
+
+function setInterval_(interval, task)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		var id = setInterval(function() {
+			_elm_lang$core$Native_Scheduler.rawSpawn(task);
+		}, interval);
+
+		return function() { clearInterval(id); };
+	});
+}
+
+return {
+	now: now,
+	setInterval_: F2(setInterval_)
+};
+
+}();
+var _elm_lang$core$Time$setInterval = _elm_lang$core$Native_Time.setInterval_;
+var _elm_lang$core$Time$spawnHelp = F3(
+	function (router, intervals, processes) {
+		var _p0 = intervals;
+		if (_p0.ctor === '[]') {
+			return _elm_lang$core$Task$succeed(processes);
+		} else {
+			var _p1 = _p0._0;
+			var spawnRest = function (id) {
+				return A3(
+					_elm_lang$core$Time$spawnHelp,
+					router,
+					_p0._1,
+					A3(_elm_lang$core$Dict$insert, _p1, id, processes));
+			};
+			var spawnTimer = _elm_lang$core$Native_Scheduler.spawn(
+				A2(
+					_elm_lang$core$Time$setInterval,
+					_p1,
+					A2(_elm_lang$core$Platform$sendToSelf, router, _p1)));
+			return A2(_elm_lang$core$Task$andThen, spawnRest, spawnTimer);
+		}
+	});
+var _elm_lang$core$Time$addMySub = F2(
+	function (_p2, state) {
+		var _p3 = _p2;
+		var _p6 = _p3._1;
+		var _p5 = _p3._0;
+		var _p4 = A2(_elm_lang$core$Dict$get, _p5, state);
+		if (_p4.ctor === 'Nothing') {
+			return A3(
+				_elm_lang$core$Dict$insert,
+				_p5,
+				{
+					ctor: '::',
+					_0: _p6,
+					_1: {ctor: '[]'}
+				},
+				state);
+		} else {
+			return A3(
+				_elm_lang$core$Dict$insert,
+				_p5,
+				{ctor: '::', _0: _p6, _1: _p4._0},
+				state);
+		}
+	});
+var _elm_lang$core$Time$inMilliseconds = function (t) {
+	return t;
+};
+var _elm_lang$core$Time$millisecond = 1;
+var _elm_lang$core$Time$second = 1000 * _elm_lang$core$Time$millisecond;
+var _elm_lang$core$Time$minute = 60 * _elm_lang$core$Time$second;
+var _elm_lang$core$Time$hour = 60 * _elm_lang$core$Time$minute;
+var _elm_lang$core$Time$inHours = function (t) {
+	return t / _elm_lang$core$Time$hour;
+};
+var _elm_lang$core$Time$inMinutes = function (t) {
+	return t / _elm_lang$core$Time$minute;
+};
+var _elm_lang$core$Time$inSeconds = function (t) {
+	return t / _elm_lang$core$Time$second;
+};
+var _elm_lang$core$Time$now = _elm_lang$core$Native_Time.now;
+var _elm_lang$core$Time$onSelfMsg = F3(
+	function (router, interval, state) {
+		var _p7 = A2(_elm_lang$core$Dict$get, interval, state.taggers);
+		if (_p7.ctor === 'Nothing') {
+			return _elm_lang$core$Task$succeed(state);
+		} else {
+			var tellTaggers = function (time) {
+				return _elm_lang$core$Task$sequence(
+					A2(
+						_elm_lang$core$List$map,
+						function (tagger) {
+							return A2(
+								_elm_lang$core$Platform$sendToApp,
+								router,
+								tagger(time));
+						},
+						_p7._0));
+			};
+			return A2(
+				_elm_lang$core$Task$andThen,
+				function (_p8) {
+					return _elm_lang$core$Task$succeed(state);
+				},
+				A2(_elm_lang$core$Task$andThen, tellTaggers, _elm_lang$core$Time$now));
+		}
+	});
+var _elm_lang$core$Time$subscription = _elm_lang$core$Native_Platform.leaf('Time');
+var _elm_lang$core$Time$State = F2(
+	function (a, b) {
+		return {taggers: a, processes: b};
+	});
+var _elm_lang$core$Time$init = _elm_lang$core$Task$succeed(
+	A2(_elm_lang$core$Time$State, _elm_lang$core$Dict$empty, _elm_lang$core$Dict$empty));
+var _elm_lang$core$Time$onEffects = F3(
+	function (router, subs, _p9) {
+		var _p10 = _p9;
+		var rightStep = F3(
+			function (_p12, id, _p11) {
+				var _p13 = _p11;
+				return {
+					ctor: '_Tuple3',
+					_0: _p13._0,
+					_1: _p13._1,
+					_2: A2(
+						_elm_lang$core$Task$andThen,
+						function (_p14) {
+							return _p13._2;
+						},
+						_elm_lang$core$Native_Scheduler.kill(id))
+				};
+			});
+		var bothStep = F4(
+			function (interval, taggers, id, _p15) {
+				var _p16 = _p15;
+				return {
+					ctor: '_Tuple3',
+					_0: _p16._0,
+					_1: A3(_elm_lang$core$Dict$insert, interval, id, _p16._1),
+					_2: _p16._2
+				};
+			});
+		var leftStep = F3(
+			function (interval, taggers, _p17) {
+				var _p18 = _p17;
+				return {
+					ctor: '_Tuple3',
+					_0: {ctor: '::', _0: interval, _1: _p18._0},
+					_1: _p18._1,
+					_2: _p18._2
+				};
+			});
+		var newTaggers = A3(_elm_lang$core$List$foldl, _elm_lang$core$Time$addMySub, _elm_lang$core$Dict$empty, subs);
+		var _p19 = A6(
+			_elm_lang$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			newTaggers,
+			_p10.processes,
+			{
+				ctor: '_Tuple3',
+				_0: {ctor: '[]'},
+				_1: _elm_lang$core$Dict$empty,
+				_2: _elm_lang$core$Task$succeed(
+					{ctor: '_Tuple0'})
+			});
+		var spawnList = _p19._0;
+		var existingDict = _p19._1;
+		var killTask = _p19._2;
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (newProcesses) {
+				return _elm_lang$core$Task$succeed(
+					A2(_elm_lang$core$Time$State, newTaggers, newProcesses));
+			},
+			A2(
+				_elm_lang$core$Task$andThen,
+				function (_p20) {
+					return A3(_elm_lang$core$Time$spawnHelp, router, spawnList, existingDict);
+				},
+				killTask));
+	});
+var _elm_lang$core$Time$Every = F2(
+	function (a, b) {
+		return {ctor: 'Every', _0: a, _1: b};
+	});
+var _elm_lang$core$Time$every = F2(
+	function (interval, tagger) {
+		return _elm_lang$core$Time$subscription(
+			A2(_elm_lang$core$Time$Every, interval, tagger));
+	});
+var _elm_lang$core$Time$subMap = F2(
+	function (f, _p21) {
+		var _p22 = _p21;
+		return A2(
+			_elm_lang$core$Time$Every,
+			_p22._0,
+			function (_p23) {
+				return f(
+					_p22._1(_p23));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Time'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Time$init, onEffects: _elm_lang$core$Time$onEffects, onSelfMsg: _elm_lang$core$Time$onSelfMsg, tag: 'sub', subMap: _elm_lang$core$Time$subMap};
+
 //import Maybe, Native.Array, Native.List, Native.Utils, Result //
 
 var _elm_lang$core$Native_Json = function() {
@@ -7095,6 +7507,196 @@ var _elm_lang$core$Json_Decode$int = _elm_lang$core$Native_Json.decodePrimitive(
 var _elm_lang$core$Json_Decode$bool = _elm_lang$core$Native_Json.decodePrimitive('bool');
 var _elm_lang$core$Json_Decode$string = _elm_lang$core$Native_Json.decodePrimitive('string');
 var _elm_lang$core$Json_Decode$Decoder = {ctor: 'Decoder'};
+
+var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
+var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
+var _elm_lang$core$Process$spawn = _elm_lang$core$Native_Scheduler.spawn;
+
+var _elm_lang$dom$Native_Dom = function() {
+
+var fakeNode = {
+	addEventListener: function() {},
+	removeEventListener: function() {}
+};
+
+var onDocument = on(typeof document !== 'undefined' ? document : fakeNode);
+var onWindow = on(typeof window !== 'undefined' ? window : fakeNode);
+
+function on(node)
+{
+	return function(eventName, decoder, toTask)
+	{
+		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+
+			function performTask(event)
+			{
+				var result = A2(_elm_lang$core$Json_Decode$decodeValue, decoder, event);
+				if (result.ctor === 'Ok')
+				{
+					_elm_lang$core$Native_Scheduler.rawSpawn(toTask(result._0));
+				}
+			}
+
+			node.addEventListener(eventName, performTask);
+
+			return function()
+			{
+				node.removeEventListener(eventName, performTask);
+			};
+		});
+	};
+}
+
+var rAF = typeof requestAnimationFrame !== 'undefined'
+	? requestAnimationFrame
+	: function(callback) { callback(); };
+
+function withNode(id, doStuff)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		rAF(function()
+		{
+			var node = document.getElementById(id);
+			if (node === null)
+			{
+				callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'NotFound', _0: id }));
+				return;
+			}
+			callback(_elm_lang$core$Native_Scheduler.succeed(doStuff(node)));
+		});
+	});
+}
+
+
+// FOCUS
+
+function focus(id)
+{
+	return withNode(id, function(node) {
+		node.focus();
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function blur(id)
+{
+	return withNode(id, function(node) {
+		node.blur();
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+
+// SCROLLING
+
+function getScrollTop(id)
+{
+	return withNode(id, function(node) {
+		return node.scrollTop;
+	});
+}
+
+function setScrollTop(id, desiredScrollTop)
+{
+	return withNode(id, function(node) {
+		node.scrollTop = desiredScrollTop;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function toBottom(id)
+{
+	return withNode(id, function(node) {
+		node.scrollTop = node.scrollHeight;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function getScrollLeft(id)
+{
+	return withNode(id, function(node) {
+		return node.scrollLeft;
+	});
+}
+
+function setScrollLeft(id, desiredScrollLeft)
+{
+	return withNode(id, function(node) {
+		node.scrollLeft = desiredScrollLeft;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function toRight(id)
+{
+	return withNode(id, function(node) {
+		node.scrollLeft = node.scrollWidth;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+
+// SIZE
+
+function width(options, id)
+{
+	return withNode(id, function(node) {
+		switch (options.ctor)
+		{
+			case 'Content':
+				return node.scrollWidth;
+			case 'VisibleContent':
+				return node.clientWidth;
+			case 'VisibleContentWithBorders':
+				return node.offsetWidth;
+			case 'VisibleContentWithBordersAndMargins':
+				var rect = node.getBoundingClientRect();
+				return rect.right - rect.left;
+		}
+	});
+}
+
+function height(options, id)
+{
+	return withNode(id, function(node) {
+		switch (options.ctor)
+		{
+			case 'Content':
+				return node.scrollHeight;
+			case 'VisibleContent':
+				return node.clientHeight;
+			case 'VisibleContentWithBorders':
+				return node.offsetHeight;
+			case 'VisibleContentWithBordersAndMargins':
+				var rect = node.getBoundingClientRect();
+				return rect.bottom - rect.top;
+		}
+	});
+}
+
+return {
+	onDocument: F3(onDocument),
+	onWindow: F3(onWindow),
+
+	focus: focus,
+	blur: blur,
+
+	getScrollTop: getScrollTop,
+	setScrollTop: F2(setScrollTop),
+	getScrollLeft: getScrollLeft,
+	setScrollLeft: F2(setScrollLeft),
+	toBottom: toBottom,
+	toRight: toRight,
+
+	height: F2(height),
+	width: F2(width)
+};
+
+}();
+
+var _elm_lang$dom$Dom_LowLevel$onWindow = _elm_lang$dom$Native_Dom.onWindow;
+var _elm_lang$dom$Dom_LowLevel$onDocument = _elm_lang$dom$Native_Dom.onDocument;
 
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrap;
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrapWithFlags;
@@ -9599,6 +10201,769 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _elm_lang$http$Native_Http = function() {
+
+
+// ENCODING AND DECODING
+
+function encodeUri(string)
+{
+	return encodeURIComponent(string);
+}
+
+function decodeUri(string)
+{
+	try
+	{
+		return _elm_lang$core$Maybe$Just(decodeURIComponent(string));
+	}
+	catch(e)
+	{
+		return _elm_lang$core$Maybe$Nothing;
+	}
+}
+
+
+// SEND REQUEST
+
+function toTask(request, maybeProgress)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		var xhr = new XMLHttpRequest();
+
+		configureProgress(xhr, maybeProgress);
+
+		xhr.addEventListener('error', function() {
+			callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'NetworkError' }));
+		});
+		xhr.addEventListener('timeout', function() {
+			callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'Timeout' }));
+		});
+		xhr.addEventListener('load', function() {
+			callback(handleResponse(xhr, request.expect.responseToResult));
+		});
+
+		try
+		{
+			xhr.open(request.method, request.url, true);
+		}
+		catch (e)
+		{
+			return callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'BadUrl', _0: request.url }));
+		}
+
+		configureRequest(xhr, request);
+		send(xhr, request.body);
+
+		return function() { xhr.abort(); };
+	});
+}
+
+function configureProgress(xhr, maybeProgress)
+{
+	if (maybeProgress.ctor === 'Nothing')
+	{
+		return;
+	}
+
+	xhr.addEventListener('progress', function(event) {
+		if (!event.lengthComputable)
+		{
+			return;
+		}
+		_elm_lang$core$Native_Scheduler.rawSpawn(maybeProgress._0({
+			bytes: event.loaded,
+			bytesExpected: event.total
+		}));
+	});
+}
+
+function configureRequest(xhr, request)
+{
+	function setHeader(pair)
+	{
+		xhr.setRequestHeader(pair._0, pair._1);
+	}
+
+	A2(_elm_lang$core$List$map, setHeader, request.headers);
+	xhr.responseType = request.expect.responseType;
+	xhr.withCredentials = request.withCredentials;
+
+	if (request.timeout.ctor === 'Just')
+	{
+		xhr.timeout = request.timeout._0;
+	}
+}
+
+function send(xhr, body)
+{
+	switch (body.ctor)
+	{
+		case 'EmptyBody':
+			xhr.send();
+			return;
+
+		case 'StringBody':
+			xhr.setRequestHeader('Content-Type', body._0);
+			xhr.send(body._1);
+			return;
+
+		case 'FormDataBody':
+			xhr.send(body._0);
+			return;
+	}
+}
+
+
+// RESPONSES
+
+function handleResponse(xhr, responseToResult)
+{
+	var response = toResponse(xhr);
+
+	if (xhr.status < 200 || 300 <= xhr.status)
+	{
+		response.body = xhr.responseText;
+		return _elm_lang$core$Native_Scheduler.fail({
+			ctor: 'BadStatus',
+			_0: response
+		});
+	}
+
+	var result = responseToResult(response);
+
+	if (result.ctor === 'Ok')
+	{
+		return _elm_lang$core$Native_Scheduler.succeed(result._0);
+	}
+	else
+	{
+		response.body = xhr.responseText;
+		return _elm_lang$core$Native_Scheduler.fail({
+			ctor: 'BadPayload',
+			_0: result._0,
+			_1: response
+		});
+	}
+}
+
+function toResponse(xhr)
+{
+	return {
+		status: { code: xhr.status, message: xhr.statusText },
+		headers: parseHeaders(xhr.getAllResponseHeaders()),
+		url: xhr.responseURL,
+		body: xhr.response
+	};
+}
+
+function parseHeaders(rawHeaders)
+{
+	var headers = _elm_lang$core$Dict$empty;
+
+	if (!rawHeaders)
+	{
+		return headers;
+	}
+
+	var headerPairs = rawHeaders.split('\u000d\u000a');
+	for (var i = headerPairs.length; i--; )
+	{
+		var headerPair = headerPairs[i];
+		var index = headerPair.indexOf('\u003a\u0020');
+		if (index > 0)
+		{
+			var key = headerPair.substring(0, index);
+			var value = headerPair.substring(index + 2);
+
+			headers = A3(_elm_lang$core$Dict$update, key, function(oldValue) {
+				if (oldValue.ctor === 'Just')
+				{
+					return _elm_lang$core$Maybe$Just(value + ', ' + oldValue._0);
+				}
+				return _elm_lang$core$Maybe$Just(value);
+			}, headers);
+		}
+	}
+
+	return headers;
+}
+
+
+// EXPECTORS
+
+function expectStringResponse(responseToResult)
+{
+	return {
+		responseType: 'text',
+		responseToResult: responseToResult
+	};
+}
+
+function mapExpect(func, expect)
+{
+	return {
+		responseType: expect.responseType,
+		responseToResult: function(response) {
+			var convertedResponse = expect.responseToResult(response);
+			return A2(_elm_lang$core$Result$map, func, convertedResponse);
+		}
+	};
+}
+
+
+// BODY
+
+function multipart(parts)
+{
+	var formData = new FormData();
+
+	while (parts.ctor !== '[]')
+	{
+		var part = parts._0;
+		formData.append(part._0, part._1);
+		parts = parts._1;
+	}
+
+	return { ctor: 'FormDataBody', _0: formData };
+}
+
+return {
+	toTask: F2(toTask),
+	expectStringResponse: expectStringResponse,
+	mapExpect: F2(mapExpect),
+	multipart: multipart,
+	encodeUri: encodeUri,
+	decodeUri: decodeUri
+};
+
+}();
+
+var _elm_lang$http$Http_Internal$map = F2(
+	function (func, request) {
+		return _elm_lang$core$Native_Utils.update(
+			request,
+			{
+				expect: A2(_elm_lang$http$Native_Http.mapExpect, func, request.expect)
+			});
+	});
+var _elm_lang$http$Http_Internal$RawRequest = F7(
+	function (a, b, c, d, e, f, g) {
+		return {method: a, headers: b, url: c, body: d, expect: e, timeout: f, withCredentials: g};
+	});
+var _elm_lang$http$Http_Internal$Request = function (a) {
+	return {ctor: 'Request', _0: a};
+};
+var _elm_lang$http$Http_Internal$Expect = {ctor: 'Expect'};
+var _elm_lang$http$Http_Internal$FormDataBody = {ctor: 'FormDataBody'};
+var _elm_lang$http$Http_Internal$StringBody = F2(
+	function (a, b) {
+		return {ctor: 'StringBody', _0: a, _1: b};
+	});
+var _elm_lang$http$Http_Internal$EmptyBody = {ctor: 'EmptyBody'};
+var _elm_lang$http$Http_Internal$Header = F2(
+	function (a, b) {
+		return {ctor: 'Header', _0: a, _1: b};
+	});
+
+var _elm_lang$http$Http$decodeUri = _elm_lang$http$Native_Http.decodeUri;
+var _elm_lang$http$Http$encodeUri = _elm_lang$http$Native_Http.encodeUri;
+var _elm_lang$http$Http$expectStringResponse = _elm_lang$http$Native_Http.expectStringResponse;
+var _elm_lang$http$Http$expectJson = function (decoder) {
+	return _elm_lang$http$Http$expectStringResponse(
+		function (response) {
+			return A2(_elm_lang$core$Json_Decode$decodeString, decoder, response.body);
+		});
+};
+var _elm_lang$http$Http$expectString = _elm_lang$http$Http$expectStringResponse(
+	function (response) {
+		return _elm_lang$core$Result$Ok(response.body);
+	});
+var _elm_lang$http$Http$multipartBody = _elm_lang$http$Native_Http.multipart;
+var _elm_lang$http$Http$stringBody = _elm_lang$http$Http_Internal$StringBody;
+var _elm_lang$http$Http$jsonBody = function (value) {
+	return A2(
+		_elm_lang$http$Http_Internal$StringBody,
+		'application/json',
+		A2(_elm_lang$core$Json_Encode$encode, 0, value));
+};
+var _elm_lang$http$Http$emptyBody = _elm_lang$http$Http_Internal$EmptyBody;
+var _elm_lang$http$Http$header = _elm_lang$http$Http_Internal$Header;
+var _elm_lang$http$Http$request = _elm_lang$http$Http_Internal$Request;
+var _elm_lang$http$Http$post = F3(
+	function (url, body, decoder) {
+		return _elm_lang$http$Http$request(
+			{
+				method: 'POST',
+				headers: {ctor: '[]'},
+				url: url,
+				body: body,
+				expect: _elm_lang$http$Http$expectJson(decoder),
+				timeout: _elm_lang$core$Maybe$Nothing,
+				withCredentials: false
+			});
+	});
+var _elm_lang$http$Http$get = F2(
+	function (url, decoder) {
+		return _elm_lang$http$Http$request(
+			{
+				method: 'GET',
+				headers: {ctor: '[]'},
+				url: url,
+				body: _elm_lang$http$Http$emptyBody,
+				expect: _elm_lang$http$Http$expectJson(decoder),
+				timeout: _elm_lang$core$Maybe$Nothing,
+				withCredentials: false
+			});
+	});
+var _elm_lang$http$Http$getString = function (url) {
+	return _elm_lang$http$Http$request(
+		{
+			method: 'GET',
+			headers: {ctor: '[]'},
+			url: url,
+			body: _elm_lang$http$Http$emptyBody,
+			expect: _elm_lang$http$Http$expectString,
+			timeout: _elm_lang$core$Maybe$Nothing,
+			withCredentials: false
+		});
+};
+var _elm_lang$http$Http$toTask = function (_p0) {
+	var _p1 = _p0;
+	return A2(_elm_lang$http$Native_Http.toTask, _p1._0, _elm_lang$core$Maybe$Nothing);
+};
+var _elm_lang$http$Http$send = F2(
+	function (resultToMessage, request) {
+		return A2(
+			_elm_lang$core$Task$attempt,
+			resultToMessage,
+			_elm_lang$http$Http$toTask(request));
+	});
+var _elm_lang$http$Http$Response = F4(
+	function (a, b, c, d) {
+		return {url: a, status: b, headers: c, body: d};
+	});
+var _elm_lang$http$Http$BadPayload = F2(
+	function (a, b) {
+		return {ctor: 'BadPayload', _0: a, _1: b};
+	});
+var _elm_lang$http$Http$BadStatus = function (a) {
+	return {ctor: 'BadStatus', _0: a};
+};
+var _elm_lang$http$Http$NetworkError = {ctor: 'NetworkError'};
+var _elm_lang$http$Http$Timeout = {ctor: 'Timeout'};
+var _elm_lang$http$Http$BadUrl = function (a) {
+	return {ctor: 'BadUrl', _0: a};
+};
+var _elm_lang$http$Http$StringPart = F2(
+	function (a, b) {
+		return {ctor: 'StringPart', _0: a, _1: b};
+	});
+var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
+
+var _elm_lang$navigation$Native_Navigation = function() {
+
+
+// FAKE NAVIGATION
+
+function go(n)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		if (n !== 0)
+		{
+			history.go(n);
+		}
+		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+function pushState(url)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		history.pushState({}, '', url);
+		callback(_elm_lang$core$Native_Scheduler.succeed(getLocation()));
+	});
+}
+
+function replaceState(url)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		history.replaceState({}, '', url);
+		callback(_elm_lang$core$Native_Scheduler.succeed(getLocation()));
+	});
+}
+
+
+// REAL NAVIGATION
+
+function reloadPage(skipCache)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		document.location.reload(skipCache);
+		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+function setLocation(url)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		try
+		{
+			window.location = url;
+		}
+		catch(err)
+		{
+			// Only Firefox can throw a NS_ERROR_MALFORMED_URI exception here.
+			// Other browsers reload the page, so let's be consistent about that.
+			document.location.reload(false);
+		}
+		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+
+// GET LOCATION
+
+function getLocation()
+{
+	var location = document.location;
+
+	return {
+		href: location.href,
+		host: location.host,
+		hostname: location.hostname,
+		protocol: location.protocol,
+		origin: location.origin,
+		port_: location.port,
+		pathname: location.pathname,
+		search: location.search,
+		hash: location.hash,
+		username: location.username,
+		password: location.password
+	};
+}
+
+
+// DETECT IE11 PROBLEMS
+
+function isInternetExplorer11()
+{
+	return window.navigator.userAgent.indexOf('Trident') !== -1;
+}
+
+
+return {
+	go: go,
+	setLocation: setLocation,
+	reloadPage: reloadPage,
+	pushState: pushState,
+	replaceState: replaceState,
+	getLocation: getLocation,
+	isInternetExplorer11: isInternetExplorer11
+};
+
+}();
+
+var _elm_lang$navigation$Navigation$replaceState = _elm_lang$navigation$Native_Navigation.replaceState;
+var _elm_lang$navigation$Navigation$pushState = _elm_lang$navigation$Native_Navigation.pushState;
+var _elm_lang$navigation$Navigation$go = _elm_lang$navigation$Native_Navigation.go;
+var _elm_lang$navigation$Navigation$reloadPage = _elm_lang$navigation$Native_Navigation.reloadPage;
+var _elm_lang$navigation$Navigation$setLocation = _elm_lang$navigation$Native_Navigation.setLocation;
+var _elm_lang$navigation$Navigation_ops = _elm_lang$navigation$Navigation_ops || {};
+_elm_lang$navigation$Navigation_ops['&>'] = F2(
+	function (task1, task2) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (_p0) {
+				return task2;
+			},
+			task1);
+	});
+var _elm_lang$navigation$Navigation$notify = F3(
+	function (router, subs, location) {
+		var send = function (_p1) {
+			var _p2 = _p1;
+			return A2(
+				_elm_lang$core$Platform$sendToApp,
+				router,
+				_p2._0(location));
+		};
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			_elm_lang$core$Task$sequence(
+				A2(_elm_lang$core$List$map, send, subs)),
+			_elm_lang$core$Task$succeed(
+				{ctor: '_Tuple0'}));
+	});
+var _elm_lang$navigation$Navigation$cmdHelp = F3(
+	function (router, subs, cmd) {
+		var _p3 = cmd;
+		switch (_p3.ctor) {
+			case 'Jump':
+				return _elm_lang$navigation$Navigation$go(_p3._0);
+			case 'New':
+				return A2(
+					_elm_lang$core$Task$andThen,
+					A2(_elm_lang$navigation$Navigation$notify, router, subs),
+					_elm_lang$navigation$Navigation$pushState(_p3._0));
+			case 'Modify':
+				return A2(
+					_elm_lang$core$Task$andThen,
+					A2(_elm_lang$navigation$Navigation$notify, router, subs),
+					_elm_lang$navigation$Navigation$replaceState(_p3._0));
+			case 'Visit':
+				return _elm_lang$navigation$Navigation$setLocation(_p3._0);
+			default:
+				return _elm_lang$navigation$Navigation$reloadPage(_p3._0);
+		}
+	});
+var _elm_lang$navigation$Navigation$killPopWatcher = function (popWatcher) {
+	var _p4 = popWatcher;
+	if (_p4.ctor === 'Normal') {
+		return _elm_lang$core$Process$kill(_p4._0);
+	} else {
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			_elm_lang$core$Process$kill(_p4._0),
+			_elm_lang$core$Process$kill(_p4._1));
+	}
+};
+var _elm_lang$navigation$Navigation$onSelfMsg = F3(
+	function (router, location, state) {
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			A3(_elm_lang$navigation$Navigation$notify, router, state.subs, location),
+			_elm_lang$core$Task$succeed(state));
+	});
+var _elm_lang$navigation$Navigation$subscription = _elm_lang$core$Native_Platform.leaf('Navigation');
+var _elm_lang$navigation$Navigation$command = _elm_lang$core$Native_Platform.leaf('Navigation');
+var _elm_lang$navigation$Navigation$Location = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return {href: a, host: b, hostname: c, protocol: d, origin: e, port_: f, pathname: g, search: h, hash: i, username: j, password: k};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _elm_lang$navigation$Navigation$State = F2(
+	function (a, b) {
+		return {subs: a, popWatcher: b};
+	});
+var _elm_lang$navigation$Navigation$init = _elm_lang$core$Task$succeed(
+	A2(
+		_elm_lang$navigation$Navigation$State,
+		{ctor: '[]'},
+		_elm_lang$core$Maybe$Nothing));
+var _elm_lang$navigation$Navigation$Reload = function (a) {
+	return {ctor: 'Reload', _0: a};
+};
+var _elm_lang$navigation$Navigation$reload = _elm_lang$navigation$Navigation$command(
+	_elm_lang$navigation$Navigation$Reload(false));
+var _elm_lang$navigation$Navigation$reloadAndSkipCache = _elm_lang$navigation$Navigation$command(
+	_elm_lang$navigation$Navigation$Reload(true));
+var _elm_lang$navigation$Navigation$Visit = function (a) {
+	return {ctor: 'Visit', _0: a};
+};
+var _elm_lang$navigation$Navigation$load = function (url) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Visit(url));
+};
+var _elm_lang$navigation$Navigation$Modify = function (a) {
+	return {ctor: 'Modify', _0: a};
+};
+var _elm_lang$navigation$Navigation$modifyUrl = function (url) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Modify(url));
+};
+var _elm_lang$navigation$Navigation$New = function (a) {
+	return {ctor: 'New', _0: a};
+};
+var _elm_lang$navigation$Navigation$newUrl = function (url) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$New(url));
+};
+var _elm_lang$navigation$Navigation$Jump = function (a) {
+	return {ctor: 'Jump', _0: a};
+};
+var _elm_lang$navigation$Navigation$back = function (n) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Jump(0 - n));
+};
+var _elm_lang$navigation$Navigation$forward = function (n) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Jump(n));
+};
+var _elm_lang$navigation$Navigation$cmdMap = F2(
+	function (_p5, myCmd) {
+		var _p6 = myCmd;
+		switch (_p6.ctor) {
+			case 'Jump':
+				return _elm_lang$navigation$Navigation$Jump(_p6._0);
+			case 'New':
+				return _elm_lang$navigation$Navigation$New(_p6._0);
+			case 'Modify':
+				return _elm_lang$navigation$Navigation$Modify(_p6._0);
+			case 'Visit':
+				return _elm_lang$navigation$Navigation$Visit(_p6._0);
+			default:
+				return _elm_lang$navigation$Navigation$Reload(_p6._0);
+		}
+	});
+var _elm_lang$navigation$Navigation$Monitor = function (a) {
+	return {ctor: 'Monitor', _0: a};
+};
+var _elm_lang$navigation$Navigation$program = F2(
+	function (locationToMessage, stuff) {
+		var init = stuff.init(
+			_elm_lang$navigation$Native_Navigation.getLocation(
+				{ctor: '_Tuple0'}));
+		var subs = function (model) {
+			return _elm_lang$core$Platform_Sub$batch(
+				{
+					ctor: '::',
+					_0: _elm_lang$navigation$Navigation$subscription(
+						_elm_lang$navigation$Navigation$Monitor(locationToMessage)),
+					_1: {
+						ctor: '::',
+						_0: stuff.subscriptions(model),
+						_1: {ctor: '[]'}
+					}
+				});
+		};
+		return _elm_lang$html$Html$program(
+			{init: init, view: stuff.view, update: stuff.update, subscriptions: subs});
+	});
+var _elm_lang$navigation$Navigation$programWithFlags = F2(
+	function (locationToMessage, stuff) {
+		var init = function (flags) {
+			return A2(
+				stuff.init,
+				flags,
+				_elm_lang$navigation$Native_Navigation.getLocation(
+					{ctor: '_Tuple0'}));
+		};
+		var subs = function (model) {
+			return _elm_lang$core$Platform_Sub$batch(
+				{
+					ctor: '::',
+					_0: _elm_lang$navigation$Navigation$subscription(
+						_elm_lang$navigation$Navigation$Monitor(locationToMessage)),
+					_1: {
+						ctor: '::',
+						_0: stuff.subscriptions(model),
+						_1: {ctor: '[]'}
+					}
+				});
+		};
+		return _elm_lang$html$Html$programWithFlags(
+			{init: init, view: stuff.view, update: stuff.update, subscriptions: subs});
+	});
+var _elm_lang$navigation$Navigation$subMap = F2(
+	function (func, _p7) {
+		var _p8 = _p7;
+		return _elm_lang$navigation$Navigation$Monitor(
+			function (_p9) {
+				return func(
+					_p8._0(_p9));
+			});
+	});
+var _elm_lang$navigation$Navigation$InternetExplorer = F2(
+	function (a, b) {
+		return {ctor: 'InternetExplorer', _0: a, _1: b};
+	});
+var _elm_lang$navigation$Navigation$Normal = function (a) {
+	return {ctor: 'Normal', _0: a};
+};
+var _elm_lang$navigation$Navigation$spawnPopWatcher = function (router) {
+	var reportLocation = function (_p10) {
+		return A2(
+			_elm_lang$core$Platform$sendToSelf,
+			router,
+			_elm_lang$navigation$Native_Navigation.getLocation(
+				{ctor: '_Tuple0'}));
+	};
+	return _elm_lang$navigation$Native_Navigation.isInternetExplorer11(
+		{ctor: '_Tuple0'}) ? A3(
+		_elm_lang$core$Task$map2,
+		_elm_lang$navigation$Navigation$InternetExplorer,
+		_elm_lang$core$Process$spawn(
+			A3(_elm_lang$dom$Dom_LowLevel$onWindow, 'popstate', _elm_lang$core$Json_Decode$value, reportLocation)),
+		_elm_lang$core$Process$spawn(
+			A3(_elm_lang$dom$Dom_LowLevel$onWindow, 'hashchange', _elm_lang$core$Json_Decode$value, reportLocation))) : A2(
+		_elm_lang$core$Task$map,
+		_elm_lang$navigation$Navigation$Normal,
+		_elm_lang$core$Process$spawn(
+			A3(_elm_lang$dom$Dom_LowLevel$onWindow, 'popstate', _elm_lang$core$Json_Decode$value, reportLocation)));
+};
+var _elm_lang$navigation$Navigation$onEffects = F4(
+	function (router, cmds, subs, _p11) {
+		var _p12 = _p11;
+		var _p15 = _p12.popWatcher;
+		var stepState = function () {
+			var _p13 = {ctor: '_Tuple2', _0: subs, _1: _p15};
+			_v6_2:
+			do {
+				if (_p13._0.ctor === '[]') {
+					if (_p13._1.ctor === 'Just') {
+						return A2(
+							_elm_lang$navigation$Navigation_ops['&>'],
+							_elm_lang$navigation$Navigation$killPopWatcher(_p13._1._0),
+							_elm_lang$core$Task$succeed(
+								A2(_elm_lang$navigation$Navigation$State, subs, _elm_lang$core$Maybe$Nothing)));
+					} else {
+						break _v6_2;
+					}
+				} else {
+					if (_p13._1.ctor === 'Nothing') {
+						return A2(
+							_elm_lang$core$Task$map,
+							function (_p14) {
+								return A2(
+									_elm_lang$navigation$Navigation$State,
+									subs,
+									_elm_lang$core$Maybe$Just(_p14));
+							},
+							_elm_lang$navigation$Navigation$spawnPopWatcher(router));
+					} else {
+						break _v6_2;
+					}
+				}
+			} while(false);
+			return _elm_lang$core$Task$succeed(
+				A2(_elm_lang$navigation$Navigation$State, subs, _p15));
+		}();
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			_elm_lang$core$Task$sequence(
+				A2(
+					_elm_lang$core$List$map,
+					A2(_elm_lang$navigation$Navigation$cmdHelp, router, subs),
+					cmds)),
+			stepState);
+	});
+_elm_lang$core$Native_Platform.effectManagers['Navigation'] = {pkg: 'elm-lang/navigation', init: _elm_lang$navigation$Navigation$init, onEffects: _elm_lang$navigation$Navigation$onEffects, onSelfMsg: _elm_lang$navigation$Navigation$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$navigation$Navigation$cmdMap, subMap: _elm_lang$navigation$Navigation$subMap};
+
 var _elm_lang$svg$Svg$map = _elm_lang$virtual_dom$VirtualDom$map;
 var _elm_lang$svg$Svg$text = _elm_lang$virtual_dom$VirtualDom$text;
 var _elm_lang$svg$Svg$svgNamespace = A2(
@@ -10838,6 +12203,366 @@ var _elm_tools$parser$Parser$AtLeast = function (a) {
 var _elm_tools$parser$Parser$zeroOrMore = _elm_tools$parser$Parser$AtLeast(0);
 var _elm_tools$parser$Parser$oneOrMore = _elm_tools$parser$Parser$AtLeast(1);
 
+var _evancz$url_parser$UrlParser$toKeyValuePair = function (segment) {
+	var _p0 = A2(_elm_lang$core$String$split, '=', segment);
+	if (((_p0.ctor === '::') && (_p0._1.ctor === '::')) && (_p0._1._1.ctor === '[]')) {
+		return A3(
+			_elm_lang$core$Maybe$map2,
+			F2(
+				function (v0, v1) {
+					return {ctor: '_Tuple2', _0: v0, _1: v1};
+				}),
+			_elm_lang$http$Http$decodeUri(_p0._0),
+			_elm_lang$http$Http$decodeUri(_p0._1._0));
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _evancz$url_parser$UrlParser$parseParams = function (queryString) {
+	return _elm_lang$core$Dict$fromList(
+		A2(
+			_elm_lang$core$List$filterMap,
+			_evancz$url_parser$UrlParser$toKeyValuePair,
+			A2(
+				_elm_lang$core$String$split,
+				'&',
+				A2(_elm_lang$core$String$dropLeft, 1, queryString))));
+};
+var _evancz$url_parser$UrlParser$splitUrl = function (url) {
+	var _p1 = A2(_elm_lang$core$String$split, '/', url);
+	if ((_p1.ctor === '::') && (_p1._0 === '')) {
+		return _p1._1;
+	} else {
+		return _p1;
+	}
+};
+var _evancz$url_parser$UrlParser$parseHelp = function (states) {
+	parseHelp:
+	while (true) {
+		var _p2 = states;
+		if (_p2.ctor === '[]') {
+			return _elm_lang$core$Maybe$Nothing;
+		} else {
+			var _p4 = _p2._0;
+			var _p3 = _p4.unvisited;
+			if (_p3.ctor === '[]') {
+				return _elm_lang$core$Maybe$Just(_p4.value);
+			} else {
+				if ((_p3._0 === '') && (_p3._1.ctor === '[]')) {
+					return _elm_lang$core$Maybe$Just(_p4.value);
+				} else {
+					var _v4 = _p2._1;
+					states = _v4;
+					continue parseHelp;
+				}
+			}
+		}
+	}
+};
+var _evancz$url_parser$UrlParser$parse = F3(
+	function (_p5, url, params) {
+		var _p6 = _p5;
+		return _evancz$url_parser$UrlParser$parseHelp(
+			_p6._0(
+				{
+					visited: {ctor: '[]'},
+					unvisited: _evancz$url_parser$UrlParser$splitUrl(url),
+					params: params,
+					value: _elm_lang$core$Basics$identity
+				}));
+	});
+var _evancz$url_parser$UrlParser$parseHash = F2(
+	function (parser, location) {
+		return A3(
+			_evancz$url_parser$UrlParser$parse,
+			parser,
+			A2(_elm_lang$core$String$dropLeft, 1, location.hash),
+			_evancz$url_parser$UrlParser$parseParams(location.search));
+	});
+var _evancz$url_parser$UrlParser$parsePath = F2(
+	function (parser, location) {
+		return A3(
+			_evancz$url_parser$UrlParser$parse,
+			parser,
+			location.pathname,
+			_evancz$url_parser$UrlParser$parseParams(location.search));
+	});
+var _evancz$url_parser$UrlParser$intParamHelp = function (maybeValue) {
+	var _p7 = maybeValue;
+	if (_p7.ctor === 'Nothing') {
+		return _elm_lang$core$Maybe$Nothing;
+	} else {
+		return _elm_lang$core$Result$toMaybe(
+			_elm_lang$core$String$toInt(_p7._0));
+	}
+};
+var _evancz$url_parser$UrlParser$mapHelp = F2(
+	function (func, _p8) {
+		var _p9 = _p8;
+		return {
+			visited: _p9.visited,
+			unvisited: _p9.unvisited,
+			params: _p9.params,
+			value: func(_p9.value)
+		};
+	});
+var _evancz$url_parser$UrlParser$State = F4(
+	function (a, b, c, d) {
+		return {visited: a, unvisited: b, params: c, value: d};
+	});
+var _evancz$url_parser$UrlParser$Parser = function (a) {
+	return {ctor: 'Parser', _0: a};
+};
+var _evancz$url_parser$UrlParser$s = function (str) {
+	return _evancz$url_parser$UrlParser$Parser(
+		function (_p10) {
+			var _p11 = _p10;
+			var _p12 = _p11.unvisited;
+			if (_p12.ctor === '[]') {
+				return {ctor: '[]'};
+			} else {
+				var _p13 = _p12._0;
+				return _elm_lang$core$Native_Utils.eq(_p13, str) ? {
+					ctor: '::',
+					_0: A4(
+						_evancz$url_parser$UrlParser$State,
+						{ctor: '::', _0: _p13, _1: _p11.visited},
+						_p12._1,
+						_p11.params,
+						_p11.value),
+					_1: {ctor: '[]'}
+				} : {ctor: '[]'};
+			}
+		});
+};
+var _evancz$url_parser$UrlParser$custom = F2(
+	function (tipe, stringToSomething) {
+		return _evancz$url_parser$UrlParser$Parser(
+			function (_p14) {
+				var _p15 = _p14;
+				var _p16 = _p15.unvisited;
+				if (_p16.ctor === '[]') {
+					return {ctor: '[]'};
+				} else {
+					var _p18 = _p16._0;
+					var _p17 = stringToSomething(_p18);
+					if (_p17.ctor === 'Ok') {
+						return {
+							ctor: '::',
+							_0: A4(
+								_evancz$url_parser$UrlParser$State,
+								{ctor: '::', _0: _p18, _1: _p15.visited},
+								_p16._1,
+								_p15.params,
+								_p15.value(_p17._0)),
+							_1: {ctor: '[]'}
+						};
+					} else {
+						return {ctor: '[]'};
+					}
+				}
+			});
+	});
+var _evancz$url_parser$UrlParser$string = A2(_evancz$url_parser$UrlParser$custom, 'STRING', _elm_lang$core$Result$Ok);
+var _evancz$url_parser$UrlParser$int = A2(_evancz$url_parser$UrlParser$custom, 'NUMBER', _elm_lang$core$String$toInt);
+var _evancz$url_parser$UrlParser_ops = _evancz$url_parser$UrlParser_ops || {};
+_evancz$url_parser$UrlParser_ops['</>'] = F2(
+	function (_p20, _p19) {
+		var _p21 = _p20;
+		var _p22 = _p19;
+		return _evancz$url_parser$UrlParser$Parser(
+			function (state) {
+				return A2(
+					_elm_lang$core$List$concatMap,
+					_p22._0,
+					_p21._0(state));
+			});
+	});
+var _evancz$url_parser$UrlParser$map = F2(
+	function (subValue, _p23) {
+		var _p24 = _p23;
+		return _evancz$url_parser$UrlParser$Parser(
+			function (_p25) {
+				var _p26 = _p25;
+				return A2(
+					_elm_lang$core$List$map,
+					_evancz$url_parser$UrlParser$mapHelp(_p26.value),
+					_p24._0(
+						{visited: _p26.visited, unvisited: _p26.unvisited, params: _p26.params, value: subValue}));
+			});
+	});
+var _evancz$url_parser$UrlParser$oneOf = function (parsers) {
+	return _evancz$url_parser$UrlParser$Parser(
+		function (state) {
+			return A2(
+				_elm_lang$core$List$concatMap,
+				function (_p27) {
+					var _p28 = _p27;
+					return _p28._0(state);
+				},
+				parsers);
+		});
+};
+var _evancz$url_parser$UrlParser$top = _evancz$url_parser$UrlParser$Parser(
+	function (state) {
+		return {
+			ctor: '::',
+			_0: state,
+			_1: {ctor: '[]'}
+		};
+	});
+var _evancz$url_parser$UrlParser_ops = _evancz$url_parser$UrlParser_ops || {};
+_evancz$url_parser$UrlParser_ops['<?>'] = F2(
+	function (_p30, _p29) {
+		var _p31 = _p30;
+		var _p32 = _p29;
+		return _evancz$url_parser$UrlParser$Parser(
+			function (state) {
+				return A2(
+					_elm_lang$core$List$concatMap,
+					_p32._0,
+					_p31._0(state));
+			});
+	});
+var _evancz$url_parser$UrlParser$QueryParser = function (a) {
+	return {ctor: 'QueryParser', _0: a};
+};
+var _evancz$url_parser$UrlParser$customParam = F2(
+	function (key, func) {
+		return _evancz$url_parser$UrlParser$QueryParser(
+			function (_p33) {
+				var _p34 = _p33;
+				var _p35 = _p34.params;
+				return {
+					ctor: '::',
+					_0: A4(
+						_evancz$url_parser$UrlParser$State,
+						_p34.visited,
+						_p34.unvisited,
+						_p35,
+						_p34.value(
+							func(
+								A2(_elm_lang$core$Dict$get, key, _p35)))),
+					_1: {ctor: '[]'}
+				};
+			});
+	});
+var _evancz$url_parser$UrlParser$stringParam = function (name) {
+	return A2(_evancz$url_parser$UrlParser$customParam, name, _elm_lang$core$Basics$identity);
+};
+var _evancz$url_parser$UrlParser$intParam = function (name) {
+	return A2(_evancz$url_parser$UrlParser$customParam, name, _evancz$url_parser$UrlParser$intParamHelp);
+};
+
+var _open_chords_charts$chart_editor$Data_User$User = F4(
+	function (a, b, c, d) {
+		return {email: a, username: b, createdAt: c, updatedAt: d};
+	});
+
+var _open_chords_charts$chart_editor$Data_Session$Session = function (a) {
+	return {user: a};
+};
+
+var _open_chords_charts$chart_editor$Route$routeToString = function (page) {
+	var pieces = function () {
+		var _p0 = page;
+		if (_p0.ctor === 'Home') {
+			return {ctor: '[]'};
+		} else {
+			return {
+				ctor: '::',
+				_0: _p0._0,
+				_1: {ctor: '[]'}
+			};
+		}
+	}();
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		'#/',
+		A2(_elm_lang$core$String$join, '/', pieces));
+};
+var _open_chords_charts$chart_editor$Route$href = function (route) {
+	return _elm_lang$html$Html_Attributes$href(
+		_open_chords_charts$chart_editor$Route$routeToString(route));
+};
+var _open_chords_charts$chart_editor$Route$Chart = function (a) {
+	return {ctor: 'Chart', _0: a};
+};
+var _open_chords_charts$chart_editor$Route$Home = {ctor: 'Home'};
+var _open_chords_charts$chart_editor$Route$route = _evancz$url_parser$UrlParser$oneOf(
+	{
+		ctor: '::',
+		_0: A2(_evancz$url_parser$UrlParser$map, _open_chords_charts$chart_editor$Route$Home, _evancz$url_parser$UrlParser$top),
+		_1: {
+			ctor: '::',
+			_0: A2(_evancz$url_parser$UrlParser$map, _open_chords_charts$chart_editor$Route$Chart, _evancz$url_parser$UrlParser$string),
+			_1: {ctor: '[]'}
+		}
+	});
+var _open_chords_charts$chart_editor$Route$fromLocation = function (location) {
+	return _elm_lang$core$String$isEmpty(location.hash) ? _elm_lang$core$Maybe$Just(_open_chords_charts$chart_editor$Route$Home) : A2(_evancz$url_parser$UrlParser$parseHash, _open_chords_charts$chart_editor$Route$route, location);
+};
+
+var _open_chords_charts$chart_editor$Page_Home$view = F2(
+	function (session, model) {
+		return A2(
+			_elm_lang$html$Html$main_,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h1,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Homepage'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$ul,
+						{ctor: '[]'},
+						A2(
+							_elm_lang$core$List$map,
+							function (_p0) {
+								var _p1 = _p0;
+								return A2(
+									_elm_lang$html$Html$li,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$a,
+											{
+												ctor: '::',
+												_0: _open_chords_charts$chart_editor$Route$href(
+													_open_chords_charts$chart_editor$Route$Chart(_p1.slug)),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text(_p1.name),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									});
+							},
+							model)),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _open_chords_charts$chart_editor$Page_Home$initialModel = {
+	ctor: '::',
+	_0: {name: 'All of me', slug: 'all-of-me'},
+	_1: {ctor: '[]'}
+};
+var _open_chords_charts$chart_editor$Page_Home$ChartInfos = F2(
+	function (a, b) {
+		return {name: a, slug: b};
+	});
+
 var _open_chords_charts$chart_editor$Music_Note$getAtUnsafe = F2(
 	function (index, list) {
 		var cyclingIndex = A2(
@@ -11592,7 +13317,7 @@ var _open_chords_charts$chart_editor$Music_Chart$Key = function (a) {
 	return {ctor: 'Key', _0: a};
 };
 
-var _open_chords_charts$chart_editor$Parsers$oneOfTuples = function (tuples) {
+var _open_chords_charts$chart_editor$Music_Chart_Parsers$oneOfTuples = function (tuples) {
 	var sortTuples = function (_p0) {
 		return _elm_lang$core$List$reverse(
 			A2(
@@ -11615,15 +13340,15 @@ var _open_chords_charts$chart_editor$Parsers$oneOfTuples = function (tuples) {
 			},
 			sortTuples(tuples)));
 };
-var _open_chords_charts$chart_editor$Parsers$note = A2(
+var _open_chords_charts$chart_editor$Music_Chart_Parsers$note = A2(
 	_elm_tools$parser$Parser$inContext,
 	'note',
-	_open_chords_charts$chart_editor$Parsers$oneOfTuples(_open_chords_charts$chart_editor$Music_Note$notesAndStrings));
-var _open_chords_charts$chart_editor$Parsers$quality = A2(
+	_open_chords_charts$chart_editor$Music_Chart_Parsers$oneOfTuples(_open_chords_charts$chart_editor$Music_Note$notesAndStrings));
+var _open_chords_charts$chart_editor$Music_Chart_Parsers$quality = A2(
 	_elm_tools$parser$Parser$inContext,
 	'quality',
-	_open_chords_charts$chart_editor$Parsers$oneOfTuples(_open_chords_charts$chart_editor$Music_Chord$qualitiesAndStrings));
-var _open_chords_charts$chart_editor$Parsers$chord = A2(
+	_open_chords_charts$chart_editor$Music_Chart_Parsers$oneOfTuples(_open_chords_charts$chart_editor$Music_Chord$qualitiesAndStrings));
+var _open_chords_charts$chart_editor$Music_Chart_Parsers$chord = A2(
 	_elm_tools$parser$Parser$inContext,
 	'chord',
 	A2(
@@ -11631,9 +13356,9 @@ var _open_chords_charts$chart_editor$Parsers$chord = A2(
 		A2(
 			_elm_tools$parser$Parser_ops['|='],
 			_elm_tools$parser$Parser$succeed(_open_chords_charts$chart_editor$Music_Chord$Chord),
-			_open_chords_charts$chart_editor$Parsers$note),
-		_open_chords_charts$chart_editor$Parsers$quality));
-var _open_chords_charts$chart_editor$Parsers$chords = A2(
+			_open_chords_charts$chart_editor$Music_Chart_Parsers$note),
+		_open_chords_charts$chart_editor$Music_Chart_Parsers$quality));
+var _open_chords_charts$chart_editor$Music_Chart_Parsers$chords = A2(
 	_elm_tools$parser$Parser$inContext,
 	'chords',
 	A2(
@@ -11645,7 +13370,7 @@ var _open_chords_charts$chart_editor$Parsers$chords = A2(
 					function (x, y) {
 						return {ctor: '::', _0: x, _1: y};
 					})),
-			_open_chords_charts$chart_editor$Parsers$chord),
+			_open_chords_charts$chart_editor$Music_Chart_Parsers$chord),
 		A2(
 			_elm_tools$parser$Parser$repeat,
 			_elm_tools$parser$Parser$zeroOrMore,
@@ -11655,8 +13380,8 @@ var _open_chords_charts$chart_editor$Parsers$chords = A2(
 					_elm_tools$parser$Parser_ops['|.'],
 					_elm_tools$parser$Parser$succeed(_elm_lang$core$Basics$identity),
 					_elm_tools$parser$Parser$symbol('/')),
-				_open_chords_charts$chart_editor$Parsers$chord))));
-var _open_chords_charts$chart_editor$Parsers$bar = A2(
+				_open_chords_charts$chart_editor$Music_Chart_Parsers$chord))));
+var _open_chords_charts$chart_editor$Music_Chart_Parsers$bar = A2(
 	_elm_tools$parser$Parser$inContext,
 	'bar',
 	_elm_tools$parser$Parser$oneOf(
@@ -11671,11 +13396,11 @@ var _open_chords_charts$chart_editor$Parsers$bar = A2(
 				_0: A2(
 					_elm_tools$parser$Parser_ops['|='],
 					_elm_tools$parser$Parser$succeed(_open_chords_charts$chart_editor$Music_Chart$Bar),
-					_open_chords_charts$chart_editor$Parsers$chords),
+					_open_chords_charts$chart_editor$Music_Chart_Parsers$chords),
 				_1: {ctor: '[]'}
 			}
 		}));
-var _open_chords_charts$chart_editor$Parsers$keepUntilEndOfLine = A2(
+var _open_chords_charts$chart_editor$Music_Chart_Parsers$keepUntilEndOfLine = A2(
 	_elm_tools$parser$Parser$keep,
 	_elm_tools$parser$Parser$oneOrMore,
 	function (c) {
@@ -11683,7 +13408,7 @@ var _open_chords_charts$chart_editor$Parsers$keepUntilEndOfLine = A2(
 			c,
 			_elm_lang$core$Native_Utils.chr('\n'));
 	});
-var _open_chords_charts$chart_editor$Parsers$spacesAndNewlines = A2(
+var _open_chords_charts$chart_editor$Music_Chart_Parsers$spacesAndNewlines = A2(
 	_elm_tools$parser$Parser$ignore,
 	_elm_tools$parser$Parser$zeroOrMore,
 	function (c) {
@@ -11693,7 +13418,7 @@ var _open_chords_charts$chart_editor$Parsers$spacesAndNewlines = A2(
 			c,
 			_elm_lang$core$Native_Utils.chr('\n'));
 	});
-var _open_chords_charts$chart_editor$Parsers$spaces = A2(
+var _open_chords_charts$chart_editor$Music_Chart_Parsers$spaces = A2(
 	_elm_tools$parser$Parser$ignore,
 	_elm_tools$parser$Parser$zeroOrMore,
 	function (c) {
@@ -11701,7 +13426,7 @@ var _open_chords_charts$chart_editor$Parsers$spaces = A2(
 			c,
 			_elm_lang$core$Native_Utils.chr(' '));
 	});
-var _open_chords_charts$chart_editor$Parsers$part = A2(
+var _open_chords_charts$chart_editor$Music_Chart_Parsers$part = A2(
 	_elm_tools$parser$Parser$inContext,
 	'part',
 	A2(
@@ -11720,9 +13445,9 @@ var _open_chords_charts$chart_editor$Parsers$part = A2(
 									return toPart(partName);
 								})),
 						_elm_tools$parser$Parser$symbol('=')),
-					_open_chords_charts$chart_editor$Parsers$spaces),
-				_open_chords_charts$chart_editor$Parsers$keepUntilEndOfLine),
-			_open_chords_charts$chart_editor$Parsers$spacesAndNewlines),
+					_open_chords_charts$chart_editor$Music_Chart_Parsers$spaces),
+				_open_chords_charts$chart_editor$Music_Chart_Parsers$keepUntilEndOfLine),
+			_open_chords_charts$chart_editor$Music_Chart_Parsers$spacesAndNewlines),
 		_elm_tools$parser$Parser$oneOf(
 			{
 				ctor: '::',
@@ -11736,15 +13461,15 @@ var _open_chords_charts$chart_editor$Parsers$part = A2(
 					A2(
 						_elm_tools$parser$Parser$repeat,
 						_elm_tools$parser$Parser$oneOrMore,
-						A2(_elm_tools$parser$Parser_ops['|.'], _open_chords_charts$chart_editor$Parsers$bar, _open_chords_charts$chart_editor$Parsers$spacesAndNewlines))),
+						A2(_elm_tools$parser$Parser_ops['|.'], _open_chords_charts$chart_editor$Music_Chart_Parsers$bar, _open_chords_charts$chart_editor$Music_Chart_Parsers$spacesAndNewlines))),
 				_1: {
 					ctor: '::',
 					_0: _elm_tools$parser$Parser$succeed(_open_chords_charts$chart_editor$Music_Chart$PartRepeat),
 					_1: {ctor: '[]'}
 				}
 			})));
-var _open_chords_charts$chart_editor$Parsers$newLine = _elm_tools$parser$Parser$symbol('\n');
-var _open_chords_charts$chart_editor$Parsers$chart = function () {
+var _open_chords_charts$chart_editor$Music_Chart_Parsers$newLine = _elm_tools$parser$Parser$symbol('\n');
+var _open_chords_charts$chart_editor$Music_Chart_Parsers$chart = function () {
 	var dashes = '---';
 	return A2(
 		_elm_tools$parser$Parser$inContext,
@@ -11780,27 +13505,27 @@ var _open_chords_charts$chart_editor$Parsers$chart = function () {
 																A2(
 																	_elm_tools$parser$Parser_ops['|.'],
 																	_elm_tools$parser$Parser$succeed(_open_chords_charts$chart_editor$Music_Chart$Chart),
-																	_open_chords_charts$chart_editor$Parsers$spacesAndNewlines),
+																	_open_chords_charts$chart_editor$Music_Chart_Parsers$spacesAndNewlines),
 																_elm_tools$parser$Parser$symbol(dashes)),
-															_open_chords_charts$chart_editor$Parsers$newLine),
+															_open_chords_charts$chart_editor$Music_Chart_Parsers$newLine),
 														_elm_tools$parser$Parser$symbol('title:')),
-													_open_chords_charts$chart_editor$Parsers$spaces),
-												_open_chords_charts$chart_editor$Parsers$keepUntilEndOfLine),
-											_open_chords_charts$chart_editor$Parsers$newLine),
+													_open_chords_charts$chart_editor$Music_Chart_Parsers$spaces),
+												_open_chords_charts$chart_editor$Music_Chart_Parsers$keepUntilEndOfLine),
+											_open_chords_charts$chart_editor$Music_Chart_Parsers$newLine),
 										_elm_tools$parser$Parser$symbol('key:')),
-									_open_chords_charts$chart_editor$Parsers$spaces),
-								A2(_elm_tools$parser$Parser$map, _open_chords_charts$chart_editor$Music_Chart$Key, _open_chords_charts$chart_editor$Parsers$note)),
-							_open_chords_charts$chart_editor$Parsers$newLine),
+									_open_chords_charts$chart_editor$Music_Chart_Parsers$spaces),
+								A2(_elm_tools$parser$Parser$map, _open_chords_charts$chart_editor$Music_Chart$Key, _open_chords_charts$chart_editor$Music_Chart_Parsers$note)),
+							_open_chords_charts$chart_editor$Music_Chart_Parsers$newLine),
 						_elm_tools$parser$Parser$symbol(dashes)),
-					_open_chords_charts$chart_editor$Parsers$spacesAndNewlines),
+					_open_chords_charts$chart_editor$Music_Chart_Parsers$spacesAndNewlines),
 				A2(
 					_elm_tools$parser$Parser$repeat,
 					_elm_tools$parser$Parser$oneOrMore,
-					A2(_elm_tools$parser$Parser_ops['|.'], _open_chords_charts$chart_editor$Parsers$part, _open_chords_charts$chart_editor$Parsers$spacesAndNewlines))),
+					A2(_elm_tools$parser$Parser_ops['|.'], _open_chords_charts$chart_editor$Music_Chart_Parsers$part, _open_chords_charts$chart_editor$Music_Chart_Parsers$spacesAndNewlines))),
 			_elm_tools$parser$Parser$end));
 }();
 
-var _open_chords_charts$chart_editor$ChartCard$qualityDecoder = function (string) {
+var _open_chords_charts$chart_editor$Page_ChartCard$qualityDecoder = function (string) {
 	var _p0 = _open_chords_charts$chart_editor$Music_Chord$qualityFromString(string);
 	if (_p0.ctor === 'Just') {
 		return _elm_lang$core$Json_Decode$succeed(_p0._0);
@@ -11808,7 +13533,7 @@ var _open_chords_charts$chart_editor$ChartCard$qualityDecoder = function (string
 		return _elm_lang$core$Json_Decode$fail('Invalid quality');
 	}
 };
-var _open_chords_charts$chart_editor$ChartCard$noteDecoder = function (string) {
+var _open_chords_charts$chart_editor$Page_ChartCard$noteDecoder = function (string) {
 	var _p1 = _open_chords_charts$chart_editor$Music_Note$fromString(string);
 	if (_p1.ctor === 'Just') {
 		return _elm_lang$core$Json_Decode$succeed(_p1._0);
@@ -11816,13 +13541,13 @@ var _open_chords_charts$chart_editor$ChartCard$noteDecoder = function (string) {
 		return _elm_lang$core$Json_Decode$fail('Invalid note');
 	}
 };
-var _open_chords_charts$chart_editor$ChartCard$toolbar = _elm_lang$html$Html$div(
+var _open_chords_charts$chart_editor$Page_ChartCard$toolbar = _elm_lang$html$Html$div(
 	{
 		ctor: '::',
 		_0: _elm_lang$html$Html_Attributes$class('mv3'),
 		_1: {ctor: '[]'}
 	});
-var _open_chords_charts$chart_editor$ChartCard$qualitySelect = F2(
+var _open_chords_charts$chart_editor$Page_ChartCard$qualitySelect = F2(
 	function (selectedQuality, qualityToMsg) {
 		return A2(
 			_elm_lang$html$Html$select,
@@ -11834,7 +13559,7 @@ var _open_chords_charts$chart_editor$ChartCard$qualitySelect = F2(
 					A2(
 						_elm_lang$core$Json_Decode$map,
 						qualityToMsg,
-						A2(_elm_lang$core$Json_Decode$andThen, _open_chords_charts$chart_editor$ChartCard$qualityDecoder, _elm_lang$html$Html_Events$targetValue))),
+						A2(_elm_lang$core$Json_Decode$andThen, _open_chords_charts$chart_editor$Page_ChartCard$qualityDecoder, _elm_lang$html$Html_Events$targetValue))),
 				_1: {ctor: '[]'}
 			},
 			A2(
@@ -11861,7 +13586,7 @@ var _open_chords_charts$chart_editor$ChartCard$qualitySelect = F2(
 				},
 				_open_chords_charts$chart_editor$Music_Chord$qualities));
 	});
-var _open_chords_charts$chart_editor$ChartCard$noteSelect = F3(
+var _open_chords_charts$chart_editor$Page_ChartCard$noteSelect = F3(
 	function (notes, selectedNote, noteToMsg) {
 		return A2(
 			_elm_lang$html$Html$select,
@@ -11873,7 +13598,7 @@ var _open_chords_charts$chart_editor$ChartCard$noteSelect = F3(
 					A2(
 						_elm_lang$core$Json_Decode$map,
 						noteToMsg,
-						A2(_elm_lang$core$Json_Decode$andThen, _open_chords_charts$chart_editor$ChartCard$noteDecoder, _elm_lang$html$Html_Events$targetValue))),
+						A2(_elm_lang$core$Json_Decode$andThen, _open_chords_charts$chart_editor$Page_ChartCard$noteDecoder, _elm_lang$html$Html_Events$targetValue))),
 				_1: {ctor: '[]'}
 			},
 			A2(
@@ -11900,7 +13625,7 @@ var _open_chords_charts$chart_editor$ChartCard$noteSelect = F3(
 				},
 				notes));
 	});
-var _open_chords_charts$chart_editor$ChartCard$card = F3(
+var _open_chords_charts$chart_editor$Page_ChartCard$card = F3(
 	function (titleLeft, titleRight, children) {
 		return A2(
 			_elm_lang$html$Html$div,
@@ -11977,7 +13702,7 @@ var _open_chords_charts$chart_editor$ChartCard$card = F3(
 				},
 				children));
 	});
-var _open_chords_charts$chart_editor$ChartCard$button = F3(
+var _open_chords_charts$chart_editor$Page_ChartCard$button = F3(
 	function (purpose, state, attributes) {
 		return _elm_lang$html$Html$button(
 			A2(
@@ -12010,7 +13735,7 @@ var _open_chords_charts$chart_editor$ChartCard$button = F3(
 					_1: {ctor: '[]'}
 				}));
 	});
-var _open_chords_charts$chart_editor$ChartCard$barCell = function (children) {
+var _open_chords_charts$chart_editor$Page_ChartCard$barCell = function (children) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{
@@ -12031,7 +13756,7 @@ var _open_chords_charts$chart_editor$ChartCard$barCell = function (children) {
 			_1: {ctor: '[]'}
 		});
 };
-var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
+var _open_chords_charts$chart_editor$Page_ChartCard$viewBar = F5(
 	function (status, isSelected, msg, bar, previousBar) {
 		var defaultFontSizeClasses = 'f7 f4-m f2-l';
 		var fontSizeClasses = function () {
@@ -12095,7 +13820,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 				ctor: '::',
 				_0: function () {
 					var barCellWithSvg = function (children) {
-						return _open_chords_charts$chart_editor$ChartCard$barCell(
+						return _open_chords_charts$chart_editor$Page_ChartCard$barCell(
 							{
 								ctor: '::',
 								_0: A2(
@@ -12611,7 +14336,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBar = F5(
 				_1: {ctor: '[]'}
 			});
 	});
-var _open_chords_charts$chart_editor$ChartCard$removePartAtIndex = F2(
+var _open_chords_charts$chart_editor$Page_ChartCard$removePartAtIndex = F2(
 	function (partIndex, chart) {
 		var newParts = A2(
 			_elm_lang$core$List$filterMap,
@@ -12630,7 +14355,7 @@ var _open_chords_charts$chart_editor$ChartCard$removePartAtIndex = F2(
 			chart,
 			{parts: newParts});
 	});
-var _open_chords_charts$chart_editor$ChartCard$updatePartAtIndex = F3(
+var _open_chords_charts$chart_editor$Page_ChartCard$updatePartAtIndex = F3(
 	function (partIndex, updatePart, chart) {
 		var newParts = A2(
 			_elm_lang$core$List$indexedMap,
@@ -12643,10 +14368,10 @@ var _open_chords_charts$chart_editor$ChartCard$updatePartAtIndex = F3(
 			chart,
 			{parts: newParts});
 	});
-var _open_chords_charts$chart_editor$ChartCard$updateBarAt = F3(
+var _open_chords_charts$chart_editor$Page_ChartCard$updateBarAt = F3(
 	function (barReference, updateBar, chart) {
 		return A3(
-			_open_chords_charts$chart_editor$ChartCard$updatePartAtIndex,
+			_open_chords_charts$chart_editor$Page_ChartCard$updatePartAtIndex,
 			barReference.partIndex,
 			_open_chords_charts$chart_editor$Music_Chart$mapPartBars(
 				_elm_lang$core$List$indexedMap(
@@ -12656,58 +14381,50 @@ var _open_chords_charts$chart_editor$ChartCard$updateBarAt = F3(
 						}))),
 			chart);
 	});
-var _open_chords_charts$chart_editor$ChartCard$getBarAtReference = F2(
+var _open_chords_charts$chart_editor$Page_ChartCard$getBarAtReference = F2(
 	function (barReference, chart) {
 		return A2(
 			_elm_community$list_extra$List_Extra$getAt,
 			barReference.barIndex,
 			A2(_open_chords_charts$chart_editor$Music_Chart$getBarsOfPartByIndex, barReference.partIndex, chart));
 	});
-var _open_chords_charts$chart_editor$ChartCard$youFoundABugMessage = 'Should never happen – you found a bug :-)';
-var _open_chords_charts$chart_editor$ChartCard$nbMaxChordsInBar = 4;
-var _open_chords_charts$chart_editor$ChartCard$nbBarsByRow = 8;
-var _open_chords_charts$chart_editor$ChartCard$defaultChord = A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$C, _open_chords_charts$chart_editor$Music_Chord$Major);
-var _open_chords_charts$chart_editor$ChartCard$defaultBar = _open_chords_charts$chart_editor$Music_Chart$Bar(
+var _open_chords_charts$chart_editor$Page_ChartCard$youFoundABugMessage = 'Should never happen – you found a bug :-)';
+var _open_chords_charts$chart_editor$Page_ChartCard$nbMaxChordsInBar = 4;
+var _open_chords_charts$chart_editor$Page_ChartCard$nbBarsByRow = 8;
+var _open_chords_charts$chart_editor$Page_ChartCard$defaultChord = A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$C, _open_chords_charts$chart_editor$Music_Chord$Major);
+var _open_chords_charts$chart_editor$Page_ChartCard$defaultBar = _open_chords_charts$chart_editor$Music_Chart$Bar(
 	{
 		ctor: '::',
-		_0: _open_chords_charts$chart_editor$ChartCard$defaultChord,
+		_0: _open_chords_charts$chart_editor$Page_ChartCard$defaultChord,
 		_1: {ctor: '[]'}
 	});
-var _open_chords_charts$chart_editor$ChartCard$defaultPart = A2(
+var _open_chords_charts$chart_editor$Page_ChartCard$defaultPart = A2(
 	_open_chords_charts$chart_editor$Music_Chart$Part,
 	'',
 	{
 		ctor: '::',
-		_0: _open_chords_charts$chart_editor$ChartCard$defaultBar,
+		_0: _open_chords_charts$chart_editor$Page_ChartCard$defaultBar,
 		_1: {ctor: '[]'}
 	});
-var _open_chords_charts$chart_editor$ChartCard$BarReference = F2(
+var _open_chords_charts$chart_editor$Page_ChartCard$BarReference = F2(
 	function (a, b) {
 		return {partIndex: a, barIndex: b};
 	});
-var _open_chords_charts$chart_editor$ChartCard$Model = F4(
+var _open_chords_charts$chart_editor$Page_ChartCard$Model = F4(
 	function (a, b, c, d) {
 		return {chart: a, chartStr: b, status: c, viewedKey: d};
 	});
-var _open_chords_charts$chart_editor$ChartCard$BarSelection = function (a) {
+var _open_chords_charts$chart_editor$Page_ChartCard$BarSelection = function (a) {
 	return {ctor: 'BarSelection', _0: a};
 };
-var _open_chords_charts$chart_editor$ChartCard$PartSelection = function (a) {
+var _open_chords_charts$chart_editor$Page_ChartCard$PartSelection = function (a) {
 	return {ctor: 'PartSelection', _0: a};
 };
-var _open_chords_charts$chart_editor$ChartCard$EditStatus = function (a) {
+var _open_chords_charts$chart_editor$Page_ChartCard$EditStatus = function (a) {
 	return {ctor: 'EditStatus', _0: a};
 };
-var _open_chords_charts$chart_editor$ChartCard$ViewStatus = {ctor: 'ViewStatus'};
-var _open_chords_charts$chart_editor$ChartCard$init = function (chart) {
-	return {
-		chart: chart,
-		chartStr: _open_chords_charts$chart_editor$Music_Chart$toString(chart),
-		status: _open_chords_charts$chart_editor$ChartCard$ViewStatus,
-		viewedKey: chart.key
-	};
-};
-var _open_chords_charts$chart_editor$ChartCard$update = F2(
+var _open_chords_charts$chart_editor$Page_ChartCard$ViewStatus = {ctor: 'ViewStatus'};
+var _open_chords_charts$chart_editor$Page_ChartCard$update = F2(
 	function (msg, model) {
 		var updateChartAndChartStr = F2(
 			function (chart, model) {
@@ -12720,10 +14437,10 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 			});
 		var removePart = F2(
 			function (partIndex, model) {
-				var newChart = A2(_open_chords_charts$chart_editor$ChartCard$removePartAtIndex, partIndex, model.chart);
+				var newChart = A2(_open_chords_charts$chart_editor$Page_ChartCard$removePartAtIndex, partIndex, model.chart);
 				var nbParts = _elm_lang$core$List$length(newChart.parts);
-				var newStatus = _open_chords_charts$chart_editor$ChartCard$EditStatus(
-					_open_chords_charts$chart_editor$ChartCard$PartSelection(
+				var newStatus = _open_chords_charts$chart_editor$Page_ChartCard$EditStatus(
+					_open_chords_charts$chart_editor$Page_ChartCard$PartSelection(
 						(_elm_lang$core$Native_Utils.cmp(partIndex, nbParts - 1) > 0) ? A2(_elm_lang$core$Basics$max, 0, nbParts - 1) : partIndex));
 				return A2(
 					updateChartAndChartStr,
@@ -12733,7 +14450,7 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 						{status: newStatus}));
 			});
 		var parse = function (chartStr) {
-			var _p13 = A2(_elm_tools$parser$Parser$run, _open_chords_charts$chart_editor$Parsers$chart, chartStr);
+			var _p13 = A2(_elm_tools$parser$Parser$run, _open_chords_charts$chart_editor$Music_Chart_Parsers$chart, chartStr);
 			if (_p13.ctor === 'Ok') {
 				return _elm_lang$core$Native_Utils.update(
 					model,
@@ -12745,8 +14462,8 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 		};
 		var addPart = F3(
 			function (partIndex, part, model) {
-				var newStatus = _open_chords_charts$chart_editor$ChartCard$EditStatus(
-					_open_chords_charts$chart_editor$ChartCard$PartSelection(partIndex));
+				var newStatus = _open_chords_charts$chart_editor$Page_ChartCard$EditStatus(
+					_open_chords_charts$chart_editor$Page_ChartCard$PartSelection(partIndex));
 				var chart = model.chart;
 				var newParts = function (_p15) {
 					var _p16 = _p15;
@@ -12777,10 +14494,10 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 		switch (_p17.ctor) {
 			case 'AddBar':
 				var _p21 = _p17._0;
-				var newStatus = _open_chords_charts$chart_editor$ChartCard$EditStatus(
-					_open_chords_charts$chart_editor$ChartCard$BarSelection(_p21));
+				var newStatus = _open_chords_charts$chart_editor$Page_ChartCard$EditStatus(
+					_open_chords_charts$chart_editor$Page_ChartCard$BarSelection(_p21));
 				var newChart = A3(
-					_open_chords_charts$chart_editor$ChartCard$updatePartAtIndex,
+					_open_chords_charts$chart_editor$Page_ChartCard$updatePartAtIndex,
 					_p21.partIndex,
 					_open_chords_charts$chart_editor$Music_Chart$mapPartBars(
 						function (_p18) {
@@ -12793,7 +14510,7 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 										_elm_lang$core$Basics_ops['++'],
 										{
 											ctor: '::',
-											_0: _open_chords_charts$chart_editor$ChartCard$defaultBar,
+											_0: _open_chords_charts$chart_editor$Page_ChartCard$defaultBar,
 											_1: {ctor: '[]'}
 										},
 										_p20._1));
@@ -12809,7 +14526,7 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 						{status: newStatus}));
 			case 'AddChord':
 				var newChart = A3(
-					_open_chords_charts$chart_editor$ChartCard$updateBarAt,
+					_open_chords_charts$chart_editor$Page_ChartCard$updateBarAt,
 					_p17._0,
 					_open_chords_charts$chart_editor$Music_Chart$mapBarChords(
 						function (chords) {
@@ -12818,14 +14535,14 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 								chords,
 								{
 									ctor: '::',
-									_0: _open_chords_charts$chart_editor$ChartCard$defaultChord,
+									_0: _open_chords_charts$chart_editor$Page_ChartCard$defaultChord,
 									_1: {ctor: '[]'}
 								});
 						}),
 					model.chart);
 				return A2(updateChartAndChartStr, newChart, model);
 			case 'AddPart':
-				return A3(addPart, _p17._0, _open_chords_charts$chart_editor$ChartCard$defaultPart, model);
+				return A3(addPart, _p17._0, _open_chords_charts$chart_editor$Page_ChartCard$defaultPart, model);
 			case 'DuplicatePart':
 				var _p23 = _p17._0;
 				var _p22 = A2(_elm_community$list_extra$List_Extra$getAt, _p23, model.chart.parts);
@@ -12835,8 +14552,8 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 					return A3(addPart, _p23 + 1, _p22._0, model);
 				}
 			case 'Edit':
-				var newStatus = _open_chords_charts$chart_editor$ChartCard$EditStatus(
-					_open_chords_charts$chart_editor$ChartCard$BarSelection(
+				var newStatus = _open_chords_charts$chart_editor$Page_ChartCard$EditStatus(
+					_open_chords_charts$chart_editor$Page_ChartCard$BarSelection(
 						{partIndex: 0, barIndex: 0}));
 				return _elm_lang$core$Native_Utils.update(
 					model,
@@ -12856,7 +14573,7 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 			case 'RemoveBar':
 				var _p26 = _p17._0;
 				var newChart = A3(
-					_open_chords_charts$chart_editor$ChartCard$updatePartAtIndex,
+					_open_chords_charts$chart_editor$Page_ChartCard$updatePartAtIndex,
 					_p26.partIndex,
 					_open_chords_charts$chart_editor$Music_Chart$mapPartBars(
 						_elm_community$list_extra$List_Extra$removeAt(_p26.barIndex)),
@@ -12864,8 +14581,8 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 				var nbBars = _elm_lang$core$List$length(
 					A2(_open_chords_charts$chart_editor$Music_Chart$getBarsOfPartByIndex, _p26.partIndex, newChart));
 				var newBarIndex = (_elm_lang$core$Native_Utils.cmp(_p26.barIndex, nbBars - 1) > 0) ? A2(_elm_lang$core$Basics$max, 0, nbBars - 1) : _p26.barIndex;
-				var newStatus = _open_chords_charts$chart_editor$ChartCard$EditStatus(
-					_open_chords_charts$chart_editor$ChartCard$BarSelection(
+				var newStatus = _open_chords_charts$chart_editor$Page_ChartCard$EditStatus(
+					_open_chords_charts$chart_editor$Page_ChartCard$BarSelection(
 						_elm_lang$core$Native_Utils.update(
 							_p26,
 							{barIndex: newBarIndex})));
@@ -12877,7 +14594,7 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 						{status: newStatus}));
 			case 'RemoveChord':
 				var newChart = A3(
-					_open_chords_charts$chart_editor$ChartCard$updateBarAt,
+					_open_chords_charts$chart_editor$Page_ChartCard$updateBarAt,
 					_p17._0,
 					_open_chords_charts$chart_editor$Music_Chart$mapBarChords(
 						_elm_community$list_extra$List_Extra$removeAt(_p17._1)),
@@ -12889,34 +14606,34 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 				return function (model) {
 					return _elm_lang$core$Native_Utils.update(
 						model,
-						{status: _open_chords_charts$chart_editor$ChartCard$ViewStatus});
+						{status: _open_chords_charts$chart_editor$Page_ChartCard$ViewStatus});
 				}(
 					parse(model.chartStr));
 			case 'SelectBar':
-				var newStatus = _open_chords_charts$chart_editor$ChartCard$EditStatus(
-					_open_chords_charts$chart_editor$ChartCard$BarSelection(_p17._0));
+				var newStatus = _open_chords_charts$chart_editor$Page_ChartCard$EditStatus(
+					_open_chords_charts$chart_editor$Page_ChartCard$BarSelection(_p17._0));
 				return _elm_lang$core$Native_Utils.update(
 					model,
 					{status: newStatus});
 			case 'SelectPart':
-				var newStatus = _open_chords_charts$chart_editor$ChartCard$EditStatus(
-					_open_chords_charts$chart_editor$ChartCard$PartSelection(_p17._0));
+				var newStatus = _open_chords_charts$chart_editor$Page_ChartCard$EditStatus(
+					_open_chords_charts$chart_editor$Page_ChartCard$PartSelection(_p17._0));
 				return _elm_lang$core$Native_Utils.update(
 					model,
 					{status: newStatus});
 			case 'SetBarRepeat':
 				var newChart = A3(
-					_open_chords_charts$chart_editor$ChartCard$updateBarAt,
+					_open_chords_charts$chart_editor$Page_ChartCard$updateBarAt,
 					_p17._0,
 					function (_p27) {
-						return _p17._1 ? _open_chords_charts$chart_editor$Music_Chart$BarRepeat : _open_chords_charts$chart_editor$ChartCard$defaultBar;
+						return _p17._1 ? _open_chords_charts$chart_editor$Music_Chart$BarRepeat : _open_chords_charts$chart_editor$Page_ChartCard$defaultBar;
 					},
 					model.chart);
 				return A2(updateChartAndChartStr, newChart, model);
 			case 'SetPartName':
 				var _p29 = _p17._1;
 				var newChart = A3(
-					_open_chords_charts$chart_editor$ChartCard$updatePartAtIndex,
+					_open_chords_charts$chart_editor$Page_ChartCard$updatePartAtIndex,
 					_p17._0,
 					function (part) {
 						var _p28 = part;
@@ -12930,7 +14647,7 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 				return A2(updateChartAndChartStr, newChart, model);
 			case 'SetPartRepeat':
 				var newChart = A3(
-					_open_chords_charts$chart_editor$ChartCard$updatePartAtIndex,
+					_open_chords_charts$chart_editor$Page_ChartCard$updatePartAtIndex,
 					_p17._0,
 					function (part) {
 						var partName = _open_chords_charts$chart_editor$Music_Chart$getPartName(part);
@@ -12939,7 +14656,7 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 							partName,
 							{
 								ctor: '::',
-								_0: _open_chords_charts$chart_editor$ChartCard$defaultBar,
+								_0: _open_chords_charts$chart_editor$Page_ChartCard$defaultBar,
 								_1: {ctor: '[]'}
 							});
 					},
@@ -12947,7 +14664,7 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 				return A2(updateChartAndChartStr, newChart, model);
 			case 'SetChord':
 				var newChart = A3(
-					_open_chords_charts$chart_editor$ChartCard$updateBarAt,
+					_open_chords_charts$chart_editor$Page_ChartCard$updateBarAt,
 					_p17._0,
 					_open_chords_charts$chart_editor$Music_Chart$mapBarChords(
 						_elm_lang$core$List$indexedMap(
@@ -12969,36 +14686,61 @@ var _open_chords_charts$chart_editor$ChartCard$update = F2(
 				return parse(model.chartStr);
 		}
 	});
-var _open_chords_charts$chart_editor$ChartCard$TextAreaSave = {ctor: 'TextAreaSave'};
-var _open_chords_charts$chart_editor$ChartCard$TextAreaInput = function (a) {
+var _open_chords_charts$chart_editor$Page_ChartCard$NotFound = {ctor: 'NotFound'};
+var _open_chords_charts$chart_editor$Page_ChartCard$ParserError = function (a) {
+	return {ctor: 'ParserError', _0: a};
+};
+var _open_chords_charts$chart_editor$Page_ChartCard$initialModel = function (slug) {
+	var chartStr = '\n---\ntitle: All of me\nkey: C\n---\n\n= A\nC - E7 - A7 - Dm -\n\n= B\nE7 - Am - D7 - G7 -\n\n= A\n\n= C\nF Fm C A7 Dø G7 C -\n';
+	if (_elm_lang$core$Native_Utils.eq(slug, 'all-of-me')) {
+		var _p30 = A2(_elm_tools$parser$Parser$run, _open_chords_charts$chart_editor$Music_Chart_Parsers$chart, chartStr);
+		if (_p30.ctor === 'Ok') {
+			var _p31 = _p30._0;
+			return _elm_lang$core$Result$Ok(
+				{
+					chart: _p31,
+					chartStr: _open_chords_charts$chart_editor$Music_Chart$toString(_p31),
+					status: _open_chords_charts$chart_editor$Page_ChartCard$ViewStatus,
+					viewedKey: _p31.key
+				});
+		} else {
+			return _elm_lang$core$Result$Err(
+				_open_chords_charts$chart_editor$Page_ChartCard$ParserError(_p30._0));
+		}
+	} else {
+		return _elm_lang$core$Result$Err(_open_chords_charts$chart_editor$Page_ChartCard$NotFound);
+	}
+};
+var _open_chords_charts$chart_editor$Page_ChartCard$TextAreaSave = {ctor: 'TextAreaSave'};
+var _open_chords_charts$chart_editor$Page_ChartCard$TextAreaInput = function (a) {
 	return {ctor: 'TextAreaInput', _0: a};
 };
-var _open_chords_charts$chart_editor$ChartCard$SetViewKey = function (a) {
+var _open_chords_charts$chart_editor$Page_ChartCard$SetViewKey = function (a) {
 	return {ctor: 'SetViewKey', _0: a};
 };
-var _open_chords_charts$chart_editor$ChartCard$SetChord = F3(
+var _open_chords_charts$chart_editor$Page_ChartCard$SetChord = F3(
 	function (a, b, c) {
 		return {ctor: 'SetChord', _0: a, _1: b, _2: c};
 	});
-var _open_chords_charts$chart_editor$ChartCard$SetPartRepeat = F2(
+var _open_chords_charts$chart_editor$Page_ChartCard$SetPartRepeat = F2(
 	function (a, b) {
 		return {ctor: 'SetPartRepeat', _0: a, _1: b};
 	});
-var _open_chords_charts$chart_editor$ChartCard$SetPartName = F2(
+var _open_chords_charts$chart_editor$Page_ChartCard$SetPartName = F2(
 	function (a, b) {
 		return {ctor: 'SetPartName', _0: a, _1: b};
 	});
-var _open_chords_charts$chart_editor$ChartCard$SetBarRepeat = F2(
+var _open_chords_charts$chart_editor$Page_ChartCard$SetBarRepeat = F2(
 	function (a, b) {
 		return {ctor: 'SetBarRepeat', _0: a, _1: b};
 	});
-var _open_chords_charts$chart_editor$ChartCard$SelectPart = function (a) {
+var _open_chords_charts$chart_editor$Page_ChartCard$SelectPart = function (a) {
 	return {ctor: 'SelectPart', _0: a};
 };
-var _open_chords_charts$chart_editor$ChartCard$SelectBar = function (a) {
+var _open_chords_charts$chart_editor$Page_ChartCard$SelectBar = function (a) {
 	return {ctor: 'SelectBar', _0: a};
 };
-var _open_chords_charts$chart_editor$ChartCard$viewPart = F4(
+var _open_chords_charts$chart_editor$Page_ChartCard$viewPart = F4(
 	function (chart, status, partIndex, part) {
 		var addPaddingBars = function (bars) {
 			var emptyBar = A2(
@@ -13010,36 +14752,36 @@ var _open_chords_charts$chart_editor$ChartCard$viewPart = F4(
 				},
 				{
 					ctor: '::',
-					_0: _open_chords_charts$chart_editor$ChartCard$barCell(
+					_0: _open_chords_charts$chart_editor$Page_ChartCard$barCell(
 						{ctor: '[]'}),
 					_1: {ctor: '[]'}
 				});
-			var nbPaddingBars = _open_chords_charts$chart_editor$ChartCard$nbBarsByRow - _elm_lang$core$List$length(bars);
+			var nbPaddingBars = _open_chords_charts$chart_editor$Page_ChartCard$nbBarsByRow - _elm_lang$core$List$length(bars);
 			var paddingBars = A2(_elm_lang$core$List$repeat, nbPaddingBars, emptyBar);
 			return A2(_elm_lang$core$Basics_ops['++'], paddingBars, bars);
 		};
 		var isBarSelected = function (barIndex) {
-			var _p30 = status;
-			if (_p30.ctor === 'EditStatus') {
-				var _p31 = _p30._0;
-				if (_p31.ctor === 'BarSelection') {
-					var _p32 = _p31._0;
-					return _elm_lang$core$Native_Utils.eq(partIndex, _p32.partIndex) && _elm_lang$core$Native_Utils.eq(barIndex, _p32.barIndex);
+			var _p32 = status;
+			if (_p32.ctor === 'EditStatus') {
+				var _p33 = _p32._0;
+				if (_p33.ctor === 'BarSelection') {
+					var _p34 = _p33._0;
+					return _elm_lang$core$Native_Utils.eq(partIndex, _p34.partIndex) && _elm_lang$core$Native_Utils.eq(barIndex, _p34.barIndex);
 				} else {
-					return _elm_lang$core$Native_Utils.eq(partIndex, _p31._0);
+					return _elm_lang$core$Native_Utils.eq(partIndex, _p33._0);
 				}
 			} else {
 				return false;
 			}
 		};
 		var isPartSelected = function () {
-			var _p33 = status;
-			if (_p33.ctor === 'EditStatus') {
-				var _p34 = _p33._0;
-				if (_p34.ctor === 'BarSelection') {
+			var _p35 = status;
+			if (_p35.ctor === 'EditStatus') {
+				var _p36 = _p35._0;
+				if (_p36.ctor === 'BarSelection') {
 					return false;
 				} else {
-					return _elm_lang$core$Native_Utils.eq(partIndex, _p34._0);
+					return _elm_lang$core$Native_Utils.eq(partIndex, _p36._0);
 				}
 			} else {
 				return false;
@@ -13051,15 +14793,15 @@ var _open_chords_charts$chart_editor$ChartCard$viewPart = F4(
 				A2(
 					_elm_lang$core$Basics_ops['++'],
 					function () {
-						var _p35 = status;
-						if (_p35.ctor === 'EditStatus') {
+						var _p37 = status;
+						if (_p37.ctor === 'EditStatus') {
 							return {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Attributes$class('pointer'),
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onClick(
-										_open_chords_charts$chart_editor$ChartCard$SelectPart(partIndex)),
+										_open_chords_charts$chart_editor$Page_ChartCard$SelectPart(partIndex)),
 									_1: {ctor: '[]'}
 								}
 							};
@@ -13087,8 +14829,8 @@ var _open_chords_charts$chart_editor$ChartCard$viewPart = F4(
 					_1: {ctor: '[]'}
 				});
 		};
-		var _p36 = part;
-		if (_p36.ctor === 'Part') {
+		var _p38 = part;
+		if (_p38.ctor === 'Part') {
 			return A2(
 				_elm_lang$core$List$indexedMap,
 				F2(
@@ -13103,29 +14845,29 @@ var _open_chords_charts$chart_editor$ChartCard$viewPart = F4(
 							{
 								ctor: '::',
 								_0: partCell(
-									_elm_lang$core$Native_Utils.eq(rowIndex, 0) ? _p36._0 : ''),
+									_elm_lang$core$Native_Utils.eq(rowIndex, 0) ? _p38._0 : ''),
 								_1: addPaddingBars(
 									A2(
 										_elm_lang$core$List$indexedMap,
 										F2(
 											function (barIndexInRow, bar) {
 												var previousBar = A2(_elm_community$list_extra$List_Extra$getAt, barIndexInRow - 1, rowBars);
-												var barIndex = (rowIndex * _open_chords_charts$chart_editor$ChartCard$nbBarsByRow) + barIndexInRow;
+												var barIndex = (rowIndex * _open_chords_charts$chart_editor$Page_ChartCard$nbBarsByRow) + barIndexInRow;
 												return A5(
-													_open_chords_charts$chart_editor$ChartCard$viewBar,
+													_open_chords_charts$chart_editor$Page_ChartCard$viewBar,
 													status,
 													isBarSelected(barIndex),
-													_open_chords_charts$chart_editor$ChartCard$SelectBar(
-														A2(_open_chords_charts$chart_editor$ChartCard$BarReference, partIndex, barIndex)),
+													_open_chords_charts$chart_editor$Page_ChartCard$SelectBar(
+														A2(_open_chords_charts$chart_editor$Page_ChartCard$BarReference, partIndex, barIndex)),
 													bar,
 													previousBar);
 											}),
 										rowBars))
 							});
 					}),
-				A2(_elm_community$list_extra$List_Extra$greedyGroupsOf, _open_chords_charts$chart_editor$ChartCard$nbBarsByRow, _p36._1));
+				A2(_elm_community$list_extra$List_Extra$greedyGroupsOf, _open_chords_charts$chart_editor$Page_ChartCard$nbBarsByRow, _p38._1));
 		} else {
-			var _p38 = _p36._0;
+			var _p40 = _p38._0;
 			return {
 				ctor: '::',
 				_0: A2(
@@ -13137,26 +14879,26 @@ var _open_chords_charts$chart_editor$ChartCard$viewPart = F4(
 					},
 					{
 						ctor: '::',
-						_0: partCell(_p38),
+						_0: partCell(_p40),
 						_1: function () {
-							var _p37 = A2(_open_chords_charts$chart_editor$Music_Chart$getPartByName, _p38, chart);
-							if ((_p37.ctor === 'Just') && (_p37._0.ctor === 'Part')) {
+							var _p39 = A2(_open_chords_charts$chart_editor$Music_Chart$getPartByName, _p40, chart);
+							if ((_p39.ctor === 'Just') && (_p39._0.ctor === 'Part')) {
 								return addPaddingBars(
 									A2(
 										_elm_lang$core$List$indexedMap,
 										F2(
 											function (barIndex, bar) {
 												return A5(
-													_open_chords_charts$chart_editor$ChartCard$viewBar,
+													_open_chords_charts$chart_editor$Page_ChartCard$viewBar,
 													status,
 													isBarSelected(barIndex),
-													_open_chords_charts$chart_editor$ChartCard$SelectPart(partIndex),
+													_open_chords_charts$chart_editor$Page_ChartCard$SelectPart(partIndex),
 													bar,
 													_elm_lang$core$Maybe$Nothing);
 											}),
 										A2(
 											_elm_lang$core$List$repeat,
-											_elm_lang$core$List$length(_p37._0._1),
+											_elm_lang$core$List$length(_p39._0._1),
 											_open_chords_charts$chart_editor$Music_Chart$BarRepeat)));
 							} else {
 								return {ctor: '[]'};
@@ -13167,38 +14909,38 @@ var _open_chords_charts$chart_editor$ChartCard$viewPart = F4(
 			};
 		}
 	});
-var _open_chords_charts$chart_editor$ChartCard$Save = {ctor: 'Save'};
-var _open_chords_charts$chart_editor$ChartCard$RemovePart = function (a) {
+var _open_chords_charts$chart_editor$Page_ChartCard$Save = {ctor: 'Save'};
+var _open_chords_charts$chart_editor$Page_ChartCard$RemovePart = function (a) {
 	return {ctor: 'RemovePart', _0: a};
 };
-var _open_chords_charts$chart_editor$ChartCard$RemoveChord = F2(
+var _open_chords_charts$chart_editor$Page_ChartCard$RemoveChord = F2(
 	function (a, b) {
 		return {ctor: 'RemoveChord', _0: a, _1: b};
 	});
-var _open_chords_charts$chart_editor$ChartCard$RemoveBar = function (a) {
+var _open_chords_charts$chart_editor$Page_ChartCard$RemoveBar = function (a) {
 	return {ctor: 'RemoveBar', _0: a};
 };
-var _open_chords_charts$chart_editor$ChartCard$MovePart = F2(
+var _open_chords_charts$chart_editor$Page_ChartCard$MovePart = F2(
 	function (a, b) {
 		return {ctor: 'MovePart', _0: a, _1: b};
 	});
-var _open_chords_charts$chart_editor$ChartCard$Edit = {ctor: 'Edit'};
-var _open_chords_charts$chart_editor$ChartCard$DuplicatePart = function (a) {
+var _open_chords_charts$chart_editor$Page_ChartCard$Edit = {ctor: 'Edit'};
+var _open_chords_charts$chart_editor$Page_ChartCard$DuplicatePart = function (a) {
 	return {ctor: 'DuplicatePart', _0: a};
 };
-var _open_chords_charts$chart_editor$ChartCard$AddPart = function (a) {
+var _open_chords_charts$chart_editor$Page_ChartCard$AddPart = function (a) {
 	return {ctor: 'AddPart', _0: a};
 };
-var _open_chords_charts$chart_editor$ChartCard$AddChord = function (a) {
+var _open_chords_charts$chart_editor$Page_ChartCard$AddChord = function (a) {
 	return {ctor: 'AddChord', _0: a};
 };
-var _open_chords_charts$chart_editor$ChartCard$AddBar = function (a) {
+var _open_chords_charts$chart_editor$Page_ChartCard$AddBar = function (a) {
 	return {ctor: 'AddBar', _0: a};
 };
-var _open_chords_charts$chart_editor$ChartCard$Secondary = {ctor: 'Secondary'};
-var _open_chords_charts$chart_editor$ChartCard$Primary = {ctor: 'Primary'};
-var _open_chords_charts$chart_editor$ChartCard$NotPressed = {ctor: 'NotPressed'};
-var _open_chords_charts$chart_editor$ChartCard$viewBarEditor = F3(
+var _open_chords_charts$chart_editor$Page_ChartCard$Secondary = {ctor: 'Secondary'};
+var _open_chords_charts$chart_editor$Page_ChartCard$Primary = {ctor: 'Primary'};
+var _open_chords_charts$chart_editor$Page_ChartCard$NotPressed = {ctor: 'NotPressed'};
+var _open_chords_charts$chart_editor$Page_ChartCard$viewBarEditor = F3(
 	function (chart, barReference, bar) {
 		var barRepeatCheckbox = function (isChecked) {
 			return A2(
@@ -13214,7 +14956,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBarEditor = F3(
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onCheck(
-									_open_chords_charts$chart_editor$ChartCard$SetBarRepeat(barReference)),
+									_open_chords_charts$chart_editor$Page_ChartCard$SetBarRepeat(barReference)),
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
@@ -13236,14 +14978,14 @@ var _open_chords_charts$chart_editor$ChartCard$viewBarEditor = F3(
 			A2(
 				_elm_lang$core$Basics_ops['++'],
 				function () {
-					var _p39 = bar;
-					if (_p39.ctor === 'Bar') {
-						var _p44 = _p39._0;
+					var _p41 = bar;
+					if (_p41.ctor === 'Bar') {
+						var _p46 = _p41._0;
 						return A2(
 							_elm_lang$core$Basics_ops['++'],
 							{
 								ctor: '::',
-								_0: _open_chords_charts$chart_editor$ChartCard$toolbar(
+								_0: _open_chords_charts$chart_editor$Page_ChartCard$toolbar(
 									{
 										ctor: '::',
 										_0: barRepeatCheckbox(false),
@@ -13256,52 +14998,52 @@ var _open_chords_charts$chart_editor$ChartCard$viewBarEditor = F3(
 								A2(
 									_elm_lang$core$List$indexedMap,
 									F2(
-										function (chordIndex, _p40) {
-											var _p41 = _p40;
-											var _p43 = _p41._1;
-											var _p42 = _p41._0;
-											return _open_chords_charts$chart_editor$ChartCard$toolbar(
+										function (chordIndex, _p42) {
+											var _p43 = _p42;
+											var _p45 = _p43._1;
+											var _p44 = _p43._0;
+											return _open_chords_charts$chart_editor$Page_ChartCard$toolbar(
 												{
 													ctor: '::',
 													_0: A3(
-														_open_chords_charts$chart_editor$ChartCard$noteSelect,
+														_open_chords_charts$chart_editor$Page_ChartCard$noteSelect,
 														_open_chords_charts$chart_editor$Music_Note$notes,
-														_p42,
+														_p44,
 														function (selectedNote) {
 															return A3(
-																_open_chords_charts$chart_editor$ChartCard$SetChord,
+																_open_chords_charts$chart_editor$Page_ChartCard$SetChord,
 																barReference,
 																chordIndex,
-																A2(_open_chords_charts$chart_editor$Music_Chord$Chord, selectedNote, _p43));
+																A2(_open_chords_charts$chart_editor$Music_Chord$Chord, selectedNote, _p45));
 														}),
 													_1: {
 														ctor: '::',
 														_0: A2(
-															_open_chords_charts$chart_editor$ChartCard$qualitySelect,
-															_p43,
+															_open_chords_charts$chart_editor$Page_ChartCard$qualitySelect,
+															_p45,
 															function (selectedQuality) {
 																return A3(
-																	_open_chords_charts$chart_editor$ChartCard$SetChord,
+																	_open_chords_charts$chart_editor$Page_ChartCard$SetChord,
 																	barReference,
 																	chordIndex,
-																	A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _p42, selectedQuality));
+																	A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _p44, selectedQuality));
 															}),
 														_1: {
 															ctor: '::',
 															_0: A4(
-																_open_chords_charts$chart_editor$ChartCard$button,
-																_open_chords_charts$chart_editor$ChartCard$Secondary,
-																_open_chords_charts$chart_editor$ChartCard$NotPressed,
+																_open_chords_charts$chart_editor$Page_ChartCard$button,
+																_open_chords_charts$chart_editor$Page_ChartCard$Secondary,
+																_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
 																{
 																	ctor: '::',
 																	_0: _elm_lang$html$Html_Attributes$disabled(
 																		_elm_lang$core$Native_Utils.eq(
-																			_elm_lang$core$List$length(_p44),
+																			_elm_lang$core$List$length(_p46),
 																			1)),
 																	_1: {
 																		ctor: '::',
 																		_0: _elm_lang$html$Html_Events$onClick(
-																			A2(_open_chords_charts$chart_editor$ChartCard$RemoveChord, barReference, chordIndex)),
+																			A2(_open_chords_charts$chart_editor$Page_ChartCard$RemoveChord, barReference, chordIndex)),
 																		_1: {
 																			ctor: '::',
 																			_0: _elm_lang$html$Html_Attributes$class('ml1'),
@@ -13319,26 +15061,26 @@ var _open_chords_charts$chart_editor$ChartCard$viewBarEditor = F3(
 													}
 												});
 										}),
-									_p44),
+									_p46),
 								{
 									ctor: '::',
-									_0: _open_chords_charts$chart_editor$ChartCard$toolbar(
+									_0: _open_chords_charts$chart_editor$Page_ChartCard$toolbar(
 										{
 											ctor: '::',
 											_0: A4(
-												_open_chords_charts$chart_editor$ChartCard$button,
-												_open_chords_charts$chart_editor$ChartCard$Secondary,
-												_open_chords_charts$chart_editor$ChartCard$NotPressed,
+												_open_chords_charts$chart_editor$Page_ChartCard$button,
+												_open_chords_charts$chart_editor$Page_ChartCard$Secondary,
+												_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
 												{
 													ctor: '::',
 													_0: _elm_lang$html$Html_Attributes$disabled(
 														_elm_lang$core$Native_Utils.eq(
-															_elm_lang$core$List$length(_p44),
-															_open_chords_charts$chart_editor$ChartCard$nbMaxChordsInBar)),
+															_elm_lang$core$List$length(_p46),
+															_open_chords_charts$chart_editor$Page_ChartCard$nbMaxChordsInBar)),
 													_1: {
 														ctor: '::',
 														_0: _elm_lang$html$Html_Events$onClick(
-															_open_chords_charts$chart_editor$ChartCard$AddChord(barReference)),
+															_open_chords_charts$chart_editor$Page_ChartCard$AddChord(barReference)),
 														_1: {ctor: '[]'}
 													}
 												},
@@ -13354,7 +15096,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBarEditor = F3(
 					} else {
 						return {
 							ctor: '::',
-							_0: _open_chords_charts$chart_editor$ChartCard$toolbar(
+							_0: _open_chords_charts$chart_editor$Page_ChartCard$toolbar(
 								{
 									ctor: '::',
 									_0: barRepeatCheckbox(true),
@@ -13366,20 +15108,20 @@ var _open_chords_charts$chart_editor$ChartCard$viewBarEditor = F3(
 				}(),
 				{
 					ctor: '::',
-					_0: _open_chords_charts$chart_editor$ChartCard$toolbar(
+					_0: _open_chords_charts$chart_editor$Page_ChartCard$toolbar(
 						{
 							ctor: '::',
 							_0: A4(
-								_open_chords_charts$chart_editor$ChartCard$button,
-								_open_chords_charts$chart_editor$ChartCard$Secondary,
-								_open_chords_charts$chart_editor$ChartCard$NotPressed,
+								_open_chords_charts$chart_editor$Page_ChartCard$button,
+								_open_chords_charts$chart_editor$Page_ChartCard$Secondary,
+								_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
 								{
 									ctor: '::',
 									_0: _elm_lang$html$Html_Attributes$class('mr1'),
 									_1: {
 										ctor: '::',
 										_0: _elm_lang$html$Html_Events$onClick(
-											_open_chords_charts$chart_editor$ChartCard$AddBar(barReference)),
+											_open_chords_charts$chart_editor$Page_ChartCard$AddBar(barReference)),
 										_1: {ctor: '[]'}
 									}
 								},
@@ -13391,16 +15133,16 @@ var _open_chords_charts$chart_editor$ChartCard$viewBarEditor = F3(
 							_1: {
 								ctor: '::',
 								_0: A4(
-									_open_chords_charts$chart_editor$ChartCard$button,
-									_open_chords_charts$chart_editor$ChartCard$Secondary,
-									_open_chords_charts$chart_editor$ChartCard$NotPressed,
+									_open_chords_charts$chart_editor$Page_ChartCard$button,
+									_open_chords_charts$chart_editor$Page_ChartCard$Secondary,
+									_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
 									{
 										ctor: '::',
 										_0: _elm_lang$html$Html_Attributes$class('mr1'),
 										_1: {
 											ctor: '::',
 											_0: _elm_lang$html$Html_Events$onClick(
-												_open_chords_charts$chart_editor$ChartCard$AddBar(
+												_open_chords_charts$chart_editor$Page_ChartCard$AddBar(
 													_elm_lang$core$Native_Utils.update(
 														barReference,
 														{barIndex: barReference.barIndex + 1}))),
@@ -13420,9 +15162,9 @@ var _open_chords_charts$chart_editor$ChartCard$viewBarEditor = F3(
 												A2(_open_chords_charts$chart_editor$Music_Chart$getBarsOfPartByIndex, barReference.partIndex, chart)),
 											1);
 										return A4(
-											_open_chords_charts$chart_editor$ChartCard$button,
-											_open_chords_charts$chart_editor$ChartCard$Secondary,
-											_open_chords_charts$chart_editor$ChartCard$NotPressed,
+											_open_chords_charts$chart_editor$Page_ChartCard$button,
+											_open_chords_charts$chart_editor$Page_ChartCard$Secondary,
+											_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
 											{
 												ctor: '::',
 												_0: _elm_lang$html$Html_Attributes$class('mr1'),
@@ -13432,7 +15174,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBarEditor = F3(
 													_1: {
 														ctor: '::',
 														_0: _elm_lang$html$Html_Events$onClick(
-															_open_chords_charts$chart_editor$ChartCard$RemoveBar(barReference)),
+															_open_chords_charts$chart_editor$Page_ChartCard$RemoveBar(barReference)),
 														_1: {ctor: '[]'}
 													}
 												}
@@ -13450,7 +15192,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewBarEditor = F3(
 					_1: {ctor: '[]'}
 				}));
 	});
-var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
+var _open_chords_charts$chart_editor$Page_ChartCard$viewPartEditor = F3(
 	function (chart, partIndex, part) {
 		var partRepeatCheckbox = function (isChecked) {
 			return A2(
@@ -13466,7 +15208,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onCheck(
-									_open_chords_charts$chart_editor$ChartCard$SetPartRepeat(partIndex)),
+									_open_chords_charts$chart_editor$Page_ChartCard$SetPartRepeat(partIndex)),
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
@@ -13489,7 +15231,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 				_elm_lang$core$Basics_ops['++'],
 				{
 					ctor: '::',
-					_0: _open_chords_charts$chart_editor$ChartCard$toolbar(
+					_0: _open_chords_charts$chart_editor$Page_ChartCard$toolbar(
 						{
 							ctor: '::',
 							_0: partRepeatCheckbox(
@@ -13498,7 +15240,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 						}),
 					_1: {
 						ctor: '::',
-						_0: _open_chords_charts$chart_editor$ChartCard$toolbar(
+						_0: _open_chords_charts$chart_editor$Page_ChartCard$toolbar(
 							{
 								ctor: '::',
 								_0: A2(
@@ -13509,7 +15251,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 										_1: {
 											ctor: '::',
 											_0: _elm_lang$html$Html_Events$onInput(
-												_open_chords_charts$chart_editor$ChartCard$SetPartName(partIndex)),
+												_open_chords_charts$chart_editor$Page_ChartCard$SetPartName(partIndex)),
 											_1: {
 												ctor: '::',
 												_0: _elm_lang$html$Html_Attributes$value(
@@ -13527,27 +15269,27 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 				A2(
 					_elm_lang$core$Basics_ops['++'],
 					function () {
-						var _p45 = part;
-						if (_p45.ctor === 'PartRepeat') {
+						var _p47 = part;
+						if (_p47.ctor === 'PartRepeat') {
 							return {ctor: '[]'};
 						} else {
 							return {
 								ctor: '::',
-								_0: _open_chords_charts$chart_editor$ChartCard$toolbar(
+								_0: _open_chords_charts$chart_editor$Page_ChartCard$toolbar(
 									{
 										ctor: '::',
 										_0: A4(
-											_open_chords_charts$chart_editor$ChartCard$button,
-											_open_chords_charts$chart_editor$ChartCard$Secondary,
-											_open_chords_charts$chart_editor$ChartCard$NotPressed,
+											_open_chords_charts$chart_editor$Page_ChartCard$button,
+											_open_chords_charts$chart_editor$Page_ChartCard$Secondary,
+											_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
 											{
 												ctor: '::',
 												_0: _elm_lang$html$Html_Attributes$class('mr1'),
 												_1: {
 													ctor: '::',
 													_0: _elm_lang$html$Html_Events$onClick(
-														_open_chords_charts$chart_editor$ChartCard$AddBar(
-															A2(_open_chords_charts$chart_editor$ChartCard$BarReference, partIndex, 0))),
+														_open_chords_charts$chart_editor$Page_ChartCard$AddBar(
+															A2(_open_chords_charts$chart_editor$Page_ChartCard$BarReference, partIndex, 0))),
 													_1: {ctor: '[]'}
 												}
 											},
@@ -13559,20 +15301,20 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 										_1: {
 											ctor: '::',
 											_0: A4(
-												_open_chords_charts$chart_editor$ChartCard$button,
-												_open_chords_charts$chart_editor$ChartCard$Secondary,
-												_open_chords_charts$chart_editor$ChartCard$NotPressed,
+												_open_chords_charts$chart_editor$Page_ChartCard$button,
+												_open_chords_charts$chart_editor$Page_ChartCard$Secondary,
+												_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
 												{
 													ctor: '::',
 													_0: _elm_lang$html$Html_Attributes$class('mr1'),
 													_1: {
 														ctor: '::',
 														_0: _elm_lang$html$Html_Events$onClick(
-															_open_chords_charts$chart_editor$ChartCard$AddBar(
+															_open_chords_charts$chart_editor$Page_ChartCard$AddBar(
 																A2(
-																	_open_chords_charts$chart_editor$ChartCard$BarReference,
+																	_open_chords_charts$chart_editor$Page_ChartCard$BarReference,
 																	partIndex,
-																	_elm_lang$core$List$length(_p45._1)))),
+																	_elm_lang$core$List$length(_p47._1)))),
 														_1: {ctor: '[]'}
 													}
 												},
@@ -13590,20 +15332,20 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 					}(),
 					{
 						ctor: '::',
-						_0: _open_chords_charts$chart_editor$ChartCard$toolbar(
+						_0: _open_chords_charts$chart_editor$Page_ChartCard$toolbar(
 							{
 								ctor: '::',
 								_0: A4(
-									_open_chords_charts$chart_editor$ChartCard$button,
-									_open_chords_charts$chart_editor$ChartCard$Secondary,
-									_open_chords_charts$chart_editor$ChartCard$NotPressed,
+									_open_chords_charts$chart_editor$Page_ChartCard$button,
+									_open_chords_charts$chart_editor$Page_ChartCard$Secondary,
+									_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
 									{
 										ctor: '::',
 										_0: _elm_lang$html$Html_Attributes$class('mr1'),
 										_1: {
 											ctor: '::',
 											_0: _elm_lang$html$Html_Events$onClick(
-												_open_chords_charts$chart_editor$ChartCard$AddPart(partIndex)),
+												_open_chords_charts$chart_editor$Page_ChartCard$AddPart(partIndex)),
 											_1: {ctor: '[]'}
 										}
 									},
@@ -13615,16 +15357,16 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 								_1: {
 									ctor: '::',
 									_0: A4(
-										_open_chords_charts$chart_editor$ChartCard$button,
-										_open_chords_charts$chart_editor$ChartCard$Secondary,
-										_open_chords_charts$chart_editor$ChartCard$NotPressed,
+										_open_chords_charts$chart_editor$Page_ChartCard$button,
+										_open_chords_charts$chart_editor$Page_ChartCard$Secondary,
+										_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
 										{
 											ctor: '::',
 											_0: _elm_lang$html$Html_Attributes$class('mr1'),
 											_1: {
 												ctor: '::',
 												_0: _elm_lang$html$Html_Events$onClick(
-													_open_chords_charts$chart_editor$ChartCard$AddPart(partIndex + 1)),
+													_open_chords_charts$chart_editor$Page_ChartCard$AddPart(partIndex + 1)),
 												_1: {ctor: '[]'}
 											}
 										},
@@ -13636,16 +15378,16 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 									_1: {
 										ctor: '::',
 										_0: A4(
-											_open_chords_charts$chart_editor$ChartCard$button,
-											_open_chords_charts$chart_editor$ChartCard$Secondary,
-											_open_chords_charts$chart_editor$ChartCard$NotPressed,
+											_open_chords_charts$chart_editor$Page_ChartCard$button,
+											_open_chords_charts$chart_editor$Page_ChartCard$Secondary,
+											_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
 											{
 												ctor: '::',
 												_0: _elm_lang$html$Html_Attributes$class('mr1'),
 												_1: {
 													ctor: '::',
 													_0: _elm_lang$html$Html_Events$onClick(
-														_open_chords_charts$chart_editor$ChartCard$DuplicatePart(partIndex)),
+														_open_chords_charts$chart_editor$Page_ChartCard$DuplicatePart(partIndex)),
 													_1: {ctor: '[]'}
 												}
 											},
@@ -13657,9 +15399,9 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 										_1: {
 											ctor: '::',
 											_0: A4(
-												_open_chords_charts$chart_editor$ChartCard$button,
-												_open_chords_charts$chart_editor$ChartCard$Secondary,
-												_open_chords_charts$chart_editor$ChartCard$NotPressed,
+												_open_chords_charts$chart_editor$Page_ChartCard$button,
+												_open_chords_charts$chart_editor$Page_ChartCard$Secondary,
+												_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
 												{
 													ctor: '::',
 													_0: _elm_lang$html$Html_Attributes$class('mr1'),
@@ -13670,7 +15412,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 														_1: {
 															ctor: '::',
 															_0: _elm_lang$html$Html_Events$onClick(
-																A2(_open_chords_charts$chart_editor$ChartCard$MovePart, partIndex, partIndex - 1)),
+																A2(_open_chords_charts$chart_editor$Page_ChartCard$MovePart, partIndex, partIndex - 1)),
 															_1: {ctor: '[]'}
 														}
 													}
@@ -13683,9 +15425,9 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 											_1: {
 												ctor: '::',
 												_0: A4(
-													_open_chords_charts$chart_editor$ChartCard$button,
-													_open_chords_charts$chart_editor$ChartCard$Secondary,
-													_open_chords_charts$chart_editor$ChartCard$NotPressed,
+													_open_chords_charts$chart_editor$Page_ChartCard$button,
+													_open_chords_charts$chart_editor$Page_ChartCard$Secondary,
+													_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
 													{
 														ctor: '::',
 														_0: _elm_lang$html$Html_Attributes$class('mr1'),
@@ -13698,7 +15440,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 															_1: {
 																ctor: '::',
 																_0: _elm_lang$html$Html_Events$onClick(
-																	A2(_open_chords_charts$chart_editor$ChartCard$MovePart, partIndex, partIndex + 1)),
+																	A2(_open_chords_charts$chart_editor$Page_ChartCard$MovePart, partIndex, partIndex + 1)),
 																_1: {ctor: '[]'}
 															}
 														}
@@ -13711,9 +15453,9 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 												_1: {
 													ctor: '::',
 													_0: A4(
-														_open_chords_charts$chart_editor$ChartCard$button,
-														_open_chords_charts$chart_editor$ChartCard$Secondary,
-														_open_chords_charts$chart_editor$ChartCard$NotPressed,
+														_open_chords_charts$chart_editor$Page_ChartCard$button,
+														_open_chords_charts$chart_editor$Page_ChartCard$Secondary,
+														_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
 														{
 															ctor: '::',
 															_0: _elm_lang$html$Html_Attributes$class('mr1'),
@@ -13726,7 +15468,7 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 																_1: {
 																	ctor: '::',
 																	_0: _elm_lang$html$Html_Events$onClick(
-																		_open_chords_charts$chart_editor$ChartCard$RemovePart(partIndex)),
+																		_open_chords_charts$chart_editor$Page_ChartCard$RemovePart(partIndex)),
 																	_1: {ctor: '[]'}
 																}
 															}
@@ -13746,16 +15488,16 @@ var _open_chords_charts$chart_editor$ChartCard$viewPartEditor = F3(
 						_1: {ctor: '[]'}
 					})));
 	});
-var _open_chords_charts$chart_editor$ChartCard$view = function (_p46) {
-	var _p47 = _p46;
-	var _p60 = _p47.viewedKey;
-	var _p59 = _p47.status;
-	var _p58 = _p47.chartStr;
-	var _p57 = _p47.chart;
+var _open_chords_charts$chart_editor$Page_ChartCard$view = function (_p48) {
+	var _p49 = _p48;
+	var _p62 = _p49.viewedKey;
+	var _p61 = _p49.status;
+	var _p60 = _p49.chartStr;
+	var _p59 = _p49.chart;
 	return A3(
-		_open_chords_charts$chart_editor$ChartCard$card,
-		_p57.title,
-		_open_chords_charts$chart_editor$Music_Chart$keyToString(_p57.key),
+		_open_chords_charts$chart_editor$Page_ChartCard$card,
+		_p59.title,
+		_open_chords_charts$chart_editor$Music_Chart$keyToString(_p59.key),
 		{
 			ctor: '::',
 			_0: A2(
@@ -13767,39 +15509,39 @@ var _open_chords_charts$chart_editor$ChartCard$view = function (_p46) {
 				},
 				function () {
 					var viewedChart = function () {
-						var _p48 = _p59;
-						if (_p48.ctor === 'EditStatus') {
-							return _p57;
+						var _p50 = _p61;
+						if (_p50.ctor === 'EditStatus') {
+							return _p59;
 						} else {
-							return A2(_open_chords_charts$chart_editor$Music_Chart$transpose, _p60, _p57);
+							return A2(_open_chords_charts$chart_editor$Music_Chart$transpose, _p62, _p59);
 						}
 					}();
 					return _elm_lang$core$List$concat(
 						A2(
 							_elm_lang$core$List$indexedMap,
-							A2(_open_chords_charts$chart_editor$ChartCard$viewPart, _p57, _p59),
+							A2(_open_chords_charts$chart_editor$Page_ChartCard$viewPart, _p59, _p61),
 							viewedChart.parts));
 				}()),
 			_1: {
 				ctor: '::',
 				_0: function () {
-					var _p49 = _p59;
-					if (_p49.ctor === 'EditStatus') {
+					var _p51 = _p61;
+					if (_p51.ctor === 'EditStatus') {
 						return A2(
 							_elm_lang$html$Html$div,
 							{ctor: '[]'},
 							{
 								ctor: '::',
 								_0: A4(
-									_open_chords_charts$chart_editor$ChartCard$button,
-									_open_chords_charts$chart_editor$ChartCard$Primary,
-									_open_chords_charts$chart_editor$ChartCard$NotPressed,
+									_open_chords_charts$chart_editor$Page_ChartCard$button,
+									_open_chords_charts$chart_editor$Page_ChartCard$Primary,
+									_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
 									{
 										ctor: '::',
 										_0: _elm_lang$html$Html_Attributes$class('mr1'),
 										_1: {
 											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(_open_chords_charts$chart_editor$ChartCard$Save),
+											_0: _elm_lang$html$Html_Events$onClick(_open_chords_charts$chart_editor$Page_ChartCard$Save),
 											_1: {ctor: '[]'}
 										}
 									},
@@ -13811,12 +15553,12 @@ var _open_chords_charts$chart_editor$ChartCard$view = function (_p46) {
 								_1: {
 									ctor: '::',
 									_0: A4(
-										_open_chords_charts$chart_editor$ChartCard$button,
-										_open_chords_charts$chart_editor$ChartCard$Secondary,
-										_open_chords_charts$chart_editor$ChartCard$NotPressed,
+										_open_chords_charts$chart_editor$Page_ChartCard$button,
+										_open_chords_charts$chart_editor$Page_ChartCard$Secondary,
+										_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(_open_chords_charts$chart_editor$ChartCard$TextAreaSave),
+											_0: _elm_lang$html$Html_Events$onClick(_open_chords_charts$chart_editor$Page_ChartCard$TextAreaSave),
 											_1: {ctor: '[]'}
 										},
 										{
@@ -13827,22 +15569,22 @@ var _open_chords_charts$chart_editor$ChartCard$view = function (_p46) {
 									_1: {
 										ctor: '::',
 										_0: function () {
-											var _p50 = _p49._0;
-											if (_p50.ctor === 'BarSelection') {
-												var _p52 = _p50._0;
-												var _p51 = A2(_open_chords_charts$chart_editor$ChartCard$getBarAtReference, _p52, _p57);
-												if (_p51.ctor === 'Nothing') {
-													return _elm_lang$html$Html$text(_open_chords_charts$chart_editor$ChartCard$youFoundABugMessage);
+											var _p52 = _p51._0;
+											if (_p52.ctor === 'BarSelection') {
+												var _p54 = _p52._0;
+												var _p53 = A2(_open_chords_charts$chart_editor$Page_ChartCard$getBarAtReference, _p54, _p59);
+												if (_p53.ctor === 'Nothing') {
+													return _elm_lang$html$Html$text(_open_chords_charts$chart_editor$Page_ChartCard$youFoundABugMessage);
 												} else {
-													return A3(_open_chords_charts$chart_editor$ChartCard$viewBarEditor, _p57, _p52, _p51._0);
+													return A3(_open_chords_charts$chart_editor$Page_ChartCard$viewBarEditor, _p59, _p54, _p53._0);
 												}
 											} else {
-												var _p54 = _p50._0;
-												var _p53 = A2(_elm_community$list_extra$List_Extra$getAt, _p54, _p57.parts);
-												if (_p53.ctor === 'Nothing') {
-													return _elm_lang$html$Html$text(_open_chords_charts$chart_editor$ChartCard$youFoundABugMessage);
+												var _p56 = _p52._0;
+												var _p55 = A2(_elm_community$list_extra$List_Extra$getAt, _p56, _p59.parts);
+												if (_p55.ctor === 'Nothing') {
+													return _elm_lang$html$Html$text(_open_chords_charts$chart_editor$Page_ChartCard$youFoundABugMessage);
 												} else {
-													return A3(_open_chords_charts$chart_editor$ChartCard$viewPartEditor, _p57, _p54, _p53._0);
+													return A3(_open_chords_charts$chart_editor$Page_ChartCard$viewPartEditor, _p59, _p56, _p55._0);
 												}
 											}
 										}(),
@@ -13857,16 +15599,16 @@ var _open_chords_charts$chart_editor$ChartCard$view = function (_p46) {
 														ctor: '::',
 														_0: _elm_lang$html$Html_Attributes$rows(
 															_elm_lang$core$List$length(
-																_elm_lang$core$String$lines(_p58)) + 5),
+																_elm_lang$core$String$lines(_p60)) + 5),
 														_1: {
 															ctor: '::',
-															_0: _elm_lang$html$Html_Events$onInput(_open_chords_charts$chart_editor$ChartCard$TextAreaInput),
+															_0: _elm_lang$html$Html_Events$onInput(_open_chords_charts$chart_editor$Page_ChartCard$TextAreaInput),
 															_1: {
 																ctor: '::',
 																_0: _elm_lang$html$Html_Attributes$spellcheck(false),
 																_1: {
 																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$value(_p58),
+																	_0: _elm_lang$html$Html_Attributes$value(_p60),
 																	_1: {ctor: '[]'}
 																}
 															}
@@ -13885,7 +15627,7 @@ var _open_chords_charts$chart_editor$ChartCard$view = function (_p46) {
 							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: _open_chords_charts$chart_editor$ChartCard$toolbar(
+								_0: _open_chords_charts$chart_editor$Page_ChartCard$toolbar(
 									{
 										ctor: '::',
 										_0: A2(
@@ -13897,15 +15639,15 @@ var _open_chords_charts$chart_editor$ChartCard$view = function (_p46) {
 												_1: {
 													ctor: '::',
 													_0: function () {
-														var _p55 = _p60;
-														var viewedNote = _p55._0;
+														var _p57 = _p62;
+														var viewedNote = _p57._0;
 														return A3(
-															_open_chords_charts$chart_editor$ChartCard$noteSelect,
+															_open_chords_charts$chart_editor$Page_ChartCard$noteSelect,
 															_open_chords_charts$chart_editor$Music_Note$notes,
 															viewedNote,
-															function (_p56) {
-																return _open_chords_charts$chart_editor$ChartCard$SetViewKey(
-																	_open_chords_charts$chart_editor$Music_Chart$Key(_p56));
+															function (_p58) {
+																return _open_chords_charts$chart_editor$Page_ChartCard$SetViewKey(
+																	_open_chords_charts$chart_editor$Music_Chart$Key(_p58));
 															});
 													}(),
 													_1: {ctor: '[]'}
@@ -13916,12 +15658,12 @@ var _open_chords_charts$chart_editor$ChartCard$view = function (_p46) {
 								_1: {
 									ctor: '::',
 									_0: A4(
-										_open_chords_charts$chart_editor$ChartCard$button,
-										_open_chords_charts$chart_editor$ChartCard$Primary,
-										_open_chords_charts$chart_editor$ChartCard$NotPressed,
+										_open_chords_charts$chart_editor$Page_ChartCard$button,
+										_open_chords_charts$chart_editor$Page_ChartCard$Primary,
+										_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(_open_chords_charts$chart_editor$ChartCard$Edit),
+											_0: _elm_lang$html$Html_Events$onClick(_open_chords_charts$chart_editor$Page_ChartCard$Edit),
 											_1: {ctor: '[]'}
 										},
 										{
@@ -13938,192 +15680,349 @@ var _open_chords_charts$chart_editor$ChartCard$view = function (_p46) {
 			}
 		});
 };
-var _open_chords_charts$chart_editor$ChartCard$Pressed = {ctor: 'Pressed'};
+var _open_chords_charts$chart_editor$Page_ChartCard$Pressed = {ctor: 'Pressed'};
 
-var _open_chords_charts$chart_editor$Samples$allOfMe = '\n---\ntitle: All of me\nkey: C\n---\n\n= A\nC - E7 - A7 - Dm -\n\n= B\nE7 - Am - D7 - G7 -\n\n= A\n\n= C\nF Fm C A7 Dø G7 C -\n';
-var _open_chords_charts$chart_editor$Samples$test = '\n---\ntitle: Chords chart grammar\nkey: C\n---\n\n= A\nC - A7/D7 - Gm/Eb7/D7 Ab/C7/Fm/Eb6\n';
-var _open_chords_charts$chart_editor$Samples$samples = {
-	ctor: '::',
-	_0: _open_chords_charts$chart_editor$Samples$test,
-	_1: {
-		ctor: '::',
-		_0: _open_chords_charts$chart_editor$Samples$allOfMe,
-		_1: {ctor: '[]'}
-	}
-};
-
-var _open_chords_charts$chart_editor$Main$update = F2(
-	function (msg, model) {
-		var _p0 = msg;
-		return A2(
-			_elm_lang$core$List$indexedMap,
-			F2(
-				function (index, result) {
-					return _elm_lang$core$Native_Utils.eq(index, _p0._0) ? A2(
-						_elm_lang$core$Result$map,
-						_open_chords_charts$chart_editor$ChartCard$update(_p0._1),
-						result) : result;
-				}),
-			model);
-	});
-var _open_chords_charts$chart_editor$Main$model = A2(
-	_elm_lang$core$List$map,
-	function (_p1) {
-		return A2(
-			_elm_lang$core$Result$map,
-			_open_chords_charts$chart_editor$ChartCard$init,
-			A2(_elm_tools$parser$Parser$run, _open_chords_charts$chart_editor$Parsers$chart, _p1));
-	},
-	_open_chords_charts$chart_editor$Samples$samples);
-var _open_chords_charts$chart_editor$Main$ChartCardMsg = F2(
-	function (a, b) {
-		return {ctor: 'ChartCardMsg', _0: a, _1: b};
-	});
-var _open_chords_charts$chart_editor$Main$view = function (model) {
-	var debugBreakpoints = {ctor: '[]'};
+var _open_chords_charts$chart_editor$Page_NotFound$view = function (session) {
 	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('flex flex-column min-vh-100'),
-			_1: {ctor: '[]'}
-		},
+		_elm_lang$html$Html$main_,
+		{ctor: '[]'},
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$header,
+				_elm_lang$html$Html$h1,
+				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('tc ph4'),
+					_0: _elm_lang$html$Html$text('Not Found'),
 					_1: {ctor: '[]'}
-				},
-				{
+				}),
+			_1: {ctor: '[]'}
+		});
+};
+
+var _open_chords_charts$chart_editor$Views_Page$viewFooter = A2(
+	_elm_lang$html$Html$footer,
+	{
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$class('pa3 ph5-m ph6-l bg-near-black'),
+		_1: {ctor: '[]'}
+	},
+	{
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$a,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('f6 ph2 link dim moon-gray'),
+				_1: {
 					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$h1,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('f3 f2-m f1-l fw2 black-90 mv3'),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Open Chords Charts'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
+					_0: _elm_lang$html$Html_Attributes$href('https://github.com/open-chords-charts/chart-editor'),
+					_1: {ctor: '[]'}
+				}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Source code on GitHub'),
+				_1: {ctor: '[]'}
+			}),
+		_1: {ctor: '[]'}
+	});
+var _open_chords_charts$chart_editor$Views_Page$viewHeader = F3(
+	function (page, user, isLoading) {
+		return A2(
+			_elm_lang$html$Html$header,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('tc ph4'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h1,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('f3 f2-m f1-l fw2 black-90 mv3'),
+						_1: {ctor: '[]'}
+					},
+					{
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$h2,
+							_elm_lang$html$Html$a,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('f5 f4-m f3-l fw2 black-50 mt0 lh-copy'),
+								_0: _open_chords_charts$chart_editor$Route$href(_open_chords_charts$chart_editor$Route$Home),
 								_1: {ctor: '[]'}
 							},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('Chart viewer and editor'),
+								_0: _elm_lang$html$Html$text('Open Chords Charts'),
 								_1: {ctor: '[]'}
 							}),
 						_1: {ctor: '[]'}
-					}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$section,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('flex-auto ph1 ph4-ns'),
-						_1: {ctor: '[]'}
-					},
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						debugBreakpoints,
-						A2(
-							_elm_lang$core$List$indexedMap,
-							F2(
-								function (index, result) {
-									var _p2 = result;
-									if (_p2.ctor === 'Ok') {
-										return A2(
-											_elm_lang$html$Html$map,
-											_open_chords_charts$chart_editor$Main$ChartCardMsg(index),
-											_open_chords_charts$chart_editor$ChartCard$view(_p2._0));
-									} else {
-										var _p3 = A2(_elm_lang$core$Debug$log, 'Parse error', _p2._0);
-										return A2(
-											_elm_lang$html$Html$div,
-											{ctor: '[]'},
-											{
-												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$p,
-													{ctor: '[]'},
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html$text('Chart text could not be parsed.'),
-														_1: {ctor: '[]'}
-													}),
-												_1: {
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$p,
-														{ctor: '[]'},
-														{
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$small,
-																{ctor: '[]'},
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html$text('Look at your browser developer console to see the technical error message.'),
-																	_1: {ctor: '[]'}
-																}),
-															_1: {ctor: '[]'}
-														}),
-													_1: {ctor: '[]'}
-												}
-											});
-									}
-								}),
-							model))),
+					}),
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$footer,
+						_elm_lang$html$Html$h2,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('pa3 ph5-m ph6-l bg-near-black'),
+							_0: _elm_lang$html$Html_Attributes$class('f5 f4-m f3-l fw2 black-50 mt0 lh-copy'),
 							_1: {ctor: '[]'}
 						},
 						{
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$a,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('f6 ph2 link dim moon-gray'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$href('https://github.com/open-chords-charts/chart-editor'),
-										_1: {ctor: '[]'}
-									}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Source code on GitHub'),
-									_1: {ctor: '[]'}
-								}),
+							_0: _elm_lang$html$Html$text('Chart viewer and editor'),
 							_1: {ctor: '[]'}
 						}),
 					_1: {ctor: '[]'}
 				}
+			});
+	});
+var _open_chords_charts$chart_editor$Views_Page$frame = F4(
+	function (isLoading, user, page, content) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('flex flex-column min-vh-100'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A3(_open_chords_charts$chart_editor$Views_Page$viewHeader, page, user, isLoading),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$section,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('flex-auto ph1 ph4-ns'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: content,
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: _open_chords_charts$chart_editor$Views_Page$viewFooter,
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _open_chords_charts$chart_editor$Views_Page$Home = {ctor: 'Home'};
+var _open_chords_charts$chart_editor$Views_Page$Other = {ctor: 'Other'};
+
+var _open_chords_charts$chart_editor$Main$getPage = function (pageState) {
+	var _p0 = pageState;
+	if (_p0.ctor === 'Loaded') {
+		return _p0._0;
+	} else {
+		return _p0._0;
+	}
+};
+var _open_chords_charts$chart_editor$Main$Model = F2(
+	function (a, b) {
+		return {pageState: a, session: b};
+	});
+var _open_chords_charts$chart_editor$Main$Chart = function (a) {
+	return {ctor: 'Chart', _0: a};
+};
+var _open_chords_charts$chart_editor$Main$Home = function (a) {
+	return {ctor: 'Home', _0: a};
+};
+var _open_chords_charts$chart_editor$Main$NotFound = {ctor: 'NotFound'};
+var _open_chords_charts$chart_editor$Main$Blank = {ctor: 'Blank'};
+var _open_chords_charts$chart_editor$Main$initialPage = _open_chords_charts$chart_editor$Main$Blank;
+var _open_chords_charts$chart_editor$Main$TransitioningFrom = function (a) {
+	return {ctor: 'TransitioningFrom', _0: a};
+};
+var _open_chords_charts$chart_editor$Main$Loaded = function (a) {
+	return {ctor: 'Loaded', _0: a};
+};
+var _open_chords_charts$chart_editor$Main$setRoute = F2(
+	function (maybeRoute, model) {
+		var _p1 = maybeRoute;
+		if (_p1.ctor === 'Nothing') {
+			return A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				_elm_lang$core$Native_Utils.update(
+					model,
+					{
+						pageState: _open_chords_charts$chart_editor$Main$Loaded(_open_chords_charts$chart_editor$Main$NotFound)
+					}),
+				{ctor: '[]'});
+		} else {
+			if (_p1._0.ctor === 'Home') {
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							pageState: _open_chords_charts$chart_editor$Main$Loaded(
+								_open_chords_charts$chart_editor$Main$Home(_open_chords_charts$chart_editor$Page_Home$initialModel))
+						}),
+					{ctor: '[]'});
+			} else {
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							pageState: _open_chords_charts$chart_editor$Main$Loaded(
+								_open_chords_charts$chart_editor$Main$Chart(
+									_open_chords_charts$chart_editor$Page_ChartCard$initialModel(_p1._0._0)))
+						}),
+					{ctor: '[]'});
 			}
+		}
+	});
+var _open_chords_charts$chart_editor$Main$init = function (location) {
+	return A2(
+		_open_chords_charts$chart_editor$Main$setRoute,
+		_open_chords_charts$chart_editor$Route$fromLocation(location),
+		{
+			pageState: _open_chords_charts$chart_editor$Main$Loaded(_open_chords_charts$chart_editor$Main$initialPage),
+			session: {user: _elm_lang$core$Maybe$Nothing}
 		});
 };
-var _open_chords_charts$chart_editor$Main$main = _elm_lang$html$Html$beginnerProgram(
-	{model: _open_chords_charts$chart_editor$Main$model, view: _open_chords_charts$chart_editor$Main$view, update: _open_chords_charts$chart_editor$Main$update})();
+var _open_chords_charts$chart_editor$Main$updatePage = F3(
+	function (page, msg, model) {
+		var toPage = F5(
+			function (toModel, toMsg, subUpdate, subMsg, subModel) {
+				var _p2 = A2(subUpdate, subMsg, subModel);
+				var newModel = _p2._0;
+				var newCmd = _p2._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							pageState: _open_chords_charts$chart_editor$Main$Loaded(
+								toModel(newModel))
+						}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, toMsg, newCmd)
+				};
+			});
+		var session = model.session;
+		var _p3 = {ctor: '_Tuple2', _0: msg, _1: page};
+		_v2_3:
+		do {
+			if (_p3._0.ctor === 'SetRoute') {
+				return A2(_open_chords_charts$chart_editor$Main$setRoute, _p3._0._0, model);
+			} else {
+				switch (_p3._1.ctor) {
+					case 'Chart':
+						if (_p3._1._0.ctor === 'Ok') {
+							var newSubModel = A2(_open_chords_charts$chart_editor$Page_ChartCard$update, _p3._0._0, _p3._1._0._0);
+							return A2(
+								_elm_lang$core$Platform_Cmd_ops['!'],
+								_elm_lang$core$Native_Utils.update(
+									model,
+									{
+										pageState: _open_chords_charts$chart_editor$Main$Loaded(
+											_open_chords_charts$chart_editor$Main$Chart(
+												_elm_lang$core$Result$Ok(newSubModel)))
+									}),
+								{ctor: '[]'});
+						} else {
+							break _v2_3;
+						}
+					case 'NotFound':
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							model,
+							{ctor: '[]'});
+					default:
+						break _v2_3;
+				}
+			}
+		} while(false);
+		return A2(
+			_elm_lang$core$Platform_Cmd_ops['!'],
+			model,
+			{ctor: '[]'});
+	});
+var _open_chords_charts$chart_editor$Main$update = F2(
+	function (msg, model) {
+		return A3(
+			_open_chords_charts$chart_editor$Main$updatePage,
+			_open_chords_charts$chart_editor$Main$getPage(model.pageState),
+			msg,
+			model);
+	});
+var _open_chords_charts$chart_editor$Main$ChartCardMsg = function (a) {
+	return {ctor: 'ChartCardMsg', _0: a};
+};
+var _open_chords_charts$chart_editor$Main$viewPage = F3(
+	function (session, isLoading, page) {
+		var frame = A2(_open_chords_charts$chart_editor$Views_Page$frame, isLoading, session.user);
+		var _p4 = page;
+		switch (_p4.ctor) {
+			case 'NotFound':
+				return A2(
+					frame,
+					_open_chords_charts$chart_editor$Views_Page$Other,
+					_open_chords_charts$chart_editor$Page_NotFound$view(session));
+			case 'Blank':
+				return A2(
+					frame,
+					_open_chords_charts$chart_editor$Views_Page$Other,
+					_elm_lang$html$Html$text(''));
+			case 'Home':
+				return A2(
+					frame,
+					_open_chords_charts$chart_editor$Views_Page$Home,
+					A2(_open_chords_charts$chart_editor$Page_Home$view, session, _p4._0));
+			default:
+				if (_p4._0.ctor === 'Err') {
+					return A2(
+						frame,
+						_open_chords_charts$chart_editor$Views_Page$Other,
+						_elm_lang$html$Html$text(
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'Error: ',
+								_elm_lang$core$Basics$toString(_p4._0._0))));
+				} else {
+					return A2(
+						_elm_lang$html$Html$map,
+						_open_chords_charts$chart_editor$Main$ChartCardMsg,
+						A2(
+							frame,
+							_open_chords_charts$chart_editor$Views_Page$Other,
+							_open_chords_charts$chart_editor$Page_ChartCard$view(_p4._0._0)));
+				}
+		}
+	});
+var _open_chords_charts$chart_editor$Main$view = function (model) {
+	var _p5 = model.pageState;
+	if (_p5.ctor === 'Loaded') {
+		return A3(_open_chords_charts$chart_editor$Main$viewPage, model.session, false, _p5._0);
+	} else {
+		return A3(_open_chords_charts$chart_editor$Main$viewPage, model.session, true, _p5._0);
+	}
+};
+var _open_chords_charts$chart_editor$Main$SetRoute = function (a) {
+	return {ctor: 'SetRoute', _0: a};
+};
+var _open_chords_charts$chart_editor$Main$main = A2(
+	_elm_lang$navigation$Navigation$program,
+	function (_p6) {
+		return _open_chords_charts$chart_editor$Main$SetRoute(
+			_open_chords_charts$chart_editor$Route$fromLocation(_p6));
+	},
+	{
+		init: _open_chords_charts$chart_editor$Main$init,
+		view: _open_chords_charts$chart_editor$Main$view,
+		update: _open_chords_charts$chart_editor$Main$update,
+		subscriptions: function (_p7) {
+			return _elm_lang$core$Platform_Sub$none;
+		}
+	})();
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
