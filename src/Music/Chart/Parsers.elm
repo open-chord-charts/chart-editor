@@ -1,4 +1,4 @@
-module Parsers exposing (..)
+module Music.Chart.Parsers exposing (..)
 
 import Parser exposing (..)
 import Music.Chart exposing (..)

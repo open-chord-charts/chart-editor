@@ -1,114 +1,171 @@
 module Main exposing (main)
 
 import Html exposing (..)
-import Html.Attributes exposing (..)
-import ChartCard
-import Parser
-import Parsers
-import Samples
+import Navigation exposing (Location)
+import Data.Session exposing (Session)
+import Route exposing (..)
+import Page.Home as Home
+import Page.ChartCard as ChartCard
+import Page.NotFound as NotFound
+import Views.Page as Page
 
 
 main : Program Never Model Msg
 main =
-    Html.beginnerProgram
-        { model = model
+    Navigation.program (Route.fromLocation >> SetRoute)
+        { init = init
         , view = view
         , update = update
+        , subscriptions = (\_ -> Sub.none)
         }
 
 
 
--- MODEL
+-- MODEL --
+
+
+type Page
+    = Blank
+    | NotFound
+    | Home Home.Model
+    | Chart (Result ChartCard.LoadError ChartCard.Model)
+
+
+type PageState
+    = Loaded Page
+    | TransitioningFrom Page
 
 
 type alias Model =
-    List (Result Parser.Error ChartCard.Model)
+    { pageState : PageState
+    , session : Session
+    }
 
 
-model : Model
-model =
-    Samples.samples
-        |> List.map (Parser.run Parsers.chart >> Result.map ChartCard.init)
+init : Location -> ( Model, Cmd Msg )
+init location =
+    setRoute (Route.fromLocation location)
+        { pageState = Loaded initialPage
+        , session = { user = Nothing }
+        }
 
 
-
--- MSG
-
-
-type Msg
-    = ChartCardMsg Int ChartCard.Msg
-
-
-
--- UPDATE
-
-
-update : Msg -> Model -> Model
-update msg model =
-    case msg of
-        ChartCardMsg msgIndex nestedMsg ->
-            model
-                |> List.indexedMap
-                    (\index result ->
-                        if index == msgIndex then
-                            result |> Result.map (ChartCard.update nestedMsg)
-                        else
-                            result
-                    )
+initialPage : Page
+initialPage =
+    Blank
 
 
 
--- VIEW
+-- VIEW --
 
 
 view : Model -> Html Msg
 view model =
-    let
-        debugBreakpoints =
-            -- [ div [ class "dn-ns" ] [ text "normal" ]
-            -- , div [ class "dn db-ns" ] [ text "not-small" ]
-            -- , div [ class "dn db-m" ] [ text "medium" ]
-            -- , div [ class "dn db-l" ] [ text "large" ]
-            -- ]
-            []
-    in
-        div [ class "flex flex-column min-vh-100" ]
-            [ header [ class "tc ph4" ]
-                [ h1 [ class "f3 f2-m f1-l fw2 black-90 mv3" ]
-                    [ text "Open Chords Charts" ]
-                , h2 [ class "f5 f4-m f3-l fw2 black-50 mt0 lh-copy" ]
-                    [ text "Chart viewer and editor" ]
-                ]
-            , section [ class "flex-auto ph1 ph4-ns" ]
-                (debugBreakpoints
-                    ++ (model
-                            |> List.indexedMap
-                                (\index result ->
-                                    case result of
-                                        Ok chartCardModel ->
-                                            ChartCard.view chartCardModel
-                                                |> Html.map (ChartCardMsg index)
+    case model.pageState of
+        Loaded page ->
+            viewPage model.session False page
 
-                                        Err err ->
-                                            let
-                                                _ =
-                                                    Debug.log "Parse error" err
-                                            in
-                                                div []
-                                                    [ p [] [ text "Chart text could not be parsed." ]
-                                                    , p []
-                                                        [ small []
-                                                            [ text "Look at your browser developer console to see the technical error message." ]
-                                                        ]
-                                                    ]
-                                )
-                       )
-                )
-            , footer [ class "pa3 ph5-m ph6-l bg-near-black" ]
-                [ a
-                    [ class "f6 ph2 link dim moon-gray"
-                    , href "https://github.com/open-chords-charts/chart-editor"
-                    ]
-                    [ text "Source code on GitHub" ]
-                ]
-            ]
+        TransitioningFrom page ->
+            viewPage model.session True page
+
+
+viewPage : Session -> Bool -> Page -> Html Msg
+viewPage session isLoading page =
+    let
+        frame =
+            Page.frame isLoading session.user
+    in
+        case page of
+            NotFound ->
+                NotFound.view session
+                    |> frame Page.Other
+
+            Blank ->
+                -- This is for the very intiial page load, while we are loading
+                -- data via HTTP. We could also render a spinner here.
+                Html.text ""
+                    |> frame Page.Other
+
+            Home subModel ->
+                Home.view session subModel
+                    |> frame Page.Home
+
+            Chart (Err err) ->
+                Html.text ("Error: " ++ Basics.toString err)
+                    |> frame Page.Other
+
+            Chart (Ok subModel) ->
+                ChartCard.view subModel
+                    |> frame Page.Other
+                    |> Html.map ChartCardMsg
+
+
+getPage : PageState -> Page
+getPage pageState =
+    case pageState of
+        Loaded page ->
+            page
+
+        TransitioningFrom page ->
+            page
+
+
+
+-- UPDATE --
+
+
+type Msg
+    = SetRoute (Maybe Route)
+    | ChartCardMsg ChartCard.Msg
+
+
+setRoute : Maybe Route -> Model -> ( Model, Cmd Msg )
+setRoute maybeRoute model =
+    case maybeRoute of
+        Nothing ->
+            { model | pageState = Loaded NotFound } ! []
+
+        Just (Route.Home) ->
+            { model | pageState = Loaded (Home Home.initialModel) } ! []
+
+        Just (Route.Chart slug) ->
+            { model | pageState = Loaded (Chart (ChartCard.initialModel slug)) } ! []
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    updatePage (getPage model.pageState) msg model
+
+
+updatePage : Page -> Msg -> Model -> ( Model, Cmd Msg )
+updatePage page msg model =
+    let
+        session =
+            model.session
+
+        toPage toModel toMsg subUpdate subMsg subModel =
+            let
+                ( newModel, newCmd ) =
+                    subUpdate subMsg subModel
+            in
+                ( { model | pageState = Loaded (toModel newModel) }, Cmd.map toMsg newCmd )
+    in
+        case ( msg, page ) of
+            ( SetRoute route, _ ) ->
+                setRoute route model
+
+            ( ChartCardMsg subMsg, Chart (Ok subModel) ) ->
+                let
+                    newSubModel =
+                        ChartCard.update subMsg subModel
+                in
+                    { model | pageState = newSubModel |> Ok |> Chart |> Loaded } ! []
+
+            ( _, NotFound ) ->
+                -- Disregard incoming messages when we're on the
+                -- NotFound page.
+                model ! []
+
+            ( _, _ ) ->
+                -- Disregard incoming messages that arrived for the wrong page
+                model ! []

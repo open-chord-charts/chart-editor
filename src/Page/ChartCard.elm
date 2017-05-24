@@ -1,4 +1,4 @@
-module ChartCard exposing (..)
+module Page.ChartCard exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -6,10 +6,10 @@ import Html.Events exposing (..)
 import Json.Decode as Decode exposing (Decoder)
 import List.Extra as List
 import Music.Chart exposing (..)
+import Music.Chart.Parsers as Parsers
 import Music.Chord exposing (..)
 import Music.Note exposing (..)
 import Parser
-import Parsers
 import String
 import Svg exposing (svg)
 import Svg.Attributes
@@ -147,13 +147,51 @@ type alias Model =
     }
 
 
-init : Chart -> Model
-init chart =
-    { chart = chart
-    , chartStr = Music.Chart.toString chart
-    , status = ViewStatus
-    , viewedKey = chart.key
-    }
+type alias Slug =
+    String
+
+
+type LoadError
+    = ParserError Parser.Error
+    | NotFound
+
+
+initialModel : Slug -> Result LoadError Model
+initialModel slug =
+    let
+        chartStr =
+            """
+---
+title: All of me
+key: C
+---
+
+= A
+C - E7 - A7 - Dm -
+
+= B
+E7 - Am - D7 - G7 -
+
+= A
+
+= C
+F Fm C A7 Dø G7 C -
+"""
+    in
+        if slug == "all-of-me" then
+            case Parser.run Parsers.chart chartStr of
+                Ok chart ->
+                    Ok
+                        { chart = chart
+                        , chartStr = Music.Chart.toString chart
+                        , status = ViewStatus
+                        , viewedKey = chart.key
+                        }
+
+                Err parserError ->
+                    Err (ParserError parserError)
+        else
+            Err NotFound
 
 
 
