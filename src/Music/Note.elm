@@ -137,7 +137,7 @@ fromOctaveIndex octaveIndex =
         selectedNotes =
             [ Af, A, Bf, B, C, Df, D, Ef, E, F, Gf, G ]
     in
-        selectedNotes |> getAtUnsafe octaveIndex
+        selectedNotes |> getAtCycling octaveIndex
 
 
 interval : Note -> Note -> Interval
@@ -183,11 +183,11 @@ fromString s =
 
 
 
--- UNSAFE LIST FUNCTIONS
+-- CYCLING LIST FUNCTIONS
 
 
-getAtUnsafe : Int -> List a -> a
-getAtUnsafe index list =
+getAtCycling : Int -> List a -> a
+getAtCycling index list =
     let
         cyclingIndex =
             index % List.length list
