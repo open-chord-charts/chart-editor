@@ -12567,7 +12567,7 @@ var _open_chords_charts$chart_editor$Page_Home$ChartInfos = F2(
 		return {name: a, slug: b};
 	});
 
-var _open_chords_charts$chart_editor$Music_Note$getAtUnsafe = F2(
+var _open_chords_charts$chart_editor$Music_Note$getAtCycling = F2(
 	function (index, list) {
 		var cyclingIndex = A2(
 			_elm_lang$core$Basics_ops['%'],
@@ -12906,7 +12906,7 @@ var _open_chords_charts$chart_editor$Music_Note$fromOctaveIndex = function (octa
 			}
 		}
 	};
-	return A2(_open_chords_charts$chart_editor$Music_Note$getAtUnsafe, octaveIndex, selectedNotes);
+	return A2(_open_chords_charts$chart_editor$Music_Note$getAtCycling, octaveIndex, selectedNotes);
 };
 var _open_chords_charts$chart_editor$Music_Note$transpose = F2(
 	function (interval, note) {
@@ -13149,10 +13149,6 @@ var _open_chords_charts$chart_editor$Music_Chart$partToString = function (part) 
 	}();
 	return A2(_elm_lang$core$Basics_ops['++'], partAsString, '\n');
 };
-var _open_chords_charts$chart_editor$Music_Chart$keyToString = function (_p2) {
-	var _p3 = _p2;
-	return _open_chords_charts$chart_editor$Music_Note$toString(_p3._0);
-};
 var _open_chords_charts$chart_editor$Music_Chart$toString = function (chart) {
 	var metadata = A2(
 		_elm_lang$core$String$join,
@@ -13165,7 +13161,7 @@ var _open_chords_charts$chart_editor$Music_Chart$toString = function (chart) {
 				_0: A2(
 					_elm_lang$core$Basics_ops['++'],
 					'key: ',
-					_open_chords_charts$chart_editor$Music_Chart$keyToString(chart.key)),
+					_open_chords_charts$chart_editor$Music_Note$toString(chart.key)),
 				_1: {ctor: '[]'}
 			}
 		});
@@ -13207,11 +13203,11 @@ var _open_chords_charts$chart_editor$Music_Chart$toString = function (chart) {
 		});
 };
 var _open_chords_charts$chart_editor$Music_Chart$getPartName = function (part) {
-	var _p4 = part;
-	if (_p4.ctor === 'Part') {
-		return _p4._0;
+	var _p2 = part;
+	if (_p2.ctor === 'Part') {
+		return _p2._0;
 	} else {
-		return _p4._0;
+		return _p2._0;
 	}
 };
 var _open_chords_charts$chart_editor$Music_Chart$getPartByName = F2(
@@ -13219,9 +13215,9 @@ var _open_chords_charts$chart_editor$Music_Chart$getPartByName = F2(
 		return A2(
 			_elm_community$list_extra$List_Extra$find,
 			function (part) {
-				var _p5 = part;
-				if (_p5.ctor === 'Part') {
-					return _elm_lang$core$Native_Utils.eq(partName, _p5._0);
+				var _p3 = part;
+				if (_p3.ctor === 'Part') {
+					return _elm_lang$core$Native_Utils.eq(partName, _p3._0);
 				} else {
 					return false;
 				}
@@ -13230,21 +13226,21 @@ var _open_chords_charts$chart_editor$Music_Chart$getPartByName = F2(
 	});
 var _open_chords_charts$chart_editor$Music_Chart$getBarsOfPartByIndex = F2(
 	function (partIndex, chart) {
-		var _p6 = A2(_elm_community$list_extra$List_Extra$getAt, partIndex, chart.parts);
-		if (_p6.ctor === 'Nothing') {
+		var _p4 = A2(_elm_community$list_extra$List_Extra$getAt, partIndex, chart.parts);
+		if (_p4.ctor === 'Nothing') {
 			return {ctor: '[]'};
 		} else {
-			var _p7 = _p6._0;
-			if (_p7.ctor === 'Part') {
-				return _p7._1;
+			var _p5 = _p4._0;
+			if (_p5.ctor === 'Part') {
+				return _p5._1;
 			} else {
 				return {ctor: '[]'};
 			}
 		}
 	});
 var _open_chords_charts$chart_editor$Music_Chart$isPartRepeat = function (part) {
-	var _p8 = part;
-	if (_p8.ctor === 'Part') {
+	var _p6 = part;
+	if (_p6.ctor === 'Part') {
 		return false;
 	} else {
 		return true;
@@ -13263,12 +13259,12 @@ var _open_chords_charts$chart_editor$Music_Chart$Part = F2(
 	});
 var _open_chords_charts$chart_editor$Music_Chart$mapPartBars = F2(
 	function (f, part) {
-		var _p9 = part;
-		if (_p9.ctor === 'Part') {
+		var _p7 = part;
+		if (_p7.ctor === 'Part') {
 			return A2(
 				_open_chords_charts$chart_editor$Music_Chart$Part,
-				_p9._0,
-				f(_p9._1));
+				_p7._0,
+				f(_p7._1));
 		} else {
 			return part;
 		}
@@ -13279,10 +13275,10 @@ var _open_chords_charts$chart_editor$Music_Chart$Bar = function (a) {
 };
 var _open_chords_charts$chart_editor$Music_Chart$mapBarChords = F2(
 	function (f, bar) {
-		var _p10 = bar;
-		if (_p10.ctor === 'Bar') {
+		var _p8 = bar;
+		if (_p8.ctor === 'Bar') {
 			return _open_chords_charts$chart_editor$Music_Chart$Bar(
-				f(_p10._0));
+				f(_p8._0));
 		} else {
 			return bar;
 		}
@@ -13304,22 +13300,16 @@ var _open_chords_charts$chart_editor$Music_Chart$transposePart = F2(
 			part);
 	});
 var _open_chords_charts$chart_editor$Music_Chart$transpose = F2(
-	function (_p11, chart) {
-		var _p12 = _p11;
-		var _p13 = chart.key;
-		var keyNote = _p13._0;
+	function (key, chart) {
+		var interval = A2(_open_chords_charts$chart_editor$Music_Note$interval, chart.key, key);
 		var newParts = A2(
 			_elm_lang$core$List$map,
-			_open_chords_charts$chart_editor$Music_Chart$transposePart(
-				A2(_open_chords_charts$chart_editor$Music_Note$interval, keyNote, _p12._0)),
+			_open_chords_charts$chart_editor$Music_Chart$transposePart(interval),
 			chart.parts);
 		return _elm_lang$core$Native_Utils.update(
 			chart,
-			{key: _p12, parts: newParts});
+			{key: key, parts: newParts});
 	});
-var _open_chords_charts$chart_editor$Music_Chart$Key = function (a) {
-	return {ctor: 'Key', _0: a};
-};
 
 var _open_chords_charts$chart_editor$Music_Chart_Parsers$oneOfTuples = function (tuples) {
 	var sortTuples = function (_p0) {
@@ -13518,7 +13508,7 @@ var _open_chords_charts$chart_editor$Music_Chart_Parsers$chart = function () {
 											_open_chords_charts$chart_editor$Music_Chart_Parsers$newLine),
 										_elm_tools$parser$Parser$symbol('key:')),
 									_open_chords_charts$chart_editor$Music_Chart_Parsers$spaces),
-								A2(_elm_tools$parser$Parser$map, _open_chords_charts$chart_editor$Music_Chart$Key, _open_chords_charts$chart_editor$Music_Chart_Parsers$note)),
+								_open_chords_charts$chart_editor$Music_Chart_Parsers$note),
 							_open_chords_charts$chart_editor$Music_Chart_Parsers$newLine),
 						_elm_tools$parser$Parser$symbol(dashes)),
 					_open_chords_charts$chart_editor$Music_Chart_Parsers$spacesAndNewlines),
@@ -14910,7 +14900,10 @@ var _open_chords_charts$chart_editor$Page_ChartCard$viewPart = F4(
 											}),
 										A2(
 											_elm_lang$core$List$repeat,
-											_elm_lang$core$List$length(_p40._0._1),
+											A2(
+												_elm_lang$core$Basics$min,
+												_open_chords_charts$chart_editor$Page_ChartCard$nbBarsByRow,
+												_elm_lang$core$List$length(_p40._0._1)),
 											_open_chords_charts$chart_editor$Music_Chart$BarRepeat)));
 							} else {
 								return {ctor: '[]'};
@@ -15502,14 +15495,14 @@ var _open_chords_charts$chart_editor$Page_ChartCard$viewPartEditor = F3(
 	});
 var _open_chords_charts$chart_editor$Page_ChartCard$view = function (_p49) {
 	var _p50 = _p49;
-	var _p63 = _p50.viewedKey;
-	var _p62 = _p50.status;
-	var _p61 = _p50.chartStr;
-	var _p60 = _p50.chart;
+	var _p61 = _p50.viewedKey;
+	var _p60 = _p50.status;
+	var _p59 = _p50.chartStr;
+	var _p58 = _p50.chart;
 	return A3(
 		_open_chords_charts$chart_editor$Page_ChartCard$card,
-		_p60.title,
-		_open_chords_charts$chart_editor$Music_Chart$keyToString(_p60.key),
+		_p58.title,
+		_open_chords_charts$chart_editor$Music_Note$toString(_p58.key),
 		{
 			ctor: '::',
 			_0: A2(
@@ -15521,23 +15514,23 @@ var _open_chords_charts$chart_editor$Page_ChartCard$view = function (_p49) {
 				},
 				function () {
 					var viewedChart = function () {
-						var _p51 = _p62;
+						var _p51 = _p60;
 						if (_p51.ctor === 'EditStatus') {
-							return _p60;
+							return _p58;
 						} else {
-							return A2(_open_chords_charts$chart_editor$Music_Chart$transpose, _p63, _p60);
+							return A2(_open_chords_charts$chart_editor$Music_Chart$transpose, _p61, _p58);
 						}
 					}();
 					return _elm_lang$core$List$concat(
 						A2(
 							_elm_lang$core$List$indexedMap,
-							A2(_open_chords_charts$chart_editor$Page_ChartCard$viewPart, _p60, _p62),
+							A2(_open_chords_charts$chart_editor$Page_ChartCard$viewPart, _p58, _p60),
 							viewedChart.parts));
 				}()),
 			_1: {
 				ctor: '::',
 				_0: function () {
-					var _p52 = _p62;
+					var _p52 = _p60;
 					if (_p52.ctor === 'EditStatus') {
 						return A2(
 							_elm_lang$html$Html$div,
@@ -15584,19 +15577,19 @@ var _open_chords_charts$chart_editor$Page_ChartCard$view = function (_p49) {
 											var _p53 = _p52._0;
 											if (_p53.ctor === 'BarSelection') {
 												var _p55 = _p53._0;
-												var _p54 = A2(_open_chords_charts$chart_editor$Page_ChartCard$getBarAtReference, _p55, _p60);
+												var _p54 = A2(_open_chords_charts$chart_editor$Page_ChartCard$getBarAtReference, _p55, _p58);
 												if (_p54.ctor === 'Nothing') {
 													return _elm_lang$html$Html$text(_open_chords_charts$chart_editor$Page_ChartCard$youFoundABugMessage);
 												} else {
-													return A3(_open_chords_charts$chart_editor$Page_ChartCard$viewBarEditor, _p60, _p55, _p54._0);
+													return A3(_open_chords_charts$chart_editor$Page_ChartCard$viewBarEditor, _p58, _p55, _p54._0);
 												}
 											} else {
 												var _p57 = _p53._0;
-												var _p56 = A2(_elm_community$list_extra$List_Extra$getAt, _p57, _p60.parts);
+												var _p56 = A2(_elm_community$list_extra$List_Extra$getAt, _p57, _p58.parts);
 												if (_p56.ctor === 'Nothing') {
 													return _elm_lang$html$Html$text(_open_chords_charts$chart_editor$Page_ChartCard$youFoundABugMessage);
 												} else {
-													return A3(_open_chords_charts$chart_editor$Page_ChartCard$viewPartEditor, _p60, _p57, _p56._0);
+													return A3(_open_chords_charts$chart_editor$Page_ChartCard$viewPartEditor, _p58, _p57, _p56._0);
 												}
 											}
 										}(),
@@ -15611,7 +15604,7 @@ var _open_chords_charts$chart_editor$Page_ChartCard$view = function (_p49) {
 														ctor: '::',
 														_0: _elm_lang$html$Html_Attributes$rows(
 															_elm_lang$core$List$length(
-																_elm_lang$core$String$lines(_p61)) + 5),
+																_elm_lang$core$String$lines(_p59)) + 5),
 														_1: {
 															ctor: '::',
 															_0: _elm_lang$html$Html_Events$onInput(_open_chords_charts$chart_editor$Page_ChartCard$TextAreaInput),
@@ -15620,7 +15613,7 @@ var _open_chords_charts$chart_editor$Page_ChartCard$view = function (_p49) {
 																_0: _elm_lang$html$Html_Attributes$spellcheck(false),
 																_1: {
 																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$value(_p61),
+																	_0: _elm_lang$html$Html_Attributes$value(_p59),
 																	_1: {ctor: '[]'}
 																}
 															}
@@ -15650,18 +15643,7 @@ var _open_chords_charts$chart_editor$Page_ChartCard$view = function (_p49) {
 												_0: _elm_lang$html$Html$text('Transpose to: '),
 												_1: {
 													ctor: '::',
-													_0: function () {
-														var _p58 = _p63;
-														var viewedNote = _p58._0;
-														return A3(
-															_open_chords_charts$chart_editor$Page_ChartCard$noteSelect,
-															_open_chords_charts$chart_editor$Music_Note$notes,
-															viewedNote,
-															function (_p59) {
-																return _open_chords_charts$chart_editor$Page_ChartCard$SetViewKey(
-																	_open_chords_charts$chart_editor$Music_Chart$Key(_p59));
-															});
-													}(),
+													_0: A3(_open_chords_charts$chart_editor$Page_ChartCard$noteSelect, _open_chords_charts$chart_editor$Music_Note$notes, _p61, _open_chords_charts$chart_editor$Page_ChartCard$SetViewKey),
 													_1: {ctor: '[]'}
 												}
 											}),
