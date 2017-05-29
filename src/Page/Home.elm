@@ -24,6 +24,9 @@ initialModel =
     [ { name = "All of me"
       , slug = "all-of-me"
       }
+    , { name = "Wrong chart"
+      , slug = "wrong-chart"
+      }
     ]
 
 

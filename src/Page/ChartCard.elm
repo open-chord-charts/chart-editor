@@ -159,7 +159,7 @@ type LoadError
 initialModel : Slug -> Result LoadError Model
 initialModel slug =
     let
-        chartStr =
+        allOfMe =
             """
 ---
 title: All of me
@@ -177,8 +177,27 @@ E7 - Am - D7 - G7 -
 = C
 F Fm C A7 Dø G7 C -
 """
-    in
-        if slug == "all-of-me" then
+
+        wrongChart =
+            """
+---
+title: Wrong chart
+key: C
+---
+
+= A
+Ck - E7 - A7 - Dm -
+
+= B
+E7 - Am - D7 - G7 -
+
+= A
+
+= C
+F Fm C A7 Dø G7 C -
+"""
+
+        parse chartStr =
             case Parser.run Parsers.chart chartStr of
                 Ok chart ->
                     Ok
@@ -190,8 +209,16 @@ F Fm C A7 Dø G7 C -
 
                 Err parserError ->
                     Err (ParserError parserError)
-        else
-            Err NotFound
+    in
+        case slug of
+            "all-of-me" ->
+                parse allOfMe
+
+            "wrong-chart" ->
+                parse wrongChart
+
+            _ ->
+                Err NotFound
 
 
 
