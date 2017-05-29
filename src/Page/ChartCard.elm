@@ -859,7 +859,7 @@ viewPart chart status partIndex part =
                     (partCell partName
                         :: (case Music.Chart.getPartByName partName chart of
                                 Just (Part _ bars) ->
-                                    List.repeat (List.length bars) BarRepeat
+                                    List.repeat (List.length bars |> Basics.min nbBarsByRow) BarRepeat
                                         |> List.indexedMap
                                             (\barIndex bar ->
                                                 viewBar status (isBarSelected barIndex) (SelectPart partIndex) bar Nothing
