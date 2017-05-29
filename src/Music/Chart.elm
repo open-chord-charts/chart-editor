@@ -109,9 +109,11 @@ mapBarChords f bar =
 transpose : Note -> Chart -> Chart
 transpose key chart =
     let
+        interval =
+            Note.interval chart.key key
+
         newParts =
-            chart.parts
-                |> List.map (transposePart (Note.interval chart.key key))
+            chart.parts |> List.map (transposePart interval)
     in
         { chart
             | key = key
