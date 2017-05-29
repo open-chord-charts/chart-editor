@@ -143,7 +143,7 @@ type alias Model =
     { chart : Chart
     , chartStr : String
     , status : ChartStatus
-    , viewedKey : Key
+    , viewedKey : Note
     }
 
 
@@ -242,7 +242,7 @@ type Msg
     | SetPartName PartIndex PartName
     | SetPartRepeat PartIndex Bool
     | SetChord BarReference ChordIndex Chord
-    | SetViewKey Key
+    | SetViewKey Note
     | TextAreaInput String
     | TextAreaSave
 
@@ -507,7 +507,7 @@ update msg model =
 view : Model -> Html Msg
 view { chart, chartStr, status, viewedKey } =
     card chart.title
-        (keyToString chart.key)
+        (Music.Note.toString chart.key)
         [ div [ class "dt dt--fixed collapse mv3 athelas" ]
             (let
                 viewedChart =
@@ -567,11 +567,7 @@ view { chart, chartStr, status, viewedKey } =
                     [ toolbar
                         [ label []
                             [ text "Transpose to: "
-                            , let
-                                (Key viewedNote) =
-                                    viewedKey
-                              in
-                                noteSelect Music.Note.notes viewedNote (Key >> SetViewKey)
+                            , noteSelect Music.Note.notes viewedKey SetViewKey
                             ]
                         ]
                     , button Primary

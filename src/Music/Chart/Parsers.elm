@@ -43,7 +43,7 @@ chart =
                 |. newLine
                 |. symbol "key:"
                 |. spaces
-                |= map Key note
+                |= note
                 |. newLine
                 |. symbol dashes
                 |. spacesAndNewlines

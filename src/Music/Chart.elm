@@ -10,7 +10,7 @@ import Music.Note as Note exposing (Note(..), Interval)
 
 type alias Chart =
     { title : String
-    , key : Key
+    , key : Note
     , parts : List Part
     }
 
@@ -102,25 +102,21 @@ mapBarChords f bar =
             bar
 
 
-type Key
-    = Key Note
-
-
 
 -- TRANSPOSITION FUNCTIONS
 
 
-transpose : Key -> Chart -> Chart
-transpose ((Key newKeyNote) as newKey) chart =
+transpose : Note -> Chart -> Chart
+transpose key chart =
     let
-        (Key keyNote) =
-            chart.key
-
         newParts =
             chart.parts
-                |> List.map (transposePart (Note.interval keyNote newKeyNote))
+                |> List.map (transposePart (Note.interval chart.key key))
     in
-        { chart | key = newKey, parts = newParts }
+        { chart
+            | key = key
+            , parts = newParts
+        }
 
 
 transposePart : Interval -> Part -> Part
@@ -135,11 +131,6 @@ transposeBar interval bar =
 
 
 -- TO STRING FUNCTIONS
-
-
-keyToString : Key -> String
-keyToString (Key note) =
-    Note.toString note
 
 
 barToString : Bar -> String
@@ -184,7 +175,7 @@ toString chart =
 
         metadata =
             [ "title: " ++ chart.title
-            , "key: " ++ keyToString chart.key
+            , "key: " ++ Note.toString chart.key
             ]
                 |> String.join "\n"
 
