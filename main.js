@@ -12974,17 +12974,14 @@ var _open_chords_charts$chart_editor$Music_Chord$toString = function (_p2) {
 		_open_chords_charts$chart_editor$Music_Note$toString(_p3._0),
 		_open_chords_charts$chart_editor$Music_Chord$qualityToStringHidingMajor(_p3._1));
 };
-var _open_chords_charts$chart_editor$Music_Chord$Chord = F2(
-	function (a, b) {
-		return {ctor: 'Chord', _0: a, _1: b};
-	});
 var _open_chords_charts$chart_editor$Music_Chord$transpose = F2(
 	function (interval, _p4) {
 		var _p5 = _p4;
-		return A2(
-			_open_chords_charts$chart_editor$Music_Chord$Chord,
-			A2(_open_chords_charts$chart_editor$Music_Note$transpose, interval, _p5._0),
-			_p5._1);
+		return {
+			ctor: '_Tuple2',
+			_0: A2(_open_chords_charts$chart_editor$Music_Note$transpose, interval, _p5._0),
+			_1: _p5._1
+		};
 	});
 var _open_chords_charts$chart_editor$Music_Chord$Altered = {ctor: 'Altered'};
 var _open_chords_charts$chart_editor$Music_Chord$Thirteenth = {ctor: 'Thirteenth'};
@@ -13349,7 +13346,11 @@ var _open_chords_charts$chart_editor$Music_Chart_Parsers$chord = A2(
 		_elm_tools$parser$Parser_ops['|='],
 		A2(
 			_elm_tools$parser$Parser_ops['|='],
-			_elm_tools$parser$Parser$succeed(_open_chords_charts$chart_editor$Music_Chord$Chord),
+			_elm_tools$parser$Parser$succeed(
+				F2(
+					function (v0, v1) {
+						return {ctor: '_Tuple2', _0: v0, _1: v1};
+					})),
 			_open_chords_charts$chart_editor$Music_Chart_Parsers$note),
 		_open_chords_charts$chart_editor$Music_Chart_Parsers$quality));
 var _open_chords_charts$chart_editor$Music_Chart_Parsers$chords = A2(
@@ -14385,7 +14386,7 @@ var _open_chords_charts$chart_editor$Page_ChartCard$getBarAtReference = F2(
 var _open_chords_charts$chart_editor$Page_ChartCard$youFoundABugMessage = 'Should never happen – you found a bug :-)';
 var _open_chords_charts$chart_editor$Page_ChartCard$nbMaxChordsInBar = 4;
 var _open_chords_charts$chart_editor$Page_ChartCard$nbBarsByRow = 8;
-var _open_chords_charts$chart_editor$Page_ChartCard$defaultChord = A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _open_chords_charts$chart_editor$Music_Note$C, _open_chords_charts$chart_editor$Music_Chord$Major);
+var _open_chords_charts$chart_editor$Page_ChartCard$defaultChord = {ctor: '_Tuple2', _0: _open_chords_charts$chart_editor$Music_Note$C, _1: _open_chords_charts$chart_editor$Music_Chord$Major};
 var _open_chords_charts$chart_editor$Page_ChartCard$defaultBar = _open_chords_charts$chart_editor$Music_Chart$Bar(
 	{
 		ctor: '::',
@@ -15019,7 +15020,7 @@ var _open_chords_charts$chart_editor$Page_ChartCard$viewBarEditor = F3(
 																_open_chords_charts$chart_editor$Page_ChartCard$SetChord,
 																barReference,
 																chordIndex,
-																A2(_open_chords_charts$chart_editor$Music_Chord$Chord, selectedNote, _p46));
+																{ctor: '_Tuple2', _0: selectedNote, _1: _p46});
 														}),
 													_1: {
 														ctor: '::',
@@ -15031,7 +15032,7 @@ var _open_chords_charts$chart_editor$Page_ChartCard$viewBarEditor = F3(
 																	_open_chords_charts$chart_editor$Page_ChartCard$SetChord,
 																	barReference,
 																	chordIndex,
-																	A2(_open_chords_charts$chart_editor$Music_Chord$Chord, _p45, selectedQuality));
+																	{ctor: '_Tuple2', _0: _p45, _1: selectedQuality});
 															}),
 														_1: {
 															ctor: '::',
