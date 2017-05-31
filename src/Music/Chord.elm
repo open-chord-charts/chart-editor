@@ -7,8 +7,8 @@ import Music.Note as Note exposing (Note, Interval)
 -- TYPES
 
 
-type Chord
-    = Chord Note Quality
+type alias Chord =
+    ( Note, Quality )
 
 
 type Quality
@@ -70,12 +70,12 @@ qualitiesAndStrings =
 
 
 transpose : Interval -> Chord -> Chord
-transpose interval (Chord note quality) =
-    Chord (Note.transpose interval note) quality
+transpose interval ( note, quality ) =
+    ( Note.transpose interval note, quality )
 
 
 toString : Chord -> String
-toString (Chord note quality) =
+toString ( note, quality ) =
     Note.toString note ++ (qualityToStringHidingMajor quality)
 
 

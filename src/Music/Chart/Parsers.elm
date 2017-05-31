@@ -92,7 +92,7 @@ chords =
 chord : Parser Chord
 chord =
     inContext "chord" <|
-        succeed Chord
+        succeed (,)
             |= note
             |= quality
 

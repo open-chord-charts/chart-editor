@@ -20,7 +20,7 @@ import Svg.Attributes
 
 defaultChord : Chord
 defaultChord =
-    Chord C Major
+    ( C, Major )
 
 
 defaultBar : Bar
@@ -598,16 +598,16 @@ viewBarEditor chart barReference bar =
                     [ toolbar [ barRepeatCheckbox False ] ]
                         ++ (chords
                                 |> List.indexedMap
-                                    (\chordIndex (Chord note quality) ->
+                                    (\chordIndex ( note, quality ) ->
                                         toolbar
                                             [ noteSelect Music.Note.notes
                                                 note
                                                 (\selectedNote ->
-                                                    SetChord barReference chordIndex (Chord selectedNote quality)
+                                                    SetChord barReference chordIndex ( selectedNote, quality )
                                                 )
                                             , qualitySelect quality
                                                 (\selectedQuality ->
-                                                    SetChord barReference chordIndex (Chord note selectedQuality)
+                                                    SetChord barReference chordIndex ( note, selectedQuality )
                                                 )
                                             , button Secondary
                                                 NotPressed
