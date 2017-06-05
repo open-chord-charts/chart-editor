@@ -20,14 +20,19 @@ type Part
     | PartRepeat PartName
 
 
-mapPartBars : (List Bar -> List Bar) -> Part -> Part
-mapPartBars f part =
+mapPart : (List Bar -> List Bar) -> Part -> Part
+mapPart f part =
     case part of
         Part partName bars ->
             Part partName (f bars)
 
         PartRepeat _ ->
             part
+
+
+mapPartBars : (Bar -> Bar) -> Part -> Part
+mapPartBars f =
+    mapPart (List.map f)
 
 
 type alias PartIndex =
@@ -92,14 +97,19 @@ type Bar
     | BarRepeat
 
 
-mapBarChords : (List Chord -> List Chord) -> Bar -> Bar
-mapBarChords f bar =
+mapBar : (List Chord -> List Chord) -> Bar -> Bar
+mapBar f bar =
     case bar of
         Bar chords ->
             Bar (f chords)
 
         BarRepeat ->
             bar
+
+
+mapBarChords : (Chord -> Chord) -> Bar -> Bar
+mapBarChords f =
+    mapBar (List.map f)
 
 
 
@@ -123,12 +133,12 @@ transpose key chart =
 
 transposePart : Interval -> Part -> Part
 transposePart interval part =
-    part |> mapPartBars (List.map (transposeBar interval))
+    part |> mapPartBars (transposeBar interval)
 
 
 transposeBar : Interval -> Bar -> Bar
 transposeBar interval bar =
-    bar |> mapBarChords (List.map (Chord.transpose interval))
+    bar |> mapBarChords (Chord.transpose interval)
 
 
 

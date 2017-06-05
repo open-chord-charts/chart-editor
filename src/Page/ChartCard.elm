@@ -88,7 +88,7 @@ getBarAtReference barReference chart =
 updateBarAt : BarReference -> (Bar -> Bar) -> Chart -> Chart
 updateBarAt barReference updateBar chart =
     updatePartAtIndex barReference.partIndex
-        (mapPartBars
+        (mapPart
             (List.indexedMap
                 (\barIndex bar ->
                     if barIndex == barReference.barIndex then
@@ -323,7 +323,7 @@ update msg model =
                     newChart =
                         model.chart
                             |> updatePartAtIndex barReference.partIndex
-                                (mapPartBars
+                                (mapPart
                                     (List.splitAt barReference.barIndex
                                         >> (\( init, tail ) -> init ++ [ defaultBar ] ++ tail)
                                     )
@@ -339,7 +339,7 @@ update msg model =
                 let
                     newChart =
                         model.chart
-                            |> updateBarAt barReference (mapBarChords (\chords -> chords ++ [ defaultChord ]))
+                            |> updateBarAt barReference (mapBar (\chords -> chords ++ [ defaultChord ]))
                 in
                     model |> updateChartAndChartStr newChart
 
@@ -376,7 +376,7 @@ update msg model =
                     newChart =
                         model.chart
                             |> updatePartAtIndex barReference.partIndex
-                                (mapPartBars (List.removeAt barReference.barIndex))
+                                (mapPart (List.removeAt barReference.barIndex))
 
                     nbBars =
                         getBarsOfPartByIndex barReference.partIndex newChart
@@ -399,7 +399,7 @@ update msg model =
                 let
                     newChart =
                         model.chart
-                            |> updateBarAt barReference (mapBarChords (List.removeAt chordIndex))
+                            |> updateBarAt barReference (mapBar (List.removeAt chordIndex))
                 in
                     model |> updateChartAndChartStr newChart
 
@@ -477,7 +477,7 @@ update msg model =
                     newChart =
                         model.chart
                             |> updateBarAt barReference
-                                (mapBarChords
+                                (mapBar
                                     (List.indexedMap
                                         (\chordIndex1 chord1 ->
                                             if chordIndex == chordIndex1 then
