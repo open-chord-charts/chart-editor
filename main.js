@@ -13254,7 +13254,7 @@ var _open_chords_charts$chart_editor$Music_Chart$Part = F2(
 	function (a, b) {
 		return {ctor: 'Part', _0: a, _1: b};
 	});
-var _open_chords_charts$chart_editor$Music_Chart$mapPartBars = F2(
+var _open_chords_charts$chart_editor$Music_Chart$mapPart = F2(
 	function (f, part) {
 		var _p7 = part;
 		if (_p7.ctor === 'Part') {
@@ -13266,11 +13266,15 @@ var _open_chords_charts$chart_editor$Music_Chart$mapPartBars = F2(
 			return part;
 		}
 	});
+var _open_chords_charts$chart_editor$Music_Chart$mapPartBars = function (f) {
+	return _open_chords_charts$chart_editor$Music_Chart$mapPart(
+		_elm_lang$core$List$map(f));
+};
 var _open_chords_charts$chart_editor$Music_Chart$BarRepeat = {ctor: 'BarRepeat'};
 var _open_chords_charts$chart_editor$Music_Chart$Bar = function (a) {
 	return {ctor: 'Bar', _0: a};
 };
-var _open_chords_charts$chart_editor$Music_Chart$mapBarChords = F2(
+var _open_chords_charts$chart_editor$Music_Chart$mapBar = F2(
 	function (f, bar) {
 		var _p8 = bar;
 		if (_p8.ctor === 'Bar') {
@@ -13280,20 +13284,22 @@ var _open_chords_charts$chart_editor$Music_Chart$mapBarChords = F2(
 			return bar;
 		}
 	});
+var _open_chords_charts$chart_editor$Music_Chart$mapBarChords = function (f) {
+	return _open_chords_charts$chart_editor$Music_Chart$mapBar(
+		_elm_lang$core$List$map(f));
+};
 var _open_chords_charts$chart_editor$Music_Chart$transposeBar = F2(
 	function (interval, bar) {
 		return A2(
 			_open_chords_charts$chart_editor$Music_Chart$mapBarChords,
-			_elm_lang$core$List$map(
-				_open_chords_charts$chart_editor$Music_Chord$transpose(interval)),
+			_open_chords_charts$chart_editor$Music_Chord$transpose(interval),
 			bar);
 	});
 var _open_chords_charts$chart_editor$Music_Chart$transposePart = F2(
 	function (interval, part) {
 		return A2(
 			_open_chords_charts$chart_editor$Music_Chart$mapPartBars,
-			_elm_lang$core$List$map(
-				_open_chords_charts$chart_editor$Music_Chart$transposeBar(interval)),
+			_open_chords_charts$chart_editor$Music_Chart$transposeBar(interval),
 			part);
 	});
 var _open_chords_charts$chart_editor$Music_Chart$transpose = F2(
@@ -14368,7 +14374,7 @@ var _open_chords_charts$chart_editor$Page_ChartCard$updateBarAt = F3(
 		return A3(
 			_open_chords_charts$chart_editor$Page_ChartCard$updatePartAtIndex,
 			barReference.partIndex,
-			_open_chords_charts$chart_editor$Music_Chart$mapPartBars(
+			_open_chords_charts$chart_editor$Music_Chart$mapPart(
 				_elm_lang$core$List$indexedMap(
 					F2(
 						function (barIndex, bar) {
@@ -14494,7 +14500,7 @@ var _open_chords_charts$chart_editor$Page_ChartCard$update = F2(
 				var newChart = A3(
 					_open_chords_charts$chart_editor$Page_ChartCard$updatePartAtIndex,
 					_p21.partIndex,
-					_open_chords_charts$chart_editor$Music_Chart$mapPartBars(
+					_open_chords_charts$chart_editor$Music_Chart$mapPart(
 						function (_p18) {
 							return function (_p19) {
 								var _p20 = _p19;
@@ -14523,7 +14529,7 @@ var _open_chords_charts$chart_editor$Page_ChartCard$update = F2(
 				var newChart = A3(
 					_open_chords_charts$chart_editor$Page_ChartCard$updateBarAt,
 					_p17._0,
-					_open_chords_charts$chart_editor$Music_Chart$mapBarChords(
+					_open_chords_charts$chart_editor$Music_Chart$mapBar(
 						function (chords) {
 							return A2(
 								_elm_lang$core$Basics_ops['++'],
@@ -14570,7 +14576,7 @@ var _open_chords_charts$chart_editor$Page_ChartCard$update = F2(
 				var newChart = A3(
 					_open_chords_charts$chart_editor$Page_ChartCard$updatePartAtIndex,
 					_p26.partIndex,
-					_open_chords_charts$chart_editor$Music_Chart$mapPartBars(
+					_open_chords_charts$chart_editor$Music_Chart$mapPart(
 						_elm_community$list_extra$List_Extra$removeAt(_p26.barIndex)),
 					model.chart);
 				var nbBars = _elm_lang$core$List$length(
@@ -14591,7 +14597,7 @@ var _open_chords_charts$chart_editor$Page_ChartCard$update = F2(
 				var newChart = A3(
 					_open_chords_charts$chart_editor$Page_ChartCard$updateBarAt,
 					_p17._0,
-					_open_chords_charts$chart_editor$Music_Chart$mapBarChords(
+					_open_chords_charts$chart_editor$Music_Chart$mapBar(
 						_elm_community$list_extra$List_Extra$removeAt(_p17._1)),
 					model.chart);
 				return A2(updateChartAndChartStr, newChart, model);
@@ -14661,7 +14667,7 @@ var _open_chords_charts$chart_editor$Page_ChartCard$update = F2(
 				var newChart = A3(
 					_open_chords_charts$chart_editor$Page_ChartCard$updateBarAt,
 					_p17._0,
-					_open_chords_charts$chart_editor$Music_Chart$mapBarChords(
+					_open_chords_charts$chart_editor$Music_Chart$mapBar(
 						_elm_lang$core$List$indexedMap(
 							F2(
 								function (chordIndex1, chord1) {
