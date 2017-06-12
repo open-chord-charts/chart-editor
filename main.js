@@ -13401,6 +13401,15 @@ var _open_chords_charts$chart_editor$Music_Chart_Parsers$bar = A2(
 				_1: {ctor: '[]'}
 			}
 		}));
+var _open_chords_charts$chart_editor$Music_Chart_Parsers$asPart = F2(
+	function (name, bars) {
+		var _p4 = bars;
+		if (_p4.ctor === 'Nothing') {
+			return _open_chords_charts$chart_editor$Music_Chart$PartRepeat(name);
+		} else {
+			return A2(_open_chords_charts$chart_editor$Music_Chart$Part, name, _p4._0);
+		}
+	});
 var _open_chords_charts$chart_editor$Music_Chart_Parsers$keepUntilEndOfLine = A2(
 	_elm_tools$parser$Parser$keep,
 	_elm_tools$parser$Parser$oneOrMore,
@@ -13440,11 +13449,7 @@ var _open_chords_charts$chart_editor$Music_Chart_Parsers$part = A2(
 					_elm_tools$parser$Parser_ops['|.'],
 					A2(
 						_elm_tools$parser$Parser_ops['|.'],
-						_elm_tools$parser$Parser$succeed(
-							F2(
-								function (partName, toPart) {
-									return toPart(partName);
-								})),
+						_elm_tools$parser$Parser$succeed(_open_chords_charts$chart_editor$Music_Chart_Parsers$asPart),
 						_elm_tools$parser$Parser$symbol('=')),
 					_open_chords_charts$chart_editor$Music_Chart_Parsers$spaces),
 				_open_chords_charts$chart_editor$Music_Chart_Parsers$keepUntilEndOfLine),
@@ -13454,18 +13459,14 @@ var _open_chords_charts$chart_editor$Music_Chart_Parsers$part = A2(
 				ctor: '::',
 				_0: A2(
 					_elm_tools$parser$Parser_ops['|='],
-					_elm_tools$parser$Parser$succeed(
-						F2(
-							function (bars, partName) {
-								return A2(_open_chords_charts$chart_editor$Music_Chart$Part, partName, bars);
-							})),
+					_elm_tools$parser$Parser$succeed(_elm_lang$core$Maybe$Just),
 					A2(
 						_elm_tools$parser$Parser$repeat,
 						_elm_tools$parser$Parser$oneOrMore,
 						A2(_elm_tools$parser$Parser_ops['|.'], _open_chords_charts$chart_editor$Music_Chart_Parsers$bar, _open_chords_charts$chart_editor$Music_Chart_Parsers$spacesAndNewlines))),
 				_1: {
 					ctor: '::',
-					_0: _elm_tools$parser$Parser$succeed(_open_chords_charts$chart_editor$Music_Chart$PartRepeat),
+					_0: _elm_tools$parser$Parser$succeed(_elm_lang$core$Maybe$Nothing),
 					_1: {ctor: '[]'}
 				}
 			})));
