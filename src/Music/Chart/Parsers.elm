@@ -54,16 +54,26 @@ chart =
 part : Parser Part
 part =
     inContext "part" <|
-        succeed (\partName toPart -> toPart partName)
+        succeed asPart
             |. symbol "="
             |. spaces
             |= keepUntilEndOfLine
             |. spacesAndNewlines
             |= oneOf
-                [ succeed (\bars partName -> Part partName bars)
+                [ succeed Just
                     |= repeat oneOrMore (bar |. spacesAndNewlines)
-                , succeed PartRepeat
+                , succeed Nothing
                 ]
+
+
+asPart : String -> Maybe (List Bar) -> Part
+asPart name bars =
+    case bars of
+        Nothing ->
+            PartRepeat name
+
+        Just b ->
+            Part name b
 
 
 bar : Parser Bar
