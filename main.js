@@ -13628,7 +13628,7 @@ var _open_chords_charts$chart_editor$Page_ChartCard$noteSelect = F3(
 				notes));
 	});
 var _open_chords_charts$chart_editor$Page_ChartCard$card = F3(
-	function (titleLeft, titleRight, children) {
+	function (titleLeft, slotRight, children) {
 		return A2(
 			_elm_lang$html$Html$div,
 			{
@@ -13653,7 +13653,7 @@ var _open_chords_charts$chart_editor$Page_ChartCard$card = F3(
 								_elm_lang$html$Html$div,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('fl w-90'),
+									_0: _elm_lang$html$Html_Attributes$class('fl w-80'),
 									_1: {ctor: '[]'}
 								},
 								{
@@ -13678,13 +13678,13 @@ var _open_chords_charts$chart_editor$Page_ChartCard$card = F3(
 									_elm_lang$html$Html$div,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('fl w-10 tr'),
+										_0: _elm_lang$html$Html_Attributes$class('fl w-20 tr'),
 										_1: {ctor: '[]'}
 									},
 									{
 										ctor: '::',
 										_0: A2(
-											_elm_lang$html$Html$h2,
+											_elm_lang$html$Html$div,
 											{
 												ctor: '::',
 												_0: _elm_lang$html$Html_Attributes$class('f5 mv0'),
@@ -13692,7 +13692,7 @@ var _open_chords_charts$chart_editor$Page_ChartCard$card = F3(
 											},
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html$text(titleRight),
+												_0: slotRight,
 												_1: {ctor: '[]'}
 											}),
 										_1: {ctor: '[]'}
@@ -15503,14 +15503,51 @@ var _open_chords_charts$chart_editor$Page_ChartCard$viewPartEditor = F3(
 	});
 var _open_chords_charts$chart_editor$Page_ChartCard$view = function (_p49) {
 	var _p50 = _p49;
-	var _p61 = _p50.viewedKey;
-	var _p60 = _p50.status;
-	var _p59 = _p50.chartStr;
-	var _p58 = _p50.chart;
+	var _p62 = _p50.viewedKey;
+	var _p61 = _p50.status;
+	var _p60 = _p50.chartStr;
+	var _p59 = _p50.chart;
 	return A3(
 		_open_chords_charts$chart_editor$Page_ChartCard$card,
-		_p58.title,
-		_open_chords_charts$chart_editor$Music_Note$toString(_p58.key),
+		_p59.title,
+		function () {
+			var _p51 = _p61;
+			if (_p51.ctor === 'EditStatus') {
+				return _elm_lang$html$Html$text(
+					_open_chords_charts$chart_editor$Music_Note$toString(_p59.key));
+			} else {
+				return A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$label,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Key: '),
+								_1: {
+									ctor: '::',
+									_0: A3(_open_chords_charts$chart_editor$Page_ChartCard$noteSelect, _open_chords_charts$chart_editor$Music_Note$notes, _p62, _open_chords_charts$chart_editor$Page_ChartCard$SetViewKey),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(
+								_elm_lang$core$Native_Utils.eq(_p62, _p59.key) ? '' : A2(
+									_elm_lang$core$Basics_ops['++'],
+									' (original ',
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										_open_chords_charts$chart_editor$Music_Note$toString(_p59.key),
+										')'))),
+							_1: {ctor: '[]'}
+						}
+					});
+			}
+		}(),
 		{
 			ctor: '::',
 			_0: A2(
@@ -15522,24 +15559,24 @@ var _open_chords_charts$chart_editor$Page_ChartCard$view = function (_p49) {
 				},
 				function () {
 					var viewedChart = function () {
-						var _p51 = _p60;
-						if (_p51.ctor === 'EditStatus') {
-							return _p58;
+						var _p52 = _p61;
+						if (_p52.ctor === 'EditStatus') {
+							return _p59;
 						} else {
-							return A2(_open_chords_charts$chart_editor$Music_Chart$transpose, _p61, _p58);
+							return A2(_open_chords_charts$chart_editor$Music_Chart$transpose, _p62, _p59);
 						}
 					}();
 					return _elm_lang$core$List$concat(
 						A2(
 							_elm_lang$core$List$indexedMap,
-							A2(_open_chords_charts$chart_editor$Page_ChartCard$viewPart, _p58, _p60),
+							A2(_open_chords_charts$chart_editor$Page_ChartCard$viewPart, _p59, _p61),
 							viewedChart.parts));
 				}()),
 			_1: {
 				ctor: '::',
 				_0: function () {
-					var _p52 = _p60;
-					if (_p52.ctor === 'EditStatus') {
+					var _p53 = _p61;
+					if (_p53.ctor === 'EditStatus') {
 						return A2(
 							_elm_lang$html$Html$div,
 							{ctor: '[]'},
@@ -15582,22 +15619,22 @@ var _open_chords_charts$chart_editor$Page_ChartCard$view = function (_p49) {
 									_1: {
 										ctor: '::',
 										_0: function () {
-											var _p53 = _p52._0;
-											if (_p53.ctor === 'BarSelection') {
-												var _p55 = _p53._0;
-												var _p54 = A2(_open_chords_charts$chart_editor$Page_ChartCard$getBarAtReference, _p55, _p58);
-												if (_p54.ctor === 'Nothing') {
+											var _p54 = _p53._0;
+											if (_p54.ctor === 'BarSelection') {
+												var _p56 = _p54._0;
+												var _p55 = A2(_open_chords_charts$chart_editor$Page_ChartCard$getBarAtReference, _p56, _p59);
+												if (_p55.ctor === 'Nothing') {
 													return _elm_lang$html$Html$text(_open_chords_charts$chart_editor$Page_ChartCard$youFoundABugMessage);
 												} else {
-													return A3(_open_chords_charts$chart_editor$Page_ChartCard$viewBarEditor, _p58, _p55, _p54._0);
+													return A3(_open_chords_charts$chart_editor$Page_ChartCard$viewBarEditor, _p59, _p56, _p55._0);
 												}
 											} else {
-												var _p57 = _p53._0;
-												var _p56 = A2(_elm_community$list_extra$List_Extra$getAt, _p57, _p58.parts);
-												if (_p56.ctor === 'Nothing') {
+												var _p58 = _p54._0;
+												var _p57 = A2(_elm_community$list_extra$List_Extra$getAt, _p58, _p59.parts);
+												if (_p57.ctor === 'Nothing') {
 													return _elm_lang$html$Html$text(_open_chords_charts$chart_editor$Page_ChartCard$youFoundABugMessage);
 												} else {
-													return A3(_open_chords_charts$chart_editor$Page_ChartCard$viewPartEditor, _p58, _p57, _p56._0);
+													return A3(_open_chords_charts$chart_editor$Page_ChartCard$viewPartEditor, _p59, _p58, _p57._0);
 												}
 											}
 										}(),
@@ -15612,7 +15649,7 @@ var _open_chords_charts$chart_editor$Page_ChartCard$view = function (_p49) {
 														ctor: '::',
 														_0: _elm_lang$html$Html_Attributes$rows(
 															_elm_lang$core$List$length(
-																_elm_lang$core$String$lines(_p59)) + 5),
+																_elm_lang$core$String$lines(_p60)) + 5),
 														_1: {
 															ctor: '::',
 															_0: _elm_lang$html$Html_Events$onInput(_open_chords_charts$chart_editor$Page_ChartCard$TextAreaInput),
@@ -15621,7 +15658,7 @@ var _open_chords_charts$chart_editor$Page_ChartCard$view = function (_p49) {
 																_0: _elm_lang$html$Html_Attributes$spellcheck(false),
 																_1: {
 																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$value(_p59),
+																	_0: _elm_lang$html$Html_Attributes$value(_p60),
 																	_1: {ctor: '[]'}
 																}
 															}
@@ -15640,41 +15677,21 @@ var _open_chords_charts$chart_editor$Page_ChartCard$view = function (_p49) {
 							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: _open_chords_charts$chart_editor$Page_ChartCard$toolbar(
+								_0: A4(
+									_open_chords_charts$chart_editor$Page_ChartCard$button,
+									_open_chords_charts$chart_editor$Page_ChartCard$Primary,
+									_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
 									{
 										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$label,
-											{ctor: '[]'},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('Transpose to: '),
-												_1: {
-													ctor: '::',
-													_0: A3(_open_chords_charts$chart_editor$Page_ChartCard$noteSelect, _open_chords_charts$chart_editor$Music_Note$notes, _p61, _open_chords_charts$chart_editor$Page_ChartCard$SetViewKey),
-													_1: {ctor: '[]'}
-												}
-											}),
+										_0: _elm_lang$html$Html_Events$onClick(_open_chords_charts$chart_editor$Page_ChartCard$Edit),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Edit'),
 										_1: {ctor: '[]'}
 									}),
-								_1: {
-									ctor: '::',
-									_0: A4(
-										_open_chords_charts$chart_editor$Page_ChartCard$button,
-										_open_chords_charts$chart_editor$Page_ChartCard$Primary,
-										_open_chords_charts$chart_editor$Page_ChartCard$NotPressed,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(_open_chords_charts$chart_editor$Page_ChartCard$Edit),
-											_1: {ctor: '[]'}
-										},
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html$text('Edit'),
-											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
-								}
+								_1: {ctor: '[]'}
 							});
 					}
 				}(),
