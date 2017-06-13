@@ -507,7 +507,18 @@ update msg model =
 view : Model -> Html Msg
 view { chart, chartStr, status, viewedKey } =
     card chart.title
-        (Music.Note.toString chart.key)
+        (div []
+            [ label []
+                [ text "Key: "
+                , noteSelect Music.Note.notes viewedKey SetViewKey
+                ]
+            , text <|
+                if viewedKey == chart.key then
+                    ""
+                else
+                    " (original " ++ Music.Note.toString chart.key ++ ")"
+            ]
+        )
         [ div [ class "dt dt--fixed collapse mv3 athelas" ]
             (let
                 viewedChart =
@@ -564,13 +575,7 @@ view { chart, chartStr, status, viewedKey } =
 
             ViewStatus ->
                 div []
-                    [ toolbar
-                        [ label []
-                            [ text "Transpose to: "
-                            , noteSelect Music.Note.notes viewedKey SetViewKey
-                            ]
-                        ]
-                    , button Primary
+                    [ button Primary
                         NotPressed
                         [ onClick Edit ]
                         [ text "Edit" ]
@@ -1136,17 +1141,17 @@ button purpose state attributes =
         )
 
 
-card : String -> String -> List (Html msg) -> Html msg
-card titleLeft titleRight children =
+card : String -> Html msg -> List (Html msg) -> Html msg
+card titleLeft slotRight children =
     div [ class "mw8 mv5" ]
         ([ div [ class "cf w-100 mt1" ]
-            [ div [ class "fl w-90" ]
+            [ div [ class "fl w-80" ]
                 [ h1 [ class "f5 mv0" ]
                     [ text titleLeft ]
                 ]
-            , div [ class "fl w-10 tr" ]
-                [ h2 [ class "f5 mv0" ]
-                    [ text titleRight ]
+            , div [ class "fl w-20 tr" ]
+                [ div [ class "f5 mv0" ]
+                    [ slotRight ]
                 ]
             ]
          ]
