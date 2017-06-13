@@ -507,17 +507,22 @@ update msg model =
 view : Model -> Html Msg
 view { chart, chartStr, status, viewedKey } =
     card chart.title
-        (div []
-            [ label []
-                [ text "Key: "
-                , noteSelect Music.Note.notes viewedKey SetViewKey
-                ]
-            , text <|
-                if viewedKey == chart.key then
-                    ""
-                else
-                    " (original " ++ Music.Note.toString chart.key ++ ")"
-            ]
+        (case status of
+            EditStatus _ ->
+                text (Music.Note.toString chart.key)
+
+            ViewStatus ->
+                div []
+                    [ label []
+                        [ text "Key: "
+                        , noteSelect Music.Note.notes viewedKey SetViewKey
+                        ]
+                    , text <|
+                        if viewedKey == chart.key then
+                            ""
+                        else
+                            " (original " ++ Music.Note.toString chart.key ++ ")"
+                    ]
         )
         [ div [ class "dt dt--fixed collapse mv3 athelas" ]
             (let
