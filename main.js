@@ -13090,7 +13090,7 @@ var _open_chords_charts$chart_editor$Music_Chord$qualitiesAndStrings = A2(
 		return {
 			ctor: '_Tuple2',
 			_0: quality,
-			_1: _open_chords_charts$chart_editor$Music_Chord$qualityToStringHidingMajor(quality)
+			_1: _open_chords_charts$chart_editor$Music_Chord$qualityToString(quality)
 		};
 	},
 	_open_chords_charts$chart_editor$Music_Chord$qualities);
@@ -13106,6 +13106,16 @@ var _open_chords_charts$chart_editor$Music_Chord$qualityFromString = function (s
 			},
 			_open_chords_charts$chart_editor$Music_Chord$qualitiesAndStrings));
 };
+var _open_chords_charts$chart_editor$Music_Chord$qualitiesAndStringsHidingMajor = A2(
+	_elm_lang$core$List$map,
+	function (quality) {
+		return {
+			ctor: '_Tuple2',
+			_0: quality,
+			_1: _open_chords_charts$chart_editor$Music_Chord$qualityToStringHidingMajor(quality)
+		};
+	},
+	_open_chords_charts$chart_editor$Music_Chord$qualities);
 
 var _open_chords_charts$chart_editor$Music_Chart$barToString = function (bar) {
 	var _p0 = bar;
@@ -13344,7 +13354,7 @@ var _open_chords_charts$chart_editor$Music_Chart_Parsers$note = A2(
 var _open_chords_charts$chart_editor$Music_Chart_Parsers$quality = A2(
 	_elm_tools$parser$Parser$inContext,
 	'quality',
-	_open_chords_charts$chart_editor$Music_Chart_Parsers$oneOfTuples(_open_chords_charts$chart_editor$Music_Chord$qualitiesAndStrings));
+	_open_chords_charts$chart_editor$Music_Chart_Parsers$oneOfTuples(_open_chords_charts$chart_editor$Music_Chord$qualitiesAndStringsHidingMajor));
 var _open_chords_charts$chart_editor$Music_Chart_Parsers$chord = A2(
 	_elm_tools$parser$Parser$inContext,
 	'chord',
@@ -13532,7 +13542,8 @@ var _open_chords_charts$chart_editor$Page_ChartCard$qualityDecoder = function (s
 	if (_p0.ctor === 'Just') {
 		return _elm_lang$core$Json_Decode$succeed(_p0._0);
 	} else {
-		return _elm_lang$core$Json_Decode$fail('Invalid quality');
+		return _elm_lang$core$Json_Decode$fail(
+			A2(_elm_lang$core$Debug$log, string, 'Invalid quality'));
 	}
 };
 var _open_chords_charts$chart_editor$Page_ChartCard$noteDecoder = function (string) {
