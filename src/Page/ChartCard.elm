@@ -1240,4 +1240,6 @@ qualityDecoder string =
             Decode.succeed quality
 
         Nothing ->
-            Decode.fail "Invalid quality"
+            "Invalid quality"
+                |> Debug.log string
+                |> Decode.fail

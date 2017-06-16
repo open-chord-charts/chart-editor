@@ -62,6 +62,12 @@ qualities =
 qualitiesAndStrings : List ( Quality, String )
 qualitiesAndStrings =
     qualities
+        |> List.map (\quality -> ( quality, qualityToString quality ))
+
+
+qualitiesAndStringsHidingMajor : List ( Quality, String )
+qualitiesAndStringsHidingMajor =
+    qualities
         |> List.map (\quality -> ( quality, qualityToStringHidingMajor quality ))
 
 

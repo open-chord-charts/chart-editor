@@ -110,7 +110,7 @@ chord =
 quality : Parser Quality
 quality =
     inContext "quality" <|
-        oneOfTuples Chord.qualitiesAndStrings
+        oneOfTuples Chord.qualitiesAndStringsHidingMajor
 
 
 note : Parser Note
